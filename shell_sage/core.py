@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['print', 'sp', 'csp', 'ssp', 'clis', 'sps', 'conts', 'p', 'get_pane', 'get_panes', 'tmux_history_lim', 'get_history',
-           'get_opts', 'get_sage', 'get_res', 'main']
+           'get_opts', 'get_sage', 'get_res', 'cli_rag', 'main']
 
 # %% ../nbs/00_core.ipynb 3
 from datetime import datetime
@@ -200,24 +200,65 @@ def get_res(sage, q, provider, is_command=False):
 
 # %% ../nbs/00_core.ipynb 34
 @call_parse
-def main(
-    query: Param('The query to send to the LLM', str, nargs='+'),
-    pid: str = 'current', # `current`, `all` or tmux pane_id (e.g. %0) for context
-    skip_system: bool = False, # Whether to skip system information in the AI's context
-    history_lines: int = None, # Number of history lines. Defaults to tmux scrollback history length
-    s: bool = False, # Enable sassy mode
-    c: bool = False, # Enable command mode
-    provider: str = None, # The LLM Provider
-    model: str = None, # The LLM model that will be invoked on the LLM provider
-    base_url: str = None,
-    api_key: str = None,
-    code_theme: str = None, # The code theme to use when rendering ShellSage's responses
-    code_lexer: str = None, # The lexer to use for inline code markdown blocks
-    verbosity: int = 0 # Level of verbosity (0 or 1)
+def cli_rag(
+    index: Param("Index all man pages", store_true) = False,
+    query: Param("Query to search in man pages", str) = None,
+    db_path: Param("Path to LanceDB database", str) = "man_index.lance"
 ):
+    "RAG CLI for manual indexing or querying man pages"
+    if index:
+        from .rag import index_cmd
+        index_cmd(db_path)
+        print("Man pages have been indexed in LanceDB!")
+    elif query:
+        from .rag import search_cmd
+        search_cmd(query, db_path=db_path)
+    else:
+        print("Please specify --index or --query")
+
+# %% ../nbs/00_core.ipynb 35
+@call_parse
+def main(
+    query: Param("The query to send to the LLM", str, nargs='*') = None,  # Make query optional
+    pid: Param("Current, all or tmux pane_id for context", str) = 'current',
+    skip_system: Param("Skip system information in AI context", store_true) = False,
+    history_lines: Param("Number of history lines", int) = None,
+    s: Param("Enable sassy mode", store_true) = False,
+    c: Param("Enable command mode", store_true) = False,
+    provider: Param("The LLM Provider", str) = None,
+    model: Param("The LLM model", str) = None,
+    base_url: Param("Base URL for API", str) = None,
+    api_key: Param("API key", str) = None,
+    code_theme: Param("Code theme for responses", str) = None,
+    code_lexer: Param("Lexer for inline code", str) = None,
+    index_man: Param("Index all man pages", store_true) = False,
+    man_query: Param("Query indexed man pages", str) = None,
+    db_path: Param("Path to LanceDB database", str) = "man_index.lance",
+    verbosity: Param("Level of verbosity (0 or 1)", int) = 0
+):
+    """ShellSage CLI for interacting with LLMs and querying man pages."""
+    # Handle RAG operations first
+    if index_man:
+        from .rag import index_cmd
+        index_cmd(db_path)
+        return
+        
+    if man_query:
+        from .rag import query_man_pages
+        results = query_man_pages(man_query, db_path=db_path)
+        for title, section, chunk, score in results:
+            print(f"\n=== {title}({section}) ===")
+            print(f"Score: {score}")
+            print(chunk)
+        return
+
+    # Require query for normal operation
+    if not query:
+        raise ValueError("Query is required unless using --index-man or --man-query")
+    
     opts = get_opts(history_lines=history_lines, provider=provider, model=model,
-                    base_url=base_url, api_key=api_key, code_theme=code_theme,
-                    code_lexer=code_lexer)
+                   base_url=base_url, api_key=api_key, code_theme=code_theme,
+                   code_lexer=code_lexer)
 
     mode = 'default'
     if s: mode = 'sassy'
@@ -250,8 +291,8 @@ def main(
     query = [mk_msg(query)] if opts.provider == 'openai' else query
 
     if verbosity>0: print(f"{datetime.now()} | Sending prompt to model")
-    sage  = get_sage(opts.provider, opts.model, opts.base_url, opts.api_key, mode)
-    res   = get_res(sage, query, opts.provider, is_command=c)
+    sage = get_sage(opts.provider, opts.model, opts.base_url, opts.api_key, mode)
+    res = get_res(sage, query, opts.provider, is_command=c)
     
     if c: co(['tmux', 'send-keys', res], text=True)
     else: print(md(res))
