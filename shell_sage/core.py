@@ -219,46 +219,42 @@ def cli_rag(
 # %% ../nbs/00_core.ipynb 35
 @call_parse
 def main(
-    query: Param("The query to send to the LLM", str, nargs='*') = None,  # Make query optional
-    pid: Param("Current, all or tmux pane_id for context", str) = 'current',
-    skip_system: Param("Skip system information in AI context", store_true) = False,
-    history_lines: Param("Number of history lines", int) = None,
-    s: Param("Enable sassy mode", store_true) = False,
-    c: Param("Enable command mode", store_true) = False,
-    provider: Param("The LLM Provider", str) = None,
-    model: Param("The LLM model", str) = None,
-    base_url: Param("Base URL for API", str) = None,
-    api_key: Param("API key", str) = None,
-    code_theme: Param("Code theme for responses", str) = None,
-    code_lexer: Param("Lexer for inline code", str) = None,
-    index_man: Param("Index all man pages", store_true) = False,
-    man_query: Param("Query indexed man pages", str) = None,
-    db_path: Param("Path to LanceDB database", str) = "man_index.lance",
-    verbosity: Param("Level of verbosity (0 or 1)", int) = 0
+    query: list = Param("The query to send to the LLM", str, nargs='*'),
+    pid: str = Param("'current', 'all' or tmux pane_id (e.g. %0) for context", str, default='current'),
+    skip_system: bool = Param("Whether to skip system information in the AI's context", bool, default=False),
+    history_lines: int = Param("Number of history lines. Defaults to tmux scrollback history length", int, default=None),
+    s: bool = Param("Enable sassy mode", bool, default=False),
+    c: bool = Param("Enable command mode", bool, default=False),
+    provider: str = Param("The LLM Provider", str, default=None),
+    model: str = Param("The LLM model that will be invoked on the LLM provider", str, default=None),
+    base_url: str = Param("Base URL for the LLM provider", str, default=None),
+    api_key: str = Param("API key for the LLM provider", str, default=None),
+    code_theme: str = Param("The code theme to use when rendering ShellSage's responses", str, default=None),
+    code_lexer: str = Param("The lexer to use for inline code markdown blocks", str, default=None),
+    index: bool = Param("Index all man pages into the vector database", bool, default=False),
+    man_query: str = Param("Query indexed man pages for relevant information", str, default=None),
+    db_path: str = Param("Path to the LanceDB database", str, default="man_index.lance"),
+    verbosity: int = Param("Level of verbosity (0 or 1)", int, default=0)
 ):
-    """ShellSage CLI for interacting with LLMs and querying man pages."""
+    """Main entry point for ShellSage CLI"""
     # Handle RAG operations first
-    if index_man:
+    if index:
         from .rag import index_cmd
         index_cmd(db_path)
         return
         
     if man_query:
-        from .rag import query_man_pages
-        results = query_man_pages(man_query, db_path=db_path)
-        for title, section, chunk, score in results:
-            print(f"\n=== {title}({section}) ===")
-            print(f"Score: {score}")
-            print(chunk)
+        from .rag import search_cmd
+        search_cmd(man_query, db_path=db_path)
         return
 
     # Require query for normal operation
     if not query:
-        raise ValueError("Query is required unless using --index-man or --man-query")
+        raise ValueError("Query is required unless using --index or --man-query")
     
     opts = get_opts(history_lines=history_lines, provider=provider, model=model,
-                   base_url=base_url, api_key=api_key, code_theme=code_theme,
-                   code_lexer=code_lexer)
+                    base_url=base_url, api_key=api_key, code_theme=code_theme,
+                    code_lexer=code_lexer)
 
     mode = 'default'
     if s: mode = 'sassy'

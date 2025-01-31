@@ -25,6 +25,5 @@ d = { 'settings': { 'branch': 'main',
                                 'shell_sage.rag.get_man_pages': ('rag.html#get_man_pages', 'shell_sage/rag.py'),
                                 'shell_sage.rag.index_cmd': ('rag.html#index_cmd', 'shell_sage/rag.py'),
                                 'shell_sage.rag.init_db': ('rag.html#init_db', 'shell_sage/rag.py'),
-                                'shell_sage.rag.query_man_pages': ('rag.html#query_man_pages', 'shell_sage/rag.py'),
                                 'shell_sage.rag.read_man_page': ('rag.html#read_man_page', 'shell_sage/rag.py'),
                                 'shell_sage.rag.search_cmd': ('rag.html#search_cmd', 'shell_sage/rag.py')}}}

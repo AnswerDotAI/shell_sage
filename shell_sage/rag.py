@@ -2,20 +2,24 @@
 
 # %% auto 0
 __all__ = ['get_man_pages', 'read_man_page', 'chunk_text', 'get_embeddings', 'init_db', 'create_chunks_table', 'index_cmd',
-           'query_man_pages', 'search_cmd']
+           'search_cmd']
 
-# %% ../nbs/02_rag.ipynb 3
-import subprocess
-import logging
-import os
+# %% ../nbs/02_rag.ipynb 2
+__all__ = ['get_man_pages', 'read_man_page', 'chunk_text', 'get_embeddings', 'init_db', 'create_chunks_table', 'index_cmd', 'search_cmd']
+
 import lancedb
-import pyarrow as pa
 from chonkie import RecursiveChunker
 from model2vec import StaticModel
+import subprocess
+import re
+import logging
+import os
+import shutil
+import pyarrow as pa
 
 logging.basicConfig(level=logging.INFO)
 
-# %% ../nbs/02_rag.ipynb 4
+# %% ../nbs/02_rag.ipynb 3
 def get_man_pages():
     """Get all available man pages on the system."""
     result = subprocess.run(['apropos', '-l', '.'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -36,22 +40,22 @@ def get_man_pages():
                     'path': path
                 })
         except Exception as e:
-            logging.debug("Skipping line " + str(line) + ": " + str(e))
+            logging.debug(f"Skipping line {line}: {str(e)}")
             continue
             
     return pages
 
-# %% ../nbs/02_rag.ipynb 5
+# %% ../nbs/02_rag.ipynb 4
 def read_man_page(path):
     """Read a man page and return its text content."""
     try:
         result = subprocess.run(['man', path], capture_output=True, text=True)
         return result.stdout if result.returncode == 0 else ""
     except Exception as e:
-        logging.warning("Failed to read man page " + str(path) + ": " + str(e))
+        logging.warning(f"Failed to read man page {path}: {str(e)}")
         return ""
 
-# %% ../nbs/02_rag.ipynb 6
+# %% ../nbs/02_rag.ipynb 5
 def chunk_text(text):
     """Chunk text using Chonkie's RecursiveChunker."""
     chunker = RecursiveChunker(
@@ -62,14 +66,14 @@ def chunk_text(text):
     chunks = chunker.chunk(text)
     return [chunk.text for chunk in chunks]
 
-# %% ../nbs/02_rag.ipynb 7
+# %% ../nbs/02_rag.ipynb 6
 def get_embeddings(texts):
     """Get embeddings using Model2Vec."""
     model = StaticModel.from_pretrained("minishlab/M2V_base_output")
     vectors = model.encode(texts)
     return [vector.tolist() for vector in vectors]
 
-# %% ../nbs/02_rag.ipynb 8
+# %% ../nbs/02_rag.ipynb 7
 def init_db(db_path="man_index.lance"):
     """Initialize or open a LanceDB database."""
     return lancedb.connect(db_path)
@@ -77,14 +81,14 @@ def init_db(db_path="man_index.lance"):
 def create_chunks_table(db):
     """Create or replace the man page chunks table."""
     schema = pa.schema([
-        pa.field("title", pa.string()),
-        pa.field("section", pa.string()),
-        pa.field("chunk", pa.string()),
-        pa.field("vector", pa.list_(pa.float32(), 256))
+        ('title', pa.string()),
+        ('section', pa.string()),
+        ('chunk', pa.string()),
+        ('vector', pa.list_(pa.float32(), 256))
     ])
     return db.create_table("man_chunks", schema=schema, mode="overwrite")
 
-# %% ../nbs/02_rag.ipynb 9
+# %% ../nbs/02_rag.ipynb 8
 def index_cmd(db_path="man_index.lance"):
     """Index all man pages into the vector database."""
     db = init_db(db_path)
@@ -98,10 +102,12 @@ def index_cmd(db_path="man_index.lance"):
             logging.info(f"Processing {page['title']}({page['section']})")
             text = read_man_page(page['path'])
             if not text:
+                logging.warning(f"Empty content for {page['title']}({page['section']})")
                 continue
                 
             chunks = chunk_text(text)
             if not chunks:
+                logging.warning(f"No chunks created for {page['title']}({page['section']})")
                 continue
                 
             vectors = get_embeddings(chunks)
@@ -120,33 +126,19 @@ def index_cmd(db_path="man_index.lance"):
             logging.error(f"Failed to process {page['title']}({page['section']}): {str(e)}")
             continue
 
-# %% ../nbs/02_rag.ipynb 10
-def query_man_pages(query, top_k=5, db_path="man_index.lance"):
-    """Search indexed man pages for relevant information."""
-    db = init_db(db_path)
-    table = db.open_table("man_chunks")
-    
-    model = StaticModel.from_pretrained("minishlab/M2V_base_output")
-    query_vector = model.encode([query])[0].tolist()
-    
-    results = table.search(query_vector).limit(top_k).to_list()
-    return [(r["title"], r["section"], r["chunk"], r["_distance"]) for r in results]
-
-# %% ../nbs/02_rag.ipynb 11
+# %% ../nbs/02_rag.ipynb 9
 def search_cmd(query, top_k=5, db_path="man_index.lance"):
     """Search indexed man pages for relevant information."""
     db = init_db(db_path)
     table = db.open_table("man_chunks")
     
-    # Get query embedding
     model = StaticModel.from_pretrained("minishlab/M2V_base_output")
     query_vector = model.encode([query])[0].tolist()
     
-    # Search and return results
     results = table.search(query_vector).limit(top_k).to_list()
     
     for result in results:
-        print(f"\n=== {result['title']}({result['section']}) ===")
+        print(f"=== {result['title']}({result['section']}) ===")
         print(result['chunk'])
         print(f"Similarity score: {result['_distance']}")
     
