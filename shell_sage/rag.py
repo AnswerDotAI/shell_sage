@@ -2,7 +2,7 @@
 
 # %% auto 0
 __all__ = ['init_db', 'create_chunks_table', 'get_man_pages', 'read_man_page', 'chunk_text', 'get_embeddings', 'index_man_pages',
-           'query_man_pages']
+           'query_man_pages', 'index_cmd', 'search_cmd']
 
 # %% ../nbs/02_rag.ipynb 2
 import lancedb
@@ -15,6 +15,7 @@ import os
 import pyarrow as pa
 import numpy as np
 import pandas as pd
+from fastcore.script import call_parse, Param
 
 logging.basicConfig(level=logging.INFO)
 
@@ -155,3 +156,29 @@ def query_man_pages(query: str, top_k: int = 5, db_path: str = "man_index.lance"
         'chunk': row['chunk'],
         'score': row['_distance']
     } for _, row in results.iterrows()]
+
+# %% ../nbs/02_rag.ipynb 10
+@call_parse
+def index_cmd(
+    db_path: Param("Path to the LanceDB database", str) = "man_index.lance",
+):
+    """Index all man pages into a vector database."""
+    total_chunks = index_man_pages(db_path)
+    print(f"Successfully indexed {total_chunks} chunks from man pages")
+    return total_chunks
+
+@call_parse
+def search_cmd(
+    query: Param("Search query", str),
+    top_k: Param("Number of results to return", int) = 5,
+    db_path: Param("Path to the LanceDB database", str) = "man_index.lance",
+):
+    """Search indexed man pages."""
+    results = query_man_pages(query, top_k, db_path)
+    
+    print(f"Top {len(results)} results for query: '{query}'\n")
+    for i, result in enumerate(results, 1):
+        print(f"{i}. {result['title']}({result['section']}) - Score: {result['score']:.4f}")
+        print(f"   {result['chunk'][:200]}...\n")
+    
+    return results
