@@ -17,4 +17,11 @@ d = { 'settings': { 'branch': 'main',
                                  'shell_sage.core.get_res': ('core.html#get_res', 'shell_sage/core.py'),
                                  'shell_sage.core.get_sage': ('core.html#get_sage', 'shell_sage/core.py'),
                                  'shell_sage.core.main': ('core.html#main', 'shell_sage/core.py'),
-                                 'shell_sage.core.tmux_history_lim': ('core.html#tmux_history_lim', 'shell_sage/core.py')}}}
+                                 'shell_sage.core.tmux_history_lim': ('core.html#tmux_history_lim', 'shell_sage/core.py')},
+            'shell_sage.rag': { 'shell_sage.rag.chunk_text': ('rag.html#chunk_text', 'shell_sage/rag.py'),
+                                'shell_sage.rag.create_chunks_table': ('rag.html#create_chunks_table', 'shell_sage/rag.py'),
+                                'shell_sage.rag.get_embeddings': ('rag.html#get_embeddings', 'shell_sage/rag.py'),
+                                'shell_sage.rag.get_man_pages': ('rag.html#get_man_pages', 'shell_sage/rag.py'),
+                                'shell_sage.rag.index_man_pages': ('rag.html#index_man_pages', 'shell_sage/rag.py'),
+                                'shell_sage.rag.init_db': ('rag.html#init_db', 'shell_sage/rag.py'),
+                                'shell_sage.rag.read_man_page': ('rag.html#read_man_page', 'shell_sage/rag.py')}}}
