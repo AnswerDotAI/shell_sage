@@ -257,6 +257,46 @@ ssage --help
 # https://github.com/AnswerDotAI/shell_sage/issues
 ```
 
+### RAG Configuration
+
+ShellSage supports Retrieval Augmented Generation (RAG) to enhance
+responses with relevant man pages:
+
+``` ini
+[DEFAULT]
+# RAG settings
+use_retrieval = false    # Enable/disable RAG
+retrieve_limit = 3       # Number of man pages to retrieve
+```
+
+To use RAG functionality:
+
+1.  Install RAG dependencies:
+
+``` sh
+pip install 'shell_sage[rag]'
+```
+
+2.  Build the man page vector database:
+
+``` sh
+ssage_index
+```
+
+3.  Enable retrieval in queries:
+
+``` sh
+# Use RAG for a single query
+ssage --use-retrieval "how do I use rsync?"
+
+# Or enable permanently in config
+use_retrieval = true
+```
+
+The RAG system enhances responses by retrieving relevant man pages and
+including them in the context, leading to more accurate command-line
+assistance.
+
 ## Contributing
 
 ShellSage is built using [nbdev](https://nbdev.fast.ai/). For detailed
