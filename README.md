@@ -181,65 +181,67 @@ ssage --history-lines 50 "what commands did I just run?"
 ```
 
 ```` python
-## Development Setup Documentation
+## Developer Setup Instruction
 
-### Required Python Versions and Dependencies
-
-Ensure you have the following installed:
+### Prerequisites
 
 - Python 3.9+
-- [pip](https://pip.pypa.io/en/stable/)
-- [nbdev](https://nbdev.fast.ai/) (latest version)
+- pip
+- nbdev (latest version)
+- Quarto (for documentation generation)
 
-Install dependencies using:
+### Installation
 
-```sh
-pip install nbdev
+1. Install the development dependencies:
+
+```bash
+pip install -e '.[dev]'
+nbdev_install_quarto
 ```
 
-### nbdev Workflow Explanation
+2. Set up the tmux environment for development:
 
-1. **Initialize the Project**
-   ```sh
-   nbdev_new
-   ```
-2. **Edit Notebooks**
-   - Use Jupyter Notebook to write code and documentation.
-   ```sh
-   jupyter notebook
-   ```
-3. **Export Python Modules**
-   ```sh
-   nbdev_export
-   ```
-4. **Run Tests**
-   ```sh
-   nbdev_test
-   ```
-5. **Build Documentation**
-   ```sh
-   nbdev_build_docs
-   ```
-6. **Clean Notebooks**
-   ```sh
-   nbdev_clean
-   ```
+**Ubuntu/Debian**
+```bash
+sudo apt update
+sudo apt install tmux -y
+```
 
-### Common Development Tasks
 
-- **Adding New Features**: Modify `.ipynb` files and export them.
-- **Testing Code**: Run `nbdev_test` before pushing changes.
-- **Updating Documentation**: Modify notebooks and run `nbdev_build_docs`.
-- **Publishing Package**: Use `nbdev_pypi` for PyPI releases.
+3. Start tmux:
+```bash
+tmux
+```
 
-### Troubleshooting Guide
+## nbdev Development Workflow
 
-- **nbdev_export not working**: Ensure you have installed nbdev and activated the virtual environment.
-- **Import Errors**: Run `pip install -e .` to install the package locally.
-- **Jupyter Not Recognizing Kernel**: Install `ipykernel` using:
-  ```sh
-  pip install ipykernel
-  python -m ipykernel install --user
+### Common Commands
+
+#### Initialize Project
+```bash
+nbdev_install_quarto
+```
+
+#### Update README from `index.ipynb`
+```bash
+nbdev_readme
+```
+
+#### Export Python Modules from Notebooks
+```bash
+nbdev_export
+```
+
+### Notebook-Specific Operations
+
+- **When modifying `index.ipynb`**, generate a new README:
+  ```bash
+  nbdev_readme
+  ```
+
+- **To export all notebooks** to Python modules:
+  ```bash
+  nbdev_export
   ```
 ````
 
