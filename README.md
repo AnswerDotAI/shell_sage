@@ -181,20 +181,21 @@ ssage --history-lines 50 "what commands did I just run?"
 ```
 
 ```` python
-## Developer Setup Instruction
+# Developer Setup Guide
 
-### Prerequisites
+## Prerequisites
 
 - Python 3.9+
 - pip
 - nbdev (latest version)
 - Quarto (for documentation generation)
 
-### Installation
+## Installation
 
 1. Install the development dependencies:
 
 ```sh
+# installing all dependencies
 pip install -e '.[dev]'
 nbdev_install_quarto
 ```
@@ -206,7 +207,6 @@ nbdev_install_quarto
 sudo apt update
 sudo apt install tmux -y
 ```
-
 
 3. Start tmux:
 ```sh
