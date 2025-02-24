@@ -180,6 +180,69 @@ ssage --provider openai --model gpt-4o-mini "explain this error"
 ssage --history-lines 50 "what commands did I just run?"
 ```
 
+```` python
+## Development Setup Documentation
+
+### Required Python Versions and Dependencies
+
+Ensure you have the following installed:
+
+- Python 3.9+
+- [pip](https://pip.pypa.io/en/stable/)
+- [nbdev](https://nbdev.fast.ai/) (latest version)
+
+Install dependencies using:
+
+```sh
+pip install nbdev
+```
+
+### nbdev Workflow Explanation
+
+1. **Initialize the Project**
+   ```sh
+   nbdev_new
+   ```
+2. **Edit Notebooks**
+   - Use Jupyter Notebook to write code and documentation.
+   ```sh
+   jupyter notebook
+   ```
+3. **Export Python Modules**
+   ```sh
+   nbdev_export
+   ```
+4. **Run Tests**
+   ```sh
+   nbdev_test
+   ```
+5. **Build Documentation**
+   ```sh
+   nbdev_build_docs
+   ```
+6. **Clean Notebooks**
+   ```sh
+   nbdev_clean
+   ```
+
+### Common Development Tasks
+
+- **Adding New Features**: Modify `.ipynb` files and export them.
+- **Testing Code**: Run `nbdev_test` before pushing changes.
+- **Updating Documentation**: Modify notebooks and run `nbdev_build_docs`.
+- **Publishing Package**: Use `nbdev_pypi` for PyPI releases.
+
+### Troubleshooting Guide
+
+- **nbdev_export not working**: Ensure you have installed nbdev and activated the virtual environment.
+- **Import Errors**: Run `pip install -e .` to install the package locally.
+- **Jupyter Not Recognizing Kernel**: Install `ipykernel` using:
+  ```sh
+  pip install ipykernel
+  python -m ipykernel install --user
+  ```
+````
+
 ### Advanced Use Cases
 
 #### Git Workflow Enhancement

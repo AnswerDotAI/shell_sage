@@ -26,7 +26,9 @@ pip install -e '.[dev]'
 And install quarto too:
 
 ```
-nbdev_install_quarto
+sudo apt update
+sudo apt install tmux -y
+
 ```
 
 Then, after you make subsequent changes to `nbs/index.ipynb`, run the following from the repo's root directory to (re)build `README.md`:
