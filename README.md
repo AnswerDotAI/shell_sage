@@ -194,7 +194,7 @@ ssage --history-lines 50 "what commands did I just run?"
 
 1. Install the development dependencies:
 
-```bash
+```sh
 pip install -e '.[dev]'
 nbdev_install_quarto
 ```
@@ -202,14 +202,14 @@ nbdev_install_quarto
 2. Set up the tmux environment for development:
 
 **Ubuntu/Debian**
-```bash
+```sh
 sudo apt update
 sudo apt install tmux -y
 ```
 
 
 3. Start tmux:
-```bash
+```sh
 tmux
 ```
 
@@ -218,29 +218,29 @@ tmux
 ### Common Commands
 
 #### Initialize Project
-```bash
+```sh
 nbdev_install_quarto
 ```
 
 #### Update README from `index.ipynb`
-```bash
+```sh
 nbdev_readme
 ```
 
 #### Export Python Modules from Notebooks
-```bash
+```sh
 nbdev_export
 ```
 
 ### Notebook-Specific Operations
 
 - **When modifying `index.ipynb`**, generate a new README:
-  ```bash
+  ```sh
   nbdev_readme
   ```
 
 - **To export all notebooks** to Python modules:
-  ```bash
+  ```sh
   nbdev_export
   ```
 ````
