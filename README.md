@@ -180,7 +180,6 @@ ssage --provider openai --model gpt-4o-mini "explain this error"
 ssage --history-lines 50 "what commands did I just run?"
 ```
 
-```` python
 # Developer Setup Guide
 
 ## Prerequisites
@@ -192,58 +191,54 @@ ssage --history-lines 50 "what commands did I just run?"
 
 ## Installation
 
-1. Install the development dependencies:
+1.  Install the development dependencies:
 
-```sh
+``` sh
 # installing all dependencies
 pip install -e '.[dev]'
 nbdev_install_quarto
 ```
 
-2. Set up the tmux environment for development:
+2.  Set up the tmux environment for development:
 
 **Ubuntu/Debian**
-```sh
+
+``` sh
 sudo apt update
 sudo apt install tmux -y
 ```
 
-3. Start tmux:
-```sh
+3.  Start tmux:
+
+``` sh
 tmux
 ```
 
 ## nbdev Development Workflow
 
-### Common Commands
+### Initialize Project
 
-#### Initialize Project
-```sh
+``` sh
 nbdev_install_quarto
 ```
 
-#### Update README from `index.ipynb`
-```sh
+### Update README from `index.ipynb`
+
+``` sh
 nbdev_readme
 ```
 
-#### Export Python Modules from Notebooks
-```sh
+### Export Python Modules from Notebooks
+
+``` sh
 nbdev_export
 ```
 
 ### Notebook-Specific Operations
 
-- **When modifying `index.ipynb`**, generate a new README:
-  ```sh
-  nbdev_readme
-  ```
+When modifying index.ipynb, generate a new README: `sh   nbdev_readme`
 
-- **To export all notebooks** to Python modules:
-  ```sh
-  nbdev_export
-  ```
-````
+To export all notebooks to Python modules: `sh   nbdev_export`
 
 ### Advanced Use Cases
 
