@@ -234,12 +234,6 @@ nbdev_readme
 nbdev_export
 ```
 
-### Notebook-Specific Operations
-
-When modifying index.ipynb, generate a new README: `sh   nbdev_readme`
-
-To export all notebooks to Python modules: `sh   nbdev_export`
-
 ### Advanced Use Cases
 
 #### Git Workflow Enhancement
