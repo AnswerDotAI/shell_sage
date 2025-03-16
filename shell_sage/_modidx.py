@@ -19,4 +19,8 @@ d = { 'settings': { 'branch': 'main',
                                  'shell_sage.core.get_sage': ('core.html#get_sage', 'shell_sage/core.py'),
                                  'shell_sage.core.main': ('core.html#main', 'shell_sage/core.py'),
                                  'shell_sage.core.mk_db': ('core.html#mk_db', 'shell_sage/core.py'),
-                                 'shell_sage.core.tmux_history_lim': ('core.html#tmux_history_lim', 'shell_sage/core.py')}}}
+                                 'shell_sage.core.rgrep': ('core.html#rgrep', 'shell_sage/core.py'),
+                                 'shell_sage.core.tmux_history_lim': ('core.html#tmux_history_lim', 'shell_sage/core.py'),
+                                 'shell_sage.core.view': ('core.html#view', 'shell_sage/core.py')},
+            'shell_sage.search': { 'shell_sage.search.rgrep': ('search.html#rgrep', 'shell_sage/search.py'),
+                                   'shell_sage.search.view': ('search.html#view', 'shell_sage/search.py')}}}
