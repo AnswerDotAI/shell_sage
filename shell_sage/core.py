@@ -386,7 +386,7 @@ def main(
         print(f"{datetime.now()} | Sending prompt to model")
 
     sage = get_sage(opts.provider, opts.model, opts.base_url, opts.api_key, mode)
-    res = get_res(sage, query, opts.provider, is_command=c)
+    res = get_res(sage, query, opts.provider, mode=mode)
     
     # Handle logging if the log flag is set
     if opts.log:
