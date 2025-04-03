@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ShellSage – shell_sage</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ae44de7e3b26b230a7801128389852ee.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="ShellSage – shell_sage">
+<meta property="og:description" content="Your favorite AI buddy right in your terminal">
+<meta property="og:site_name" content="shell_sage">
+<meta name="twitter:title" content="ShellSage – shell_sage">
+<meta name="twitter:description" content="Your favorite AI buddy right in your terminal">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">shell_sage</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">ShellSage</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShellSage</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ShellSage</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShellSage Configuration</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tools.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShellSage Tools</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#imports" id="toc-imports" class="nav-link active" data-scroll-target="#imports">Imports</a></li>
+  <li><a href="#model-setup" id="toc-model-setup" class="nav-link" data-scroll-target="#model-setup">Model Setup</a></li>
+  <li><a href="#system-environment" id="toc-system-environment" class="nav-link" data-scroll-target="#system-environment">System Environment</a></li>
+  <li><a href="#tmux" id="toc-tmux" class="nav-link" data-scroll-target="#tmux">Tmux</a>
+  <ul class="collapse">
+  <li><a href="#get_pane" id="toc-get_pane" class="nav-link" data-scroll-target="#get_pane">get_pane</a></li>
+  <li><a href="#get_panes" id="toc-get_panes" class="nav-link" data-scroll-target="#get_panes">get_panes</a></li>
+  <li><a href="#tmux_history_lim" id="toc-tmux_history_lim" class="nav-link" data-scroll-target="#tmux_history_lim">tmux_history_lim</a></li>
+  <li><a href="#get_history" id="toc-get_history" class="nav-link" data-scroll-target="#get_history">get_history</a></li>
+  </ul></li>
+  <li><a href="#options-and-shellsage" id="toc-options-and-shellsage" class="nav-link" data-scroll-target="#options-and-shellsage">Options and ShellSage</a>
+  <ul class="collapse">
+  <li><a href="#get_opts" id="toc-get_opts" class="nav-link" data-scroll-target="#get_opts">get_opts</a></li>
+  <li><a href="#get_sage" id="toc-get_sage" class="nav-link" data-scroll-target="#get_sage">get_sage</a></li>
+  <li><a href="#trace" id="toc-trace" class="nav-link" data-scroll-target="#trace">trace</a></li>
+  <li><a href="#get_res" id="toc-get_res" class="nav-link" data-scroll-target="#get_res">get_res</a></li>
+  </ul></li>
+  <li><a href="#logging" id="toc-logging" class="nav-link" data-scroll-target="#logging">Logging</a>
+  <ul class="collapse">
+  <li><a href="#mk_db" id="toc-mk_db" class="nav-link" data-scroll-target="#mk_db">mk_db</a></li>
+  <li><a href="#log" id="toc-log" class="nav-link" data-scroll-target="#log">Log</a></li>
+  </ul></li>
+  <li><a href="#main" id="toc-main" class="nav-link" data-scroll-target="#main">Main</a>
+  <ul class="collapse">
+  <li><a href="#main-1" id="toc-main-1" class="nav-link" data-scroll-target="#main-1">main</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="core.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ShellSage</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="imports" class="level2">
+<h2 class="anchored" data-anchor-id="imports">Imports</h2>
+</section>
+<section id="model-setup" class="level2">
+<h2 class="anchored" data-anchor-id="model-setup">Model Setup</h2>
+</section>
+<section id="system-environment" class="level2">
+<h2 class="anchored" data-anchor-id="system-environment">System Environment</h2>
+<div id="568b5429" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># aliases = _aliases('bash')</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(aliases)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="bc002bdd" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(_sys_info())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="tmux" class="level2">
+<h2 class="anchored" data-anchor-id="tmux">Tmux</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L190" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_pane" class="level3">
+<h3 class="anchored" data-anchor-id="get_pane">get_pane</h3>
+<blockquote class="blockquote">
+<pre><code> get_pane (n, pid=None)</code></pre>
+</blockquote>
+<p><em>Get output from a tmux pane</em></p>
+<div id="e799e039" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p = get_pane(20)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(p[:512])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L197" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_panes" class="level3">
+<h3 class="anchored" data-anchor-id="get_panes">get_panes</h3>
+<blockquote class="blockquote">
+<pre><code> get_panes (n)</code></pre>
+</blockquote>
+<div id="a537f788" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ps = get_panes(20)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(ps[:512])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="28e60780" class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>co([<span class="st">'tmux'</span>, <span class="st">'display-message'</span>, <span class="st">'-p'</span>, <span class="st">'#{history-limit}'</span>], text<span class="op">=</span><span class="va">True</span>).strip()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>'2000'</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L203" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="tmux_history_lim" class="level3">
+<h3 class="anchored" data-anchor-id="tmux_history_lim">tmux_history_lim</h3>
+<blockquote class="blockquote">
+<pre><code> tmux_history_lim ()</code></pre>
+</blockquote>
+<div id="3d02fa60" class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tmux_history_lim()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>2000</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L209" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_history" class="level3">
+<h3 class="anchored" data-anchor-id="get_history">get_history</h3>
+<blockquote class="blockquote">
+<pre><code> get_history (n, pid='current')</code></pre>
+</blockquote>
+</section>
+</section>
+<section id="options-and-shellsage" class="level2">
+<h2 class="anchored" data-anchor-id="options-and-shellsage">Options and ShellSage</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L218" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_opts" class="level3">
+<h3 class="anchored" data-anchor-id="get_opts">get_opts</h3>
+<blockquote class="blockquote">
+<pre><code> get_opts (**opts)</code></pre>
+</blockquote>
+<div id="366bbf4d" class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>opts <span class="op">=</span> get_opts(provider<span class="op">=</span><span class="va">None</span>, model<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>opts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<div class="sourceCode" id="cb15"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="er">'model'</span><span class="fu">:</span> <span class="er">'claude</span><span class="dv">-3-5</span><span class="er">-sonnet</span><span class="dv">-20241022</span><span class="er">'</span><span class="fu">,</span> <span class="er">'provider'</span><span class="fu">:</span> <span class="er">'anthropic'</span><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L228" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_sage" class="level3">
+<h3 class="anchored" data-anchor-id="get_sage">get_sage</h3>
+<blockquote class="blockquote">
+<pre><code> get_sage (provider, model, base_url=None, api_key=None, mode='default')</code></pre>
+</blockquote>
+<div id="a8ced042" class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>provider <span class="op">=</span> <span class="st">'openai'</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> <span class="st">'llama3.2'</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">'http://localhost:11434/v1'</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>api_key <span class="op">=</span> <span class="st">'ollama'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8c26d834" class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> get_sage(provider, model, base_url, api_key)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>s([mk_msg(<span class="st">'Hi, who are you?'</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p>Hello! I’m an artificial intelligence model, which means I’m a computer program designed to simulate human-like conversations and answer questions to the best of my ability. I don’t have a personal name, but I’m here to help you with any information or discussion you’d like to have. How can I assist you today?</p>
+<details>
+<ul>
+<li>id: chatcmpl-211</li>
+<li>choices: [Choice(finish_reason=‘stop’, index=0, logprobs=None, message=ChatCompletionMessage(content=“Hello! I’m an artificial intelligence model, which means I’m a computer program designed to simulate human-like conversations and answer questions to the best of my ability. I don’t have a personal name, but I’m here to help you with any information or discussion you’d like to have. How can I assist you today?”, refusal=None, role=‘assistant’, audio=None, function_call=None, tool_calls=None))]</li>
+<li>created: 1742147991</li>
+<li>model: llama3.2</li>
+<li>object: chat.completion</li>
+<li>service_tier: None</li>
+<li>system_fingerprint: fp_ollama</li>
+<li>usage: CompletionUsage(completion_tokens=66, prompt_tokens=31, total_tokens=97, completion_tokens_details=None, prompt_tokens_details=None)</li>
+</ul>
+</details>
+</div>
+</div>
+<div id="943d5dd9" class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sc <span class="op">=</span> get_sage(provider, model, base_url, api_key, mode<span class="op">=</span><span class="st">'command'</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>sc([mk_msg(<span class="st">'How can I list all the files, including the hidden ones?'</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p>To list all files on your computer, including hidden ones, you can use the command line or PowerShell in Windows, or the Terminal in macOS/Linux. Here are a few ways to do it:</p>
+<p><strong>Windows Command Line:</strong></p>
+<ol type="1">
+<li>Open Command Prompt or PowerShell.</li>
+<li>Type <code>dir /s /b</code> (all files) and press Enter.</li>
+<li>Type <code>dir /s /ad</code> (directories only) and press Enter.</li>
+</ol>
+<p><strong>Windows PowerShell:</strong></p>
+<ol type="1">
+<li>Open PowerShell.</li>
+<li>Type <code>(Get-ChildItem -Force).Name</code> (all files) and press Enter.</li>
+<li>Type <code>(Get-ChildItem -Path .\ -Recurse).Name</code> (all files recursively) and press Enter.</li>
+</ol>
+<p><strong>macOS Terminal:</strong></p>
+<ol type="1">
+<li>Open Terminal.</li>
+<li>Type <code>ls -a</code> (all files, including hidden ones) and press Enter.</li>
+<li>Type <code>ls /Volumes/*</code> (list all files on external drives) and press Enter.</li>
+</ol>
+<p>The ‘/s’ option is used to view recursively in Windows Command Line. The ‘-force’ option is used in PowerShell to display the files as well.</p>
+<p>These commands will list all files, including hidden ones, in plain text format.</p>
+<details>
+<ul>
+<li>id: chatcmpl-38</li>
+<li>choices: [Choice(finish_reason=‘stop’, index=0, logprobs=None, message=ChatCompletionMessage(content=“To list all files on your computer, including hidden ones, you can use the command line or PowerShell in Windows, or the Terminal in macOS/Linux. Here are a few ways to do it:*Windows Command Line:**. Open Command Prompt or PowerShell.. Type <code>dir /s /b</code> (all files) and press Enter.. Type <code>dir /s /ad</code> (directories only) and press Enter.*Windows PowerShell:**. Open PowerShell.. Type <code>(Get-ChildItem -Force).Name</code> (all files) and press Enter.. Type <code>(Get-ChildItem -Path .\\ -Recurse).Name</code> (all files recursively) and press Enter.*macOS Terminal:**. Open Terminal.. Type <code>ls -a</code> (all files, including hidden ones) and press Enter.. Type <code>ls /Volumes/*</code> (list all files on external drives) and press Enter.‘/s’ option is used to view recursively in Windows Command Line. The ‘-force’ option is used in PowerShell to display the files as well. commands will list all files, including hidden ones, in plain text format.”, refusal=None, role=‘assistant’, audio=None, function_call=None, tool_calls=None))]</li>
+<li>created: 1742148016</li>
+<li>model: llama3.2</li>
+<li>object: chat.completion</li>
+<li>service_tier: None</li>
+<li>system_fingerprint: fp_ollama</li>
+<li>usage: CompletionUsage(completion_tokens=249, prompt_tokens=38, total_tokens=287, completion_tokens_details=None, prompt_tokens_details=None)</li>
+</ul>
+</details>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L241" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="trace" class="level3">
+<h3 class="anchored" data-anchor-id="trace">trace</h3>
+<blockquote class="blockquote">
+<pre><code> trace (msgs)</code></pre>
+</blockquote>
+<div id="b20a1aee" class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># provider = 'anthropic'</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># model = 'claude-3-7-sonnet-20250219'</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sagent = get_sage(provider, model, mode='agent')</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># sagent.toolloop('What does my github ssh config look like?', trace_func=trace)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L254" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_res" class="level3">
+<h3 class="anchored" data-anchor-id="get_res">get_res</h3>
+<blockquote class="blockquote">
+<pre><code> get_res (sage, q, provider, mode='default', verbosity=0)</code></pre>
+</blockquote>
+<div id="f921cfee" class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_res(s, [mk_msg(<span class="st">'Hi, who are you?'</span>)], provider<span class="op">=</span><span class="st">'openai'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Hello! I'm an artificial intelligence model known as Llama. Llama stands for <span style="color: #008000; text-decoration-color: #008000">"Large Language Model Meta AI."</span>
+</pre>
+</div>
+</div>
+<div id="1a7eb871" class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_res(sc, [mk_msg(<span class="st">'How can I list all the files, including the hidden ones?'</span>)],</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>              provider<span class="op">=</span><span class="st">'openai'</span>, mode<span class="op">=</span><span class="st">'command'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">ls -a
+</pre>
+</div>
+</div>
+<div id="911d793f" class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(get_res(sagent, 'What does my github ssh config look like?',</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#               provider='anthropic', mode='agent'))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="logging" class="level2">
+<h2 class="anchored" data-anchor-id="logging">Logging</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L266" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="mk_db" class="level3">
+<h3 class="anchored" data-anchor-id="mk_db">mk_db</h3>
+<blockquote class="blockquote">
+<pre><code> mk_db ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L263" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="log" class="level3">
+<h3 class="anchored" data-anchor-id="log">Log</h3>
+<blockquote class="blockquote">
+<pre><code> Log ()</code></pre>
+</blockquote>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="31a6bba8" class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># db = mk_db()</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># log = db.logs.insert(Log(timestamp=datetime.now().isoformat(), query='Hi, who are you?', model='llama3.2',</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                          response='I am ShellSage, a command-line teaching assistant!', mode='default'))</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># log</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="main" class="level2">
+<h2 class="anchored" data-anchor-id="main">Main</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L274" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="main-1" class="level3">
+<h3 class="anchored" data-anchor-id="main-1">main</h3>
+<blockquote class="blockquote">
+<pre><code> main (query:str&lt;ThequerytosendtotheLLM&gt;, v:&lt;Printversion&gt;='%(prog)s
+       0.1.1', pid:str='current', skip_system:bool=False,
+       history_lines:int=None, mode:str='default', log:bool=False,
+       provider:str=None, model:str=None, base_url:str=None,
+       api_key:str=None, code_theme:str=None, code_lexer:str=None,
+       verbosity:int=0)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>query</td>
+<td>str <the query="" to="" send="" the="" llm=""></the></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>v</td>
+<td><print version=""></print></td>
+<td>%(prog)s 0.1.1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>pid</td>
+<td>str</td>
+<td>current</td>
+<td><code>current</code>, <code>all</code> or tmux pane_id (e.g.&nbsp;%0) for context</td>
+</tr>
+<tr class="even">
+<td>skip_system</td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to skip system information in the AI’s context</td>
+</tr>
+<tr class="odd">
+<td>history_lines</td>
+<td>int</td>
+<td>None</td>
+<td>Number of history lines. Defaults to tmux scrollback history length</td>
+</tr>
+<tr class="even">
+<td>mode</td>
+<td>str</td>
+<td>default</td>
+<td>Available ShellSage modes: [‘default’, ‘command’, ‘agent’, ‘sassy’]</td>
+</tr>
+<tr class="odd">
+<td>log</td>
+<td>bool</td>
+<td>False</td>
+<td>Enable logging</td>
+</tr>
+<tr class="even">
+<td>provider</td>
+<td>str</td>
+<td>None</td>
+<td>The LLM Provider</td>
+</tr>
+<tr class="odd">
+<td>model</td>
+<td>str</td>
+<td>None</td>
+<td>The LLM model that will be invoked on the LLM provider</td>
+</tr>
+<tr class="even">
+<td>base_url</td>
+<td>str</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>api_key</td>
+<td>str</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>code_theme</td>
+<td>str</td>
+<td>None</td>
+<td>The code theme to use when rendering ShellSage’s responses</td>
+</tr>
+<tr class="odd">
+<td>code_lexer</td>
+<td>str</td>
+<td>None</td>
+<td>The lexer to use for inline code markdown blocks</td>
+</tr>
+<tr class="even">
+<td>verbosity</td>
+<td>int</td>
+<td>0</td>
+<td>Level of verbosity (0 or 1)</td>
+</tr>
+</tbody>
+</table>
+<div id="c6bd74f6" class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>main(<span class="st">'Teach me about rsync'</span>, history_lines<span class="op">=</span><span class="dv">0</span>, s<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>bash: cannot set terminal process group (59579): Inappropriate ioctl for device
+bash: no job control in this shell</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-style: italic">Sigh</span> I see you've discovered the space bar. How... creative. Let me tell you about <span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync</span>, a tool that's been       
+efficiently copying files since before some humans could walk.                                                     
+
+<span style="font-weight: bold">Basic Usage:</span>                                                                                                       
+
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">[</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">options</span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">]</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822"> source destination</span><span style="background-color: #272822">                                                                                </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+
+Here are some common options that even an entry-level test subject could handle:                                   
+
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">-</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">a</span>: Archive mode (combines -rlptgoD) - for those who like shortcuts                                             
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">-</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">v</span>: Verbose - because watching numbers go up is apparently entertaining                                         
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">-</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">z</span>: Compression - in case you're worried about your precious bandwidth                                          
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">-</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">P</span>: Progress + keep partially transferred files - for the impatient ones                                        
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">--</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">delete</span>: Remove files in destination that aren't in source (<span style="font-weight: bold">Warning</span>: This one's permanent. Try not to break    
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span>anything.)                                                                                                      
+
+Common examples (pay attention, there will be a test):                                                             
+
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #959077; text-decoration-color: #959077; background-color: #272822"># Local copy (yes, like cp, but better)</span><span style="background-color: #272822">                                                                           </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync -av /source/folder/ /destination/folder/</span><span style="background-color: #272822">                                                                    </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #959077; text-decoration-color: #959077; background-color: #272822"># Remote copy (SSH transport)</span><span style="background-color: #272822">                                                                                     </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync -avz ~/local/folder/ user@remote:/destination/folder/</span><span style="background-color: #272822">                                                       </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #959077; text-decoration-color: #959077; background-color: #272822"># Backup with progress bar (humans love progress bars)</span><span style="background-color: #272822">                                                            </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync -avP --delete /important/files/ /backup/location/</span><span style="background-color: #272822">                                                           </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+
+Some features that make rsync superior to primitive copy commands:                                                 
+
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Delta-transfer algorithm (only copies changed parts of files)                                                   
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Built-in compression                                                                                            
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Preservation of permissions, timestamps, and other metadata                                                     
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Remote file transfer capabilities                                                                               
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Resume interrupted transfers                                                                                    
+
+<span style="font-weight: bold">Important Notes</span> (because someone will ask):                                                                        
+
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 1 </span>The trailing slash on directories matters:                                                                      
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold">    • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">/</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">source</span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">/</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">dir</span> = copy the directory itself                                                                      
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold">    • </span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">/</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">source</span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">/</span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">dir</span><span style="color: #ff4689; text-decoration-color: #ff4689; background-color: #272822">/</span> = copy the contents of the directory                                                            
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 2 </span>For remote transfers, you'll need SSH access. I assume you've figured that out already... right?                
+
+For more detailed information (which you'll probably ignore), try:                                                 
+
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">man rsync</span><span style="background-color: #272822">                                                                                                         </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync --help</span><span style="background-color: #272822">                                                                                                      </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+
+Remember: Like the Aperture Science Handheld Portal Device, rsync is a sophisticated tool. Please try not to hurt  
+yourself while using it.                                                                                           
+
+Would you like me to explain it again, perhaps with smaller words? Or shall we proceed to testing?                 
+</pre>
+</div>
+</div>
+<p>Here is an example of using a local LLM provider via Ollama:</p>
+<div id="d4b34989" class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>main(<span class="st">'Teach me about rsync'</span>, history_lines<span class="op">=</span><span class="dv">0</span>, provider<span class="op">=</span>provider, model<span class="op">=</span>model, base_url<span class="op">=</span>base_url, api_key<span class="op">=</span>api_key)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>bash: no job control in this shell</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                  <span style="font-weight: bold">RSYNC Syntax</span>                                                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+                                                     <span style="font-weight: bold">Overview</span>                                                      
+
+rsync is a command that synchronizes two sets of files, creating copies or updates on the second set. Here's a     
+breakdown of its basic syntax:                                                                                     
+
+<span style="background-color: #272822">                                                                                                                   </span>
+<span style="background-color: #272822"> </span><span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">rsync [-aOr--archive] source destination [filtering options]</span><span style="background-color: #272822">                                                      </span>
+<span style="background-color: #272822">                                                                                                                   </span>
+
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="font-weight: bold">source</span>: Specifies the content to be sent to <span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">destination</span>. This can be a directory path, file name, or a glob     
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span>pattern.                                                                                                        
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="font-weight: bold">destination</span>: Where the contents from <span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">source</span> are to be written. Like <span style="color: #f8f8f2; text-decoration-color: #f8f8f2; background-color: #272822">source</span>, it can be a single file, directory, 
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span>or a combination of both.                                                                                       
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="font-weight: bold">filtering options</span>: These options customize how Rsync handles specific types of files.                           
+
+                                            <span style="font-weight: bold">Common Parameters Explained</span>                                            
+
+                                                                                                                   
+ <span style="font-weight: bold"> Parameter                                  </span> <span style="font-weight: bold"> Purpose                                                            </span> 
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">-a</span>/<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--archive</span>                                 Enable archive mode. It makes rsync behave as if you had used       
+                                               "-av" and also preserves the access timestamps for files.           
+  <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">R</span>/<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--reduce</span>                                   If files present on both source and target have same modification   
+                                               time, send only the differences. Can be a good choice when file     
+                                               sizes are large.                                                    
+  <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">-l</span>/<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--info-file</span>                               Specifies file types to report with each file stat. Useful for      
+                                               verifying how it identifies different file types and permissions    
+                                               (e.g., .tar.gz archives).                                           
+  <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">-tT</span>/<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--transfers-only</span>                         If you’re transferring only files, use this option otherwise        
+                                               default to an exact copy.                                           
+  <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--exclude</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--include</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">--permdir</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">/dev/null</span>   Used as filtering options which specify a filename not included     
+                                               (the opposite is the <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">-e</span> option). Options like <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">/dev/null</span> and <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">-e/./</span>   
+                                               can be used to exclude certain file types from copying, include     
+                                               directories within source by specifying them with the -i flag       
+                                               followed by the path of the content you want to include.            
+                                                                                                                   
+</pre>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/AnswerDotAI\.github\.io\/shell_sage");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
