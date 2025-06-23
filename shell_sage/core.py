@@ -249,7 +249,7 @@ def trace(msgs):
             if tool_use: print(f'Tool use: {tool_use.name}\nTool input: {tool_use.input}')
 
 # %% ../nbs/00_core.ipynb 33
-conts = {'anthropic': cla.contents, 'openai': cos.contents}
+conts = {'anthropic': cla.contents, 'openai': lambda r: getattr(r, 'output_text', r)}
 p = r'```(?:bash\n|\n)?([^`]+)```'
 def get_res(sage, q, provider, mode='default', verbosity=0):
     if mode == 'command':
