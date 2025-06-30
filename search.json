@@ -1,0 +1,162 @@
+[
+  {
+    "objectID": "core.html#model-setup",
+    "href": "core.html#model-setup",
+    "title": "ShellSage",
+    "section": "Model Setup",
+    "text": "Model Setup",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "core.html#system-environment",
+    "href": "core.html#system-environment",
+    "title": "ShellSage",
+    "section": "System Environment",
+    "text": "System Environment\n\n# aliases = _aliases('bash')\n# print(aliases)\n\n\n# print(_sys_info())",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "core.html#tmux",
+    "href": "core.html#tmux",
+    "title": "ShellSage",
+    "section": "Tmux",
+    "text": "Tmux\n\nsource\n\nget_pane\n\n get_pane (n, pid=None)\n\nGet output from a tmux pane\n\n# p = get_pane(20)\n# print(p[:512])\n\n\nsource\n\n\nget_panes\n\n get_panes (n)\n\n\n# ps = get_panes(20)\n# print(ps[:512])\n\n\nco(['tmux', 'display-message', '-p', '#{history-limit}'], text=True).strip()\n\n'2000'\n\n\n\nsource\n\n\ntmux_history_lim\n\n tmux_history_lim ()\n\n\ntmux_history_lim()\n\n2000\n\n\n\nsource\n\n\nget_history\n\n get_history (n, pid='current')",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "core.html#options-and-shellsage",
+    "href": "core.html#options-and-shellsage",
+    "title": "ShellSage",
+    "section": "Options and ShellSage",
+    "text": "Options and ShellSage\n\nsource\n\nget_opts\n\n get_opts (**opts)\n\n\nopts = get_opts(provider=None, model=None)\nopts\n\n{'model': 'claude-3-5-sonnet-20241022', 'provider': 'anthropic'}\n\n\n\nsource\n\n\nget_sage\n\n get_sage (provider, model, base_url=None, api_key=None, mode='default')\n\n\nprovider = 'openai'\nmodel = 'llama3.2'\nbase_url = 'http://localhost:11434/v1'\napi_key = 'ollama'\n\n\ns = get_sage(provider, model, base_url, api_key)\ns([mk_msg('Hi, who are you?')])\n\nHello! I’m an artificial intelligence model, which means I’m a computer program designed to simulate human-like conversations and answer questions to the best of my ability. I don’t have a personal name, but I’m here to help you with any information or discussion you’d like to have. How can I assist you today?\n\n\nid: chatcmpl-211\nchoices: [Choice(finish_reason=‘stop’, index=0, logprobs=None, message=ChatCompletionMessage(content=“Hello! I’m an artificial intelligence model, which means I’m a computer program designed to simulate human-like conversations and answer questions to the best of my ability. I don’t have a personal name, but I’m here to help you with any information or discussion you’d like to have. How can I assist you today?”, refusal=None, role=‘assistant’, audio=None, function_call=None, tool_calls=None))]\ncreated: 1742147991\nmodel: llama3.2\nobject: chat.completion\nservice_tier: None\nsystem_fingerprint: fp_ollama\nusage: CompletionUsage(completion_tokens=66, prompt_tokens=31, total_tokens=97, completion_tokens_details=None, prompt_tokens_details=None)\n\n\n\n\n\nsc = get_sage(provider, model, base_url, api_key, mode='command')\nsc([mk_msg('How can I list all the files, including the hidden ones?')])\n\nTo list all files on your computer, including hidden ones, you can use the command line or PowerShell in Windows, or the Terminal in macOS/Linux. Here are a few ways to do it:\nWindows Command Line:\n\nOpen Command Prompt or PowerShell.\nType dir /s /b (all files) and press Enter.\nType dir /s /ad (directories only) and press Enter.\n\nWindows PowerShell:\n\nOpen PowerShell.\nType (Get-ChildItem -Force).Name (all files) and press Enter.\nType (Get-ChildItem -Path .\\ -Recurse).Name (all files recursively) and press Enter.\n\nmacOS Terminal:\n\nOpen Terminal.\nType ls -a (all files, including hidden ones) and press Enter.\nType ls /Volumes/* (list all files on external drives) and press Enter.\n\nThe ‘/s’ option is used to view recursively in Windows Command Line. The ‘-force’ option is used in PowerShell to display the files as well.\nThese commands will list all files, including hidden ones, in plain text format.\n\n\nid: chatcmpl-38\nchoices: [Choice(finish_reason=‘stop’, index=0, logprobs=None, message=ChatCompletionMessage(content=“To list all files on your computer, including hidden ones, you can use the command line or PowerShell in Windows, or the Terminal in macOS/Linux. Here are a few ways to do it:*Windows Command Line:**. Open Command Prompt or PowerShell.. Type dir /s /b (all files) and press Enter.. Type dir /s /ad (directories only) and press Enter.*Windows PowerShell:**. Open PowerShell.. Type (Get-ChildItem -Force).Name (all files) and press Enter.. Type (Get-ChildItem -Path .\\\\ -Recurse).Name (all files recursively) and press Enter.*macOS Terminal:**. Open Terminal.. Type ls -a (all files, including hidden ones) and press Enter.. Type ls /Volumes/* (list all files on external drives) and press Enter.‘/s’ option is used to view recursively in Windows Command Line. The ‘-force’ option is used in PowerShell to display the files as well. commands will list all files, including hidden ones, in plain text format.”, refusal=None, role=‘assistant’, audio=None, function_call=None, tool_calls=None))]\ncreated: 1742148016\nmodel: llama3.2\nobject: chat.completion\nservice_tier: None\nsystem_fingerprint: fp_ollama\nusage: CompletionUsage(completion_tokens=249, prompt_tokens=38, total_tokens=287, completion_tokens_details=None, prompt_tokens_details=None)\n\n\n\n\n\nsource\n\n\ntrace\n\n trace (msgs)\n\n\n# provider = 'anthropic'\n# model = 'claude-3-7-sonnet-20250219'\n# sagent = get_sage(provider, model, mode='agent')\n# sagent.toolloop('What does my github ssh config look like?', trace_func=trace)\n\n\nsource\n\n\nget_res\n\n get_res (sage, q, provider, mode='default', verbosity=0)\n\n\nprint(get_res(s, [mk_msg('Hi, who are you?')], provider='openai'))\n\nHello! I'm an artificial intelligence model known as Llama. Llama stands for \"Large Language Model Meta AI.\"\n\n\n\n\nprint(get_res(sc, [mk_msg('How can I list all the files, including the hidden ones?')],\n              provider='openai', mode='command'))\n\nls -a\n\n\n\n\n# print(get_res(sagent, 'What does my github ssh config look like?',\n#               provider='anthropic', mode='agent'))",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "core.html#logging",
+    "href": "core.html#logging",
+    "title": "ShellSage",
+    "section": "Logging",
+    "text": "Logging\n\nsource\n\nmk_db\n\n mk_db ()\n\n\nsource\n\n\nLog\n\n Log ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\n# db = mk_db()\n# log = db.logs.insert(Log(timestamp=datetime.now().isoformat(), query='Hi, who are you?', model='llama3.2',\n#                          response='I am ShellSage, a command-line teaching assistant!', mode='default'))\n# log",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "core.html#main",
+    "href": "core.html#main",
+    "title": "ShellSage",
+    "section": "Main",
+    "text": "Main\n\nsource\n\nmain\n\n main (query:str&lt;ThequerytosendtotheLLM&gt;, v:&lt;Printversion&gt;='%(prog)s\n       0.1.2', pid:str='current', skip_system:bool=False,\n       history_lines:int=None, mode:str='default', log:bool=False,\n       provider:str=None, model:str=None, base_url:str=None,\n       api_key:str=None, code_theme:str=None, code_lexer:str=None,\n       verbosity:int=0)\n\n\n\n\n\n\n\n\n\n\n\nType\nDefault\nDetails\n\n\n\n\nquery\nstr \n\n\n\n\nv\n\n%(prog)s 0.1.2\n\n\n\npid\nstr\ncurrent\ncurrent, all or tmux pane_id (e.g. %0) for context\n\n\nskip_system\nbool\nFalse\nWhether to skip system information in the AI’s context\n\n\nhistory_lines\nint\nNone\nNumber of history lines. Defaults to tmux scrollback history length\n\n\nmode\nstr\ndefault\nAvailable ShellSage modes: [‘default’, ‘command’, ‘agent’, ‘sassy’]\n\n\nlog\nbool\nFalse\nEnable logging\n\n\nprovider\nstr\nNone\nThe LLM Provider\n\n\nmodel\nstr\nNone\nThe LLM model that will be invoked on the LLM provider\n\n\nbase_url\nstr\nNone\n\n\n\napi_key\nstr\nNone\n\n\n\ncode_theme\nstr\nNone\nThe code theme to use when rendering ShellSage’s responses\n\n\ncode_lexer\nstr\nNone\nThe lexer to use for inline code markdown blocks\n\n\nverbosity\nint\n0\nLevel of verbosity (0 or 1)\n\n\n\n\nmain('Teach me about rsync', history_lines=0, s=True)\n\nbash: cannot set terminal process group (59579): Inappropriate ioctl for device\nbash: no job control in this shell\n\n\nSigh I see you've discovered the space bar. How... creative. Let me tell you about rsync, a tool that's been       \nefficiently copying files since before some humans could walk.                                                     \n\nBasic Usage:                                                                                                       \n\n                                                                                                                   \n rsync [options] source destination                                                                                \n                                                                                                                   \n\nHere are some common options that even an entry-level test subject could handle:                                   \n\n • -a: Archive mode (combines -rlptgoD) - for those who like shortcuts                                             \n • -v: Verbose - because watching numbers go up is apparently entertaining                                         \n • -z: Compression - in case you're worried about your precious bandwidth                                          \n • -P: Progress + keep partially transferred files - for the impatient ones                                        \n • --delete: Remove files in destination that aren't in source (Warning: This one's permanent. Try not to break    \n   anything.)                                                                                                      \n\nCommon examples (pay attention, there will be a test):                                                             \n\n                                                                                                                   \n # Local copy (yes, like cp, but better)                                                                           \n rsync -av /source/folder/ /destination/folder/                                                                    \n                                                                                                                   \n # Remote copy (SSH transport)                                                                                     \n rsync -avz ~/local/folder/ user@remote:/destination/folder/                                                       \n                                                                                                                   \n # Backup with progress bar (humans love progress bars)                                                            \n rsync -avP --delete /important/files/ /backup/location/                                                           \n                                                                                                                   \n\nSome features that make rsync superior to primitive copy commands:                                                 \n\n • Delta-transfer algorithm (only copies changed parts of files)                                                   \n • Built-in compression                                                                                            \n • Preservation of permissions, timestamps, and other metadata                                                     \n • Remote file transfer capabilities                                                                               \n • Resume interrupted transfers                                                                                    \n\nImportant Notes (because someone will ask):                                                                        \n\n 1 The trailing slash on directories matters:                                                                      \n    • /source/dir = copy the directory itself                                                                      \n    • /source/dir/ = copy the contents of the directory                                                            \n 2 For remote transfers, you'll need SSH access. I assume you've figured that out already... right?                \n\nFor more detailed information (which you'll probably ignore), try:                                                 \n\n                                                                                                                   \n man rsync                                                                                                         \n rsync --help                                                                                                      \n                                                                                                                   \n\nRemember: Like the Aperture Science Handheld Portal Device, rsync is a sophisticated tool. Please try not to hurt  \nyourself while using it.                                                                                           \n\nWould you like me to explain it again, perhaps with smaller words? Or shall we proceed to testing?                 \n\n\n\nHere is an example of using a local LLM provider via Ollama:\n\nmain('Teach me about rsync', history_lines=0, provider=provider, model=model, base_url=base_url, api_key=api_key)\n\nbash: no job control in this shell\n\n\n┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n┃                                                  RSYNC Syntax                                                   ┃\n┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n                                                     Overview                                                      \n\nrsync is a command that synchronizes two sets of files, creating copies or updates on the second set. Here's a     \nbreakdown of its basic syntax:                                                                                     \n\n                                                                                                                   \n rsync [-aOr--archive] source destination [filtering options]                                                      \n                                                                                                                   \n\n • source: Specifies the content to be sent to destination. This can be a directory path, file name, or a glob     \n   pattern.                                                                                                        \n • destination: Where the contents from source are to be written. Like source, it can be a single file, directory, \n   or a combination of both.                                                                                       \n • filtering options: These options customize how Rsync handles specific types of files.                           \n\n                                            Common Parameters Explained                                            \n\n                                                                                                                   \n  Parameter                                    Purpose                                                             \n ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ \n  -a/--archive                                 Enable archive mode. It makes rsync behave as if you had used       \n                                               \"-av\" and also preserves the access timestamps for files.           \n  R/--reduce                                   If files present on both source and target have same modification   \n                                               time, send only the differences. Can be a good choice when file     \n                                               sizes are large.                                                    \n  -l/--info-file                               Specifies file types to report with each file stat. Useful for      \n                                               verifying how it identifies different file types and permissions    \n                                               (e.g., .tar.gz archives).                                           \n  -tT/--transfers-only                         If you’re transferring only files, use this option otherwise        \n                                               default to an exact copy.                                           \n  --exclude, --include, --permdir, /dev/null   Used as filtering options which specify a filename not included     \n                                               (the opposite is the -e option). Options like /dev/null and -e/./   \n                                               can be used to exclude certain file types from copying, include     \n                                               directories within source by specifying them with the -i flag       \n                                               followed by the path of the content you want to include.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "tools.html",
+    "href": "tools.html",
+    "title": "ShellSage Tools",
+    "section": "",
+    "text": "source\n\nrgrep\n\n rgrep (term:str, path:str='.', grep_args:str='')\n\nPerform recursive grep search for term in path with optional grep arguments\n\nprint(rgrep('navbar', '.', '--context 1'))\n\n/Users/nathan/git/shell_sage/nbs/_quarto.yml-  open-graph: true\n/Users/nathan/git/shell_sage/nbs/_quarto.yml-  repo-actions: [issue]\n/Users/nathan/git/shell_sage/nbs/_quarto.yml:  navbar:\n/Users/nathan/git/shell_sage/nbs/_quarto.yml-    background: primary\n/Users/nathan/git/shell_sage/nbs/_quarto.yml-    search: true\n--\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb-   \"outputs\": [],\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb-   \"source\": [\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb:    \"# print(rgrep('navbar', '.', '--context 1'))\"\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb-   ]\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb-  },\n\n\n\n\nsource\n\n\nview\n\n view (path:str, rng:tuple[int,int]=None, nums:bool=False)\n\nView directory or file contents with optional line range and numbers\n\nprint(view('.'))\n\nDirectory contents of /Users/nathan/git/shell_sage/nbs:\n/Users/nathan/git/shell_sage/nbs/00_core.ipynb\n/Users/nathan/git/shell_sage/nbs/_quarto.yml\n/Users/nathan/git/shell_sage/nbs/02_tools.ipynb\n/Users/nathan/git/shell_sage/nbs/styles.css\n/Users/nathan/git/shell_sage/nbs/CNAME\n/Users/nathan/git/shell_sage/nbs/01_config.ipynb\n/Users/nathan/git/shell_sage/nbs/nbdev.yml\n/Users/nathan/git/shell_sage/nbs/index.ipynb\n/Users/nathan/git/shell_sage/nbs/tmp.conf\n/Users/nathan/git/shell_sage/nbs/.ipynb_checkpoints/01_config-checkpoint.ipynb\n/Users/nathan/git/shell_sage/nbs/.ipynb_checkpoints/index-checkpoint.ipynb\n/Users/nathan/git/shell_sage/nbs/.ipynb_checkpoints/00_core-checkpoint.ipynb\n\n\n\nprint(view('_quarto.yml', (1,10), nums=True))\n\n     1 │ project:\n     2 │   type: website\n     3 │ \n     4 │ format:\n     5 │   html:\n     6 │     theme: cosmo\n     7 │     css: styles.css\n     8 │     toc: true\n     9 │     keep-md: true\n    10 │   commonmark: default\n\n\n\nsource\n\n\ncreate\n\n create (path:str, file_text:str, overwrite:bool=False)\n\nCreates a new file with the given content at the specified path\n\nprint(create('test.txt', 'Hello, world!'))\nprint(view('test.txt', nums=True))\n\nCreated file test.txt containing:\nHello, world!\n     1 │ Hello, world!\n\n\n\nsource\n\n\ninsert\n\n insert (path:str, insert_line:int, new_str:str)\n\nInsert new_str at specified line number\n\ninsert('test.txt', 0, 'Let\\'s add a new line')\nprint(view('test.txt', nums=True))\n\n     1 │ Let's add a new line\n     2 │ Hello, world!\n\n\n\nsource\n\n\nstr_replace\n\n str_replace (path:str, old_str:str, new_str:str)\n\nReplace first occurrence of old_str with new_str in file\n\nstr_replace('test.txt', 'new line', '&lt;we replaced this part!&gt;')\nprint(view('test.txt', nums=True))\n\n     1 │ Let's add a &lt;we replaced this part!&gt;\n     2 │ Hello, world!",
+    "crumbs": [
+      "ShellSage Tools"
+    ]
+  },
+  {
+    "objectID": "config.html",
+    "href": "config.html",
+    "title": "ShellSage Configuration",
+    "section": "",
+    "text": "_cfg_path()\n\nPath('/Users/nathan/.config/shell_sage/shell_sage.conf')\n\n\n\nproviders\n\n{'anthropic': ['claude-3-opus-20240229',\n  'claude-3-7-sonnet-20250219',\n  'claude-3-5-sonnet-20241022',\n  'claude-3-haiku-20240307',\n  'claude-3-5-haiku-20241022'],\n 'openai': ('o1-preview',\n  'o1-mini',\n  'gpt-4o',\n  'gpt-4o-mini',\n  'gpt-4-turbo',\n  'gpt-4',\n  'gpt-4-32k',\n  'gpt-3.5-turbo',\n  'gpt-3.5-turbo-instruct',\n  'o1',\n  'o3-mini',\n  'chatgpt-4o-latest')}\n\n\n\nsource\n\n\n\n ShellSageConfig (provider:str='anthropic', model:str='claude-\n                  sonnet-4-20250514', mode:str='default', base_url:str='',\n                  api_key:str='', history_lines:int=-1,\n                  code_theme:str='monokai', code_lexer:str='python',\n                  log:bool=False)\n\n\ncfg = ShellSageConfig()\ncfg\n\nShellSageConfig(provider='anthropic', model='claude-3-7-sonnet-20250219', mode='default', base_url='', api_key='', history_lines=-1, code_theme='monokai', code_lexer='python', log=False)\n\n\n\nsource\n\n\n\n\n get_cfg ()\n\n\n# cfg = get_cfg()\n# cfg",
+    "crumbs": [
+      "ShellSage Configuration"
+    ]
+  },
+  {
+    "objectID": "config.html#imports",
+    "href": "config.html#imports",
+    "title": "ShellSage Configuration",
+    "section": "",
+    "text": "_cfg_path()\n\nPath('/Users/nathan/.config/shell_sage/shell_sage.conf')\n\n\n\nproviders\n\n{'anthropic': ['claude-3-opus-20240229',\n  'claude-3-7-sonnet-20250219',\n  'claude-3-5-sonnet-20241022',\n  'claude-3-haiku-20240307',\n  'claude-3-5-haiku-20241022'],\n 'openai': ('o1-preview',\n  'o1-mini',\n  'gpt-4o',\n  'gpt-4o-mini',\n  'gpt-4-turbo',\n  'gpt-4',\n  'gpt-4-32k',\n  'gpt-3.5-turbo',\n  'gpt-3.5-turbo-instruct',\n  'o1',\n  'o3-mini',\n  'chatgpt-4o-latest')}\n\n\n\nsource\n\n\n\n ShellSageConfig (provider:str='anthropic', model:str='claude-\n                  sonnet-4-20250514', mode:str='default', base_url:str='',\n                  api_key:str='', history_lines:int=-1,\n                  code_theme:str='monokai', code_lexer:str='python',\n                  log:bool=False)\n\n\ncfg = ShellSageConfig()\ncfg\n\nShellSageConfig(provider='anthropic', model='claude-3-7-sonnet-20250219', mode='default', base_url='', api_key='', history_lines=-1, code_theme='monokai', code_lexer='python', log=False)\n\n\n\nsource\n\n\n\n\n get_cfg ()\n\n\n# cfg = get_cfg()\n# cfg",
+    "crumbs": [
+      "ShellSage Configuration"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ShellSage",
+    "section": "",
+    "text": "ShellSage works by understanding your terminal context and leveraging powerful language models (Claude or GPT) to provide intelligent assistance for:\n\nShell commands and scripting\nSystem administration tasks\nGit operations\nFile management\nProcess handling\nReal-time problem solving\n\nWhat sets ShellSage apart is its ability to:\n\nRead your terminal context through tmux integration\nProvide responses based on your current terminal state\nAccept piped input for direct analysis\nTarget specific tmux panes for focused assistance\n\nWhether you’re a seasoned sysadmin or just getting started with the command line, ShellSage acts as your intelligent terminal companion, ready to help with both simple commands and complex operations.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "ShellSage",
+    "section": "",
+    "text": "ShellSage works by understanding your terminal context and leveraging powerful language models (Claude or GPT) to provide intelligent assistance for:\n\nShell commands and scripting\nSystem administration tasks\nGit operations\nFile management\nProcess handling\nReal-time problem solving\n\nWhat sets ShellSage apart is its ability to:\n\nRead your terminal context through tmux integration\nProvide responses based on your current terminal state\nAccept piped input for direct analysis\nTarget specific tmux panes for focused assistance\n\nWhether you’re a seasoned sysadmin or just getting started with the command line, ShellSage acts as your intelligent terminal companion, ready to help with both simple commands and complex operations.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "ShellSage",
+    "section": "Installation",
+    "text": "Installation\nInstall ShellSage directly from PyPI using pip:\npip install shell-sage\n\nPrerequisites\n\nAPI Key Setup\n# For Claude (default)\nexport ANTHROPIC_API_KEY=sk...\n\n# For OpenAI (optional)\nexport OPENAI_API_KEY=sk...\ntmux Configuration\nWe recommend using this optimized tmux configuration for the best ShellSage experience. Create or edit your ~/.tmux.conf:\n# Enable mouse support\nset -g mouse on\n\n# Show pane ID and time in status bar\nset -g status-right '#{pane_id} | %H:%M '\n\n# Keep terminal content visible (needed for neovim)\nset-option -g alternate-screen off\n\n# Enable vi mode for better copy/paste\nset-window-option -g mode-keys vi\n\n# Improved search and copy bindings\nbind-key / copy-mode\\; send-key ?\nbind-key -T copy-mode-vi y \\\n  send-key -X start-of-line\\; \\\n  send-key -X begin-selection\\; \\\n  send-key -X end-of-line\\; \\\n  send-key -X cursor-left\\; \\\n  send-key -X copy-selection-and-cancel\\; \\\n  paste-buffer\nReload tmux config:\ntmux source ~/.tmux.conf\n\nThis configuration enables mouse support, displays pane IDs (crucial for targeting specific panes), maintains terminal content visibility, and adds vim-style keybindings for efficient navigation and text selection.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#getting-started",
+    "href": "index.html#getting-started",
+    "title": "ShellSage",
+    "section": "Getting Started",
+    "text": "Getting Started\n\nBasic Usage\nShellSage is designed to run within a tmux session. Here are the core commands:\n# Basic usage\nssage hi ShellSage\n\n# Pipe content to ShellSage\ncat error.log | ssage explain this error\n\n# Target a specific tmux pane\nssage --pid %3 what is happening in this pane?\n\n# Automatically fill in the command to run\nssage --c how can I list all files including the hidden ones?\n\n# Log the model, timestamp, query and response to a local SQLite database\nssage --log \"how can i remove the file\"\nThe --pid flag is particularly useful when you want to analyze content from a different pane. The pane ID is visible in your tmux status bar (configured earlier).\nThe --log option saves log data to an SQLite database located at ~/.shell_sage/log_db/logs.db.\n\n\nUsing Alternative Model Providers\nShellSage supports using different LLM providers through base URL configuration. This allows you to use local models or alternative API endpoints:\n# Use a local Ollama endpoint\nssage --provider openai --model llama3.2 --base_url http://localhost:11434/v1 --api_key ollama what is rsync?\n\n# Use together.ai\nssage --provider openai --model mistralai/Mistral-7B-Instruct-v0.3 --base_url https://api.together.xyz/v1 help me with sed # make sure you've set your together API key in your shell_sage conf\nThis is particularly useful for:\n\nRunning models locally for privacy/offline use\nUsing alternative hosting providers\nTesting different model implementations\nAccessing specialized model deployments\n\nYou can also set these configurations permanently in your ShellSage config file (~/.config/shell_sage/shell_sage.conf). See next section for details.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#configuration",
+    "href": "index.html#configuration",
+    "title": "ShellSage",
+    "section": "Configuration",
+    "text": "Configuration\nShellSage can be customized through its configuration file located at ~/.config/shell_sage/shell_sage.conf. Here’s a complete configuration example:\n[DEFAULT]\n# Choose your AI model provider\nprovider = anthropic     # or 'openai'\nmodel = claude-3-5-sonnet-20241022 # or 'gpt-4o-mini' for OpenAI\nbase_url = # leave empty to use default openai endpoint\napi_key = # leave empty to default to using your OPENAI_API_KEY env var\n\n# Terminal history settings\nhistory_lines = -1      # -1 for all history\n\n# Code display preferences\ncode_theme = monokai    # syntax highlighting theme\ncode_lexer = python     # default code lexer\nlog = False      # Set to true to enable logging by default\nYou can find all of the code theme and code lexer options here: https://pygments.org/styles/\n\nCommand Line Overrides\nAny configuration option can be overridden via command line arguments:\n# Use OpenAI instead of Claude for a single query\nssage --provider openai --model gpt-4o-mini \"explain this error\"\n\n# Adjust history lines for a specific query\nssage --history-lines 50 \"what commands did I just run?\"\n\n\nAdvanced Use Cases\n\nGit Workflow Enhancement\n# Review changes before commit\ngit diff | ssage summarize these changes\n\n# Get commit message suggestions\ngit diff --staged | ssage suggest a commit message\n\n# Analyze PR feedback\ngh pr view 123 | ssage summarize this PR feedback\n\n\nLog Analysis\n# Quick error investigation\njournalctl -xe | ssage what's causing these errors?\n\n# Apache/Nginx log analysis\ntail -n 100 /var/log/nginx/access.log | ssage analyze this traffic pattern\n\n# System performance investigation\ntop -b -n 1 | ssage explain system resource usage\n\n\nDocker Management\n# Container troubleshooting\ndocker logs my-container | ssage \"what is wrong with this container?\"\n\n# Image optimization\ndocker history my-image | ssage suggest optimization improvements\n\n# Compose file analysis\ncat docker-compose.yml | ssage review this compose configuration\n\n\nDatabase Operations\n# Query optimization\npsql -c \"EXPLAIN ANALYZE SELECT...\" | ssage optimize this query\n\n# Schema review\npg_dump --schema-only mydb | ssage review this database schema\n\n# Index suggestions\npsql -c \"\\di+\" | ssage suggest missing indexes",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#tips-best-practices",
+    "href": "index.html#tips-best-practices",
+    "title": "ShellSage",
+    "section": "Tips & Best Practices",
+    "text": "Tips & Best Practices\n\nEffective Usage Patterns\n\nContextual Queries\n\nKeep your tmux pane IDs visible in the status bar\nUse --pid when referencing other panes\nLet ShellSage see your recent command history for better context\n\nPiping Best Practices\n# Pipe logs directly\ntail log.txt | ssage \"summarize these logs\"\n\n# Combine commands\ngit diff | ssage \"review these changes\"\n\n\n\nGetting Help\n# View all available options\nssage --help\n\n# Submit issues or feature requests\n# https://github.com/AnswerDotAI/shell_sage/issues",
+    "crumbs": [
+      "ShellSage"
+    ]
+  },
+  {
+    "objectID": "index.html#contributing",
+    "href": "index.html#contributing",
+    "title": "ShellSage",
+    "section": "Contributing",
+    "text": "Contributing\nShellSage is built using nbdev. For detailed contribution guidelines, please see our CONTRIBUTING.md file.\nWe welcome contributions of all kinds:\n\nBug reports\nFeature requests\nDocumentation improvements\nCode contributions\n\nPlease visit our GitHub repository to get started.",
+    "crumbs": [
+      "ShellSage"
+    ]
+  }
+]
