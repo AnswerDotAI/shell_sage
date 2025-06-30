@@ -17,7 +17,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from . import __version__
 from .config import *
-from .tools import tools
+from .tools import ns, tools
 from subprocess import check_output as co
 from fastlite import database
 
@@ -204,7 +204,6 @@ def tmux_history_lim():
     lim = co(['tmux', 'display-message', '-p', '#{history-limit}'], text=True).strip()
     return int(lim) if lim.isdigit() else 3000
 
-
 # %% ../nbs/00_core.ipynb 23
 def get_history(n, pid='current'):
     try:
@@ -230,14 +229,14 @@ def get_sage(provider, model, base_url=None, api_key=None, mode='default'):
         if base_url:
             return chats[provider](model, sp=sps[mode], 
                                    cli=OpenAI(base_url=base_url, api_key=api_key))
-        else: return chats[provider](model, tools=tools, sp=sps[mode])
+        else: return chats[provider](model, tools=tools[provider], ns=ns[provider], sp=sps[mode])
     else:
         if base_url:
             cli = clis[provider](model, cli=OpenAI(base_url=base_url, api_key=api_key))
         else: cli = clis[provider](model)
         return partial(cli, sp=sps[mode])
 
-# %% ../nbs/00_core.ipynb 31
+# %% ../nbs/00_core.ipynb 36
 def trace(msgs):
     for m in msgs:
         if isinstance(m.content, str): continue
@@ -248,7 +247,7 @@ def trace(msgs):
             tool_use = cla.find_block(m, ToolUseBlock)
             if tool_use: print(f'Tool use: {tool_use.name}\nTool input: {tool_use.input}')
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 38
 conts = {'anthropic': cla.contents, 'openai': lambda r: getattr(r, 'output_text', r)}
 p = r'```(?:bash\n|\n)?([^`]+)```'
 def get_res(sage, q, provider, mode='default', verbosity=0):
@@ -256,10 +255,18 @@ def get_res(sage, q, provider, mode='default', verbosity=0):
         res = conts[provider](sage(q))
         return re.search(p, res).group(1).strip()
     elif mode == 'agent':
-        return conts[provider](sage.toolloop(q, trace_func=trace if verbosity else None))
+        # print(sage)
+        r = sage.toolloop(q)
+        res = list(r)
+        return conts[provider](res[-1])
+        # for i, r in enumerate(sage.toolloop(q)):
+        #     print(conts[provider](r))
+        #     ...
+        # return conts[provider](r)
+        # return conts[provider](sage.toolloop(q, trace_func=trace if verbosity else None))
     else: return conts[provider](sage(q))
 
-# %% ../nbs/00_core.ipynb 38
+# %% ../nbs/00_core.ipynb 43
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
 
 log_path = Path("~/.shell_sage/logs/").expanduser()
@@ -269,7 +276,7 @@ def mk_db():
     db.logs = db.create(Log)
     return db
 
-# %% ../nbs/00_core.ipynb 41
+# %% ../nbs/00_core.ipynb 46
 @call_parse
 def main(
     query: Param('The query to send to the LLM', str, nargs='+'),
@@ -319,7 +326,7 @@ def main(
     if verbosity > 0: print(f"{datetime.now()} | Finalizing prompt")
 
     query = f'{ctxt}\n<query>\n{query}\n</query>'
-    query = [mk_msg(query)] if opts.provider == 'openai' else query
+    # query = [mk_msg(query)] if opts.provider == 'openai' else query
 
     if verbosity > 0: print(f"{datetime.now()} | Sending prompt to model")
     sage = get_sage(opts.provider, opts.model, opts.base_url, opts.api_key, mode)

@@ -21,8 +21,4 @@ d = { 'settings': { 'branch': 'main',
                                  'shell_sage.core.mk_db': ('core.html#mk_db', 'shell_sage/core.py'),
                                  'shell_sage.core.tmux_history_lim': ('core.html#tmux_history_lim', 'shell_sage/core.py'),
                                  'shell_sage.core.trace': ('core.html#trace', 'shell_sage/core.py')},
-            'shell_sage.tools': { 'shell_sage.tools.create': ('tools.html#create', 'shell_sage/tools.py'),
-                                  'shell_sage.tools.insert': ('tools.html#insert', 'shell_sage/tools.py'),
-                                  'shell_sage.tools.rgrep': ('tools.html#rgrep', 'shell_sage/tools.py'),
-                                  'shell_sage.tools.str_replace': ('tools.html#str_replace', 'shell_sage/tools.py'),
-                                  'shell_sage.tools.view': ('tools.html#view', 'shell_sage/tools.py')}}}
+            'shell_sage.tools': {}}}
