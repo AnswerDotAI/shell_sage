@@ -35,7 +35,54 @@ Install ShellSage directly from PyPI using pip:
 pip install shell-sage
 ```
 
-### Prerequisites
+## Installing with `uv`
+
+If you have `uv` installed then you can use its powerful `tool` feature
+to install ShellSage as a global CLI — safely, with per-tool isolation
+and no need for manual virtualenv management.
+
+``` sh
+uv tool install shell_sage
+```
+
+This will make the `ssage` CLI available everywhere on your system.
+
+If you also want to install additional dependencies (for example
+`fastlite`), you can do it at install time:
+
+``` sh
+uv tool install --with fastlite shell_sage
+```
+
+### Upgrade
+
+To upgrade ShellSage to the latest version:
+
+``` sh
+uv tool upgrade shell_sage
+```
+
+### List All Installed Tools
+
+See everything you’ve installed via `uv tool`:
+
+``` sh
+uv tool list
+```
+
+### Uninstall
+
+To completely remove ShellSage and its environment:
+
+``` sh
+uv tool uninstall shell_sage
+```
+
+Using `uv tool` keeps ShellSage completely isolated from your project
+dependencies, so you can safely use `ssage` even when inside another
+virtual environment.
+
+## Prerequisites
 
 1.  **API Key Setup**
 
