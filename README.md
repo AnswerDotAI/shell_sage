@@ -45,7 +45,7 @@ and no need for manual virtualenv management.
 uv tool install shell_sage
 ```
 
-This will make the ssage CLI available everywhere on your system.
+This will make the `ssage` CLI available everywhere on your system.
 
 If you also want to install additional dependencies (for example
 `fastlite`), you can do it at install time:
