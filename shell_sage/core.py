@@ -175,39 +175,34 @@ def _aliases(shell):
     return co([shell, '-ic', 'alias'], text=True).strip()
 
 # %% ../nbs/00_core.ipynb 13
-def _man(section: int):
-    return co(f'man -k . | grep "({section})"', shell=True, text=True).strip()
-
-# %% ../nbs/00_core.ipynb 15
 def _sys_info():
     sys = co(['uname', '-a'], text=True).strip()
     ssys = f'<system>{sys}</system>'
     shell = co('echo $SHELL', shell=True, text=True).strip()
     sshell = f'<shell>{shell}</shell>'
     saliases = f'<aliases>\n{_aliases(shell)}\n</aliases>'
-    sman = f'<man_programs>\n{_man(1)}\n</aliases>'
-    return f'<system_info>\n{ssys}\n{sshell}\n{sman}\n{saliases}\n</system_info>'
+    return f'<system_info>\n{ssys}\n{sshell}\n{saliases}\n</system_info>'
 
-# %% ../nbs/00_core.ipynb 18
+# %% ../nbs/00_core.ipynb 16
 def get_pane(n, pid=None):
     "Get output from a tmux pane"
     cmd = ['tmux', 'capture-pane', '-p', '-S', f'-{n}']
     if pid: cmd += ['-t', pid]
     return co(cmd, text=True)
 
-# %% ../nbs/00_core.ipynb 20
+# %% ../nbs/00_core.ipynb 18
 def get_panes(n):
     cid = co(['tmux', 'display-message', '-p', '#{pane_id}'], text=True).strip()
     pids = [p for p in co(['tmux', 'list-panes', '-F', '#{pane_id}'], text=True).splitlines()]        
     return '\n'.join(f"<pane id={p} {'active' if p==cid else ''}>{get_pane(n, p)}</pane>" for p in pids)        
 
-# %% ../nbs/00_core.ipynb 23
+# %% ../nbs/00_core.ipynb 21
 def tmux_history_lim():
     lim = co(['tmux', 'display-message', '-p', '#{history-limit}'], text=True).strip()
     return int(lim) if lim.isdigit() else 3000
 
 
-# %% ../nbs/00_core.ipynb 25
+# %% ../nbs/00_core.ipynb 23
 def get_history(n, pid='current'):
     try:
         if pid=='current': return get_pane(n)
@@ -215,7 +210,7 @@ def get_history(n, pid='current'):
         return get_pane(n, pid)
     except subprocess.CalledProcessError: return None
 
-# %% ../nbs/00_core.ipynb 27
+# %% ../nbs/00_core.ipynb 25
 default_cfg = asdict(ShellSageConfig())
 def get_opts(**opts):
     cfg = get_cfg()
@@ -223,7 +218,7 @@ def get_opts(**opts):
         if v is None: opts[k] = cfg.get(k, default_cfg.get(k))
     return AttrDict(opts)
 
-# %% ../nbs/00_core.ipynb 29
+# %% ../nbs/00_core.ipynb 27
 def with_permission(action_desc):
     def decorator(func):
         @wraps(func)
@@ -244,24 +239,24 @@ def with_permission(action_desc):
         return wrapper
     return decorator
 
-# %% ../nbs/00_core.ipynb 30
+# %% ../nbs/00_core.ipynb 28
 tools = [with_permission('ripgrep a search term')(rg),
          with_permission('View file/director')(view),
          with_permission('Create a file')(create),
          with_permission('Replace a string with another string')(str_replace),
          with_permission('Insert content into a file')(insert)]
 
-# %% ../nbs/00_core.ipynb 32
+# %% ../nbs/00_core.ipynb 30
 sps = {'default': sp, 'command': csp, 'sassy': ssp, 'agent': asp}
 def get_sage(model, mode='default', search=False): return Chat(model=model, sp=sps[mode], tools=tools, search=search)
 
-# %% ../nbs/00_core.ipynb 34
+# %% ../nbs/00_core.ipynb 32
 def get_res(sage, q):
     # need to use stream=True to get search citations
     for o in sage(q, max_steps=10, stream=True): ...
     return o.choices[0].message.content
 
-# %% ../nbs/00_core.ipynb 39
+# %% ../nbs/00_core.ipynb 37
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
 
 log_path = Path("~/.shell_sage/logs/").expanduser()
@@ -271,7 +266,7 @@ def mk_db():
     db.logs = db.create(Log)
     return db
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 40
 @call_parse
 def main(
     query: Param('The query to send to the LLM', str, nargs='+'),
@@ -312,7 +307,7 @@ def main(
     if not sys.stdin.isatty():
         ctxt += f'\n<context>\n{sys.stdin.read()}</context>'
     
-    query = f'{ctxt}\n<query>\n{query}\n</query>'.replace(sep, '')
+    query = f'{ctxt}\n<query>\n{query}\n</query>'
 
     sage = get_sage(opts.model, mode, search=opts.search)
     res = get_res(sage, query)
@@ -324,10 +319,10 @@ def main(
                            response=res, model=opts.model, mode=mode))
     print(md(res))
 
-# %% ../nbs/00_core.ipynb 46
+# %% ../nbs/00_core.ipynb 44
 def extract_cf(idx): return re.findall(r'```(\w+)?\n(.*?)\n```', mk_db().logs()[-1].response, re.DOTALL)[idx][1]
 
-# %% ../nbs/00_core.ipynb 48
+# %% ../nbs/00_core.ipynb 46
 @call_parse
 def extract(
     idx: int,  # Index of code block to extract
