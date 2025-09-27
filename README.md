@@ -227,6 +227,60 @@ ssage --provider openai --model gpt-4o-mini "explain this error"
 ssage --history-lines 50 "what commands did I just run?"
 ```
 
+# Developer Setup Guide
+
+## Prerequisites
+
+- Python 3.9+
+- pip
+- nbdev (latest version)
+- Quarto (for documentation generation)
+
+## Installation
+
+1.  Install the development dependencies:
+
+``` sh
+# installing all dependencies
+pip install -e '.[dev]'
+nbdev_install_quarto
+```
+
+2.  Set up the tmux environment for development:
+
+**Ubuntu/Debian**
+
+``` sh
+sudo apt update
+sudo apt install tmux -y
+```
+
+3.  Start tmux:
+
+``` sh
+tmux
+```
+
+## nbdev Development Workflow
+
+### Initialize Project
+
+``` sh
+nbdev_install_quarto
+```
+
+### Update README from `index.ipynb`
+
+``` sh
+nbdev_readme
+```
+
+### Export Python Modules from Notebooks
+
+``` sh
+nbdev_export
+```
+
 ### Advanced Use Cases
 
 #### Git Workflow Enhancement
