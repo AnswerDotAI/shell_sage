@@ -22,6 +22,7 @@ from subprocess import check_output as co
 import asyncio,litellm,os,pyperclip,re,subprocess,sys
 
 # %% ../nbs/00_core.ipynb 4
+litellm.drop_params = True
 console = Console()
 print = console.print
 
