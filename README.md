@@ -5,28 +5,40 @@
 
 ## Overview
 
-**Core Features:** - **AI-powered shell assistance** - Get instant help
-with commands, syntax, and system administration - **Lisette
-integration** - Works with multiple LLM providers (Claude, GPT, Ollama,
-etc.) - **Tmux-aware context** - Automatically reads your terminal
-history for contextual help - **Tool integration** - Can view files,
-search code, create files, and make edits with your permission - **Web
-search capability** - Search the internet for up-to-date information
-when needed - **Piped input support** - Pipe command output or file
-contents directly to ShellSage - **SQLite logging** - Save all
-interactions for later reference
+**Core Features:**
 
-**Tmux Workflow:** - **Code block extraction** - Extract and send
-LLM-suggested commands directly to your tmux pane - **Multi-pane
-support** - Can analyze context from all visible tmux panes
+- **AI-powered shell assistance** - Get instant help with commands,
+  syntax, and system administration
+- **Lisette integration** - Works with multiple LLM providers (Claude,
+  GPT, Ollama, etc.)
+- **Tmux-aware context** - Automatically reads your terminal history for
+  contextual help
+- **Tool integration** - Can view files, search code, create files, and
+  make edits with your permission
+- **Web search capability** - Search the internet for up-to-date
+  information when needed
+- **Piped input support** - Pipe command output or file contents
+  directly to ShellSage
+- **SQLite logging** - Save all interactions for later reference
 
-**Modes:** - **Default mode** - Educational, friendly tone focused on
-teaching - **Sassy mode** - GLaDOS-inspired personality with dry wit
-(still helpful!)
+**Tmux Workflow:**
 
-**Display:** - **Rich markdown rendering** - Beautiful,
-syntax-highlighted output - **Customizable themes** - Configure code
-highlighting to match your preferences
+- **Code block extraction** - Extract and send LLM-suggested commands
+  directly to your tmux pane
+- **Multi-pane support** - Can analyze context from all visible tmux
+  panes
+
+**Modes:**
+
+- **Default mode** - Educational, friendly tone focused on teaching
+- **Sassy mode** - GLaDOS-inspired personality with dry wit (still
+  helpful!)
+
+**Display:**
+
+- **Rich markdown rendering** - Beautiful, syntax-highlighted output
+- **Customizable themes** - Configure code highlighting to match your
+  preferences
 
 Whether you’re a seasoned sadmin or just getting started with the
 command line, ShellSage acts as your intelligent terminal companion,
@@ -37,7 +49,7 @@ ready to help with both simple commands and complex operations.
 Install ShellSage directly from PyPI using pip:
 
 ``` sh
-pip install shell-sage
+uv pip install shell-sage
 ```
 
 ### Prerequisites
@@ -54,14 +66,14 @@ pip install shell-sage
 
 2.  **tmux Configuration**
 
-    I created a preconfigured tmux configuration that I found works well
-    with shell sage. It enables things like mouse support, adds pane ids
-    to your status bar so you can quickly reference them to have
-    ShellSage read from them, turns off alternative-screen so editor
-    content like vim will stay in the tmux buffer for ShellSage to see,
-    and adds a shortcut for automatically extracting out code fence
-    blocks into your command prompt (CTRL+B+E then the index of the code
-    fence block you want).
+    I created a preconfigured [tmux configuration](.tmux.conf) that I
+    found works well with shell sage. It enables things like mouse
+    support, adds pane ids to your status bar so you can quickly
+    reference them to have ShellSage read from them, turns off
+    alternative-screen so editor content like vim will stay in the tmux
+    buffer for ShellSage to see, and adds a shortcut for automatically
+    extracting out code fence blocks into your command prompt (CTRL+B+E
+    then the index of the code fence block you want).
 
 ## Getting Started
 
