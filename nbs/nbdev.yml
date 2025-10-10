@@ -2,8 +2,8 @@ project:
   output-dir: _docs
 
 website:
-  title: "speech_buddy"
-  site-url: "https://AnswerDotAI.github.io/speech_buddy"
-  description: "Your AI transcription buddy :D"
+  title: "shell_sage"
+  site-url: "https://AnswerDotAI.github.io/shell_sage"
+  description: "Your favorite AI buddy right in your terminal"
   repo-branch: main
-  repo-url: "https://github.com/AnswerDotAI/speech_buddy"
+  repo-url: "https://github.com/AnswerDotAI/shell_sage"

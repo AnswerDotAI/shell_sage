@@ -5,25 +5,30 @@
 
 ## Overview
 
-ShellSage works by understanding your terminal context and leveraging
-powerful language models (Claude or GPT) to provide intelligent
-assistance for:
+**Core Features:** - **AI-powered shell assistance** - Get instant help
+with commands, syntax, and system administration - **Lisette
+integration** - Works with multiple LLM providers (Claude, GPT, Ollama,
+etc.) - **Tmux-aware context** - Automatically reads your terminal
+history for contextual help - **Tool integration** - Can view files,
+search code, create files, and make edits with your permission - **Web
+search capability** - Search the internet for up-to-date information
+when needed - **Piped input support** - Pipe command output or file
+contents directly to ShellSage - **SQLite logging** - Save all
+interactions for later reference
 
-- Shell commands and scripting
-- System administration tasks
-- Git operations
-- File management
-- Process handling
-- Real-time problem solving
+**Tmux Workflow:** - **Code block extraction** - Extract and send
+LLM-suggested commands directly to your tmux pane - **Multi-pane
+support** - Can analyze context from all visible tmux panes
 
-What sets ShellSage apart is its ability to:
+**Modes:** - **Default mode** - Educational, friendly tone focused on
+teaching - **Sassy mode** - GLaDOS-inspired personality with dry wit
+(still helpful!)
 
-- Read your terminal context through tmux integration
-- Provide responses based on your current terminal state
-- Accept piped input for direct analysis
-- Target specific tmux panes for focused assistance
+**Display:** - **Rich markdown rendering** - Beautiful,
+syntax-highlighted output - **Customizable themes** - Configure code
+highlighting to match your preferences
 
-Whether you’re a seasoned sysadmin or just getting started with the
+Whether you’re a seasoned sadmin or just getting started with the
 command line, ShellSage acts as your intelligent terminal companion,
 ready to help with both simple commands and complex operations.
 
@@ -49,220 +54,200 @@ pip install shell-sage
 
 2.  **tmux Configuration**
 
-    We recommend using this optimized tmux configuration for the best
-    ShellSage experience. Create or edit your `~/.tmux.conf`:
-
-    ``` sh
-    # Enable mouse support
-    set -g mouse on
-
-    # Show pane ID and time in status bar
-    set -g status-right '#{pane_id} | %H:%M '
-
-    # Keep terminal content visible (needed for neovim)
-    set-option -g alternate-screen off
-
-    # Enable vi mode for better copy/paste
-    set-window-option -g mode-keys vi
-
-    # Improved search and copy bindings
-    bind-key / copy-mode\; send-key ?
-    bind-key -T copy-mode-vi y \
-      send-key -X start-of-line\; \
-      send-key -X begin-selection\; \
-      send-key -X end-of-line\; \
-      send-key -X cursor-left\; \
-      send-key -X copy-selection-and-cancel\; \
-      paste-buffer
-    ```
-
-    Reload tmux config:
-
-    ``` sh
-    tmux source ~/.tmux.conf
-    ```
-
-This configuration enables mouse support, displays pane IDs (crucial for
-targeting specific panes), maintains terminal content visibility, and
-adds vim-style keybindings for efficient navigation and text selection.
+    I created a preconfigured tmux configuration that I found works well
+    with shell sage. It enables things like mouse support, adds pane ids
+    to your status bar so you can quickly reference them to have
+    ShellSage read from them, turns off alternative-screen so editor
+    content like vim will stay in the tmux buffer for ShellSage to see,
+    and adds a shortcut for automatically extracting out code fence
+    blocks into your command prompt (CTRL+B+E then the index of the code
+    fence block you want).
 
 ## Getting Started
 
-### Basic Usage
+### Your First Command
 
-ShellSage is designed to run within a tmux session. Here are the core
-commands:
+Once installed, try ShellSage with a simple greeting:
 
 ``` sh
-# Basic usage
-ssage hi ShellSage
+ssage hi
+```
 
-# Pipe content to ShellSage
+If everything is properly setup, you should see a welcoming greeting
+back from ShellSage!
+
+### Getting Help with Commands
+
+The most basic use case is asking about shell commands:
+
+``` sh
+ssage how do I list all files including hidden ones? # note if you are using zsh, you will need to wrap prompts in quotes that include ?
+ssage explain what rsync does
+ssage show me tar command examples
+```
+
+ShellSage will provide the command, explain how it works, and give you
+practical examples.
+
+### Using Terminal Context
+
+ShellSage automatically reads your tmux history to understand what
+you’re working on:
+
+``` sh
+# After running some commands that produced errors
+ssage what went wrong with my last command?
+
+# Get suggestions based on your workflow
+ssage what should I do next?
+```
+
+### Piping Content for Analysis
+
+One of ShellSage’s most powerful features is analyzing piped input:
+
+``` sh
+# Understand error messages
 cat error.log | ssage explain this error
 
-# Target a specific tmux pane
-ssage --pid %3 what is happening in this pane?
+# Review code changes
+git diff | ssage summarize these changes
 
-# Automatically fill in the command to run
-ssage --c how can I list all files including the hidden ones?
-
-# Log the model, timestamp, query and response to a local SQLite database
-ssage --log "how can i remove the file"
+# Analyze system logs
+journalctl -xe | ssage what's causing these errors?
 ```
 
-The `--pid` flag is particularly useful when you want to analyze content
-from a different pane. The pane ID is visible in your tmux status bar
-(configured earlier).
+### Working with Multiple Tmux Panes
 
-The `--log` option saves log data to an SQLite database located at
-`~/.shell_sage/log_db/logs.db`.
-
-### Using Alternative Model Providers
-
-ShellSage supports using different LLM providers through base URL
-configuration. This allows you to use local models or alternative API
-endpoints:
+When you have multiple panes open, you can reference specific ones by
+their ID (shown in your status bar):
 
 ``` sh
-# Use a local Ollama endpoint
-ssage --provider openai --model llama3.2 --base_url http://localhost:11434/v1 --api_key ollama what is rsync?
+# Analyze what's happening in pane %2
+ssage --pid %2 what is this process doing?
 
-# Use together.ai
-ssage --provider openai --model mistralai/Mistral-7B-Instruct-v0.3 --base_url https://api.together.xyz/v1 help me with sed # make sure you've set your together API key in your shell_sage conf
+# Compare across all panes
+ssage --pid all summarize what's happening in all my panes
 ```
 
-This is particularly useful for:
+### Extracting and Running Commands
 
-- Running models locally for privacy/offline use
-- Using alternative hosting providers
-- Testing different model implementations
-- Accessing specialized model deployments
+When ShellSage suggests commands, you can extract them directly to your
+command line. First, enable logging:
 
-You can also set these configurations permanently in your ShellSage
-config file (`~/.config/shell_sage/shell_sage.conf`). See next section
-for details.
-
-## Configuration
-
-ShellSage can be customized through its configuration file located at
-`~/.config/shell_sage/shell_sage.conf`. Here’s a complete configuration
-example:
-
-``` ini
-[DEFAULT]
-# Choose your AI model provider
-provider = anthropic     # or 'openai'
-model = claude-3-5-sonnet-20241022 # or 'gpt-4o-mini' for OpenAI
-base_url = # leave empty to use default openai endpoint
-api_key = # leave empty to default to using your OPENAI_API_KEY env var
-
-# Terminal history settings
-history_lines = -1      # -1 for all history
-
-# Code display preferences
-code_theme = monokai    # syntax highlighting theme
-code_lexer = python     # default code lexer
-log = False      # Set to true to enable logging by default
+``` sh
+ssage --log how do I find large files?
 ```
 
-You can find all of the code theme and code lexer options here:
-https://pygments.org/styles/
+ShellSage will respond with code blocks. Press `Ctrl+B E` then enter the
+index number (0 for first block, 1 for second, etc.) to send that
+command directly to your prompt.
+
+### Enabling Sassy Mode
+
+For a more entertaining experience, try sassy mode (GLaDOS-inspired):
+
+``` sh
+ssage --mode sassy explain git rebase
+```
+
+### Next Steps
+
+Now that you’re familiar with the basics: - Try piping different types
+of content to ShellSage - Experiment with the `--pid` flag to analyze
+different panes - Enable logging with `--log` to use the code extraction
+feature - Check out the Configuration section to customize your
+experience
+
+## Configuration and Model Providers
+
+### Configuration File
+
+ShellSage can be customized through a configuration file located at
+`~/.config/shell_sage/shell_sage.conf`:
+
+    [DEFAULT]
+    model = 'claude-sonnet-4-5-20250929'    # Your preferred model
+    search = ''                             # Enable web search capability (can be either l,m,h https://lisette.answer.ai/#web-search)
+    mode = 'default'                        # or "sassy"
+    api_base = ''                           # alternative api url base
+    api_key = ''                            # alternative api key to use instead of default env var
+    history_lines = -1                      # Lines of terminal history to include. -1 means include all
+    code_theme = "monokai"                  # Syntax highlighting theme
+    code_lexer = "python"                   # Default lexer for inline code blocks
+    log = False                             # Enable SQLite logging (required for code extraction)
+
+### Using Different Model Providers
+
+ShellSage uses [lisette](https://github.com/AnswerDotAI/lisette) under
+the hood, which supports any LLM provider via
+[LiteLLM](https://docs.litellm.ai/docs/providers). This means you can
+use Claude, GPT, Gemini, local models via Ollama, and many others.
+
+#### Local Models with Ollama
+
+For privacy-conscious users or offline usage, run models locally:
+
+``` sh
+# First, install and start Ollama, then pull a model
+ollama pull qwen3:1.7b
+
+# Use with ShellSage
+ssage --model ollama_chat/qwen3:1.7b how do I compress a directory?
+
+# Or set as default in your config.toml
+model = "ollama_chat/qwen3:1.7b"
+```
+
+#### OpenAI
+
+``` sh
+export OPENAI_API_KEY=your_key_here
+ssage --model gpt-5 explain kubernetes pods
+```
+
+#### Google Gemini
+
+``` sh
+export GEMINI_API_KEY=your_key_here
+ssage --model gemini/gemini-pro what is systemd?
+```
+
+#### Other Providers
+
+For any provider supported by LiteLLM, set the appropriate API key and
+use the provider’s model format:
+
+``` sh
+# Custom API base
+ssage --api-base https://your-api.com --api-key your_key --model your_model your query
+```
+
+See the [LiteLLM providers
+documentation](https://docs.litellm.ai/docs/providers) for the complete
+list of supported providers and their model naming conventions.
 
 ### Command Line Overrides
 
-Any configuration option can be overridden via command line arguments:
+Any configuration option can be temporarily overridden via command line
+arguments:
 
 ``` sh
-# Use OpenAI instead of Claude for a single query
-ssage --provider openai --model gpt-4o-mini "explain this error"
+# Use a different model for one query
+ssage --model gpt-5 explain this error
 
-# Adjust history lines for a specific query
-ssage --history-lines 50 "what commands did I just run?"
+# Adjust history lines
+ssage --history-lines 100 what commands did I just run?
+
+# Enable logging for this prompt
+ssage --log how do I find large files?
+
+# Change the display theme
+ssage --code-theme dracula --code-lexer python show me a python example
 ```
 
-### Advanced Use Cases
-
-#### Git Workflow Enhancement
-
-``` sh
-# Review changes before commit
-git diff | ssage summarize these changes
-
-# Get commit message suggestions
-git diff --staged | ssage suggest a commit message
-
-# Analyze PR feedback
-gh pr view 123 | ssage summarize this PR feedback
-```
-
-#### Log Analysis
-
-``` sh
-# Quick error investigation
-journalctl -xe | ssage what's causing these errors?
-
-# Apache/Nginx log analysis
-tail -n 100 /var/log/nginx/access.log | ssage analyze this traffic pattern
-
-# System performance investigation
-top -b -n 1 | ssage explain system resource usage
-```
-
-#### Docker Management
-
-``` sh
-# Container troubleshooting
-docker logs my-container | ssage "what is wrong with this container?"
-
-# Image optimization
-docker history my-image | ssage suggest optimization improvements
-
-# Compose file analysis
-cat docker-compose.yml | ssage review this compose configuration
-```
-
-#### Database Operations
-
-``` sh
-# Query optimization
-psql -c "EXPLAIN ANALYZE SELECT..." | ssage optimize this query
-
-# Schema review
-pg_dump --schema-only mydb | ssage review this database schema
-
-# Index suggestions
-psql -c "\di+" | ssage suggest missing indexes
-```
-
-## Tips & Best Practices
-
-### Effective Usage Patterns
-
-1.  **Contextual Queries**
-
-    - Keep your tmux pane IDs visible in the status bar
-    - Use `--pid` when referencing other panes
-    - Let ShellSage see your recent command history for better context
-
-2.  **Piping Best Practices**
-
-    ``` sh
-    # Pipe logs directly
-    tail log.txt | ssage "summarize these logs"
-
-    # Combine commands
-    git diff | ssage "review these changes"
-    ```
-
-### Getting Help
-
-``` sh
-# View all available options
-ssage --help
-
-# Submit issues or feature requests
-# https://github.com/AnswerDotAI/shell_sage/issues
-```
+You can find all available code themes and lexers at
+https://pygments.org/styles/
 
 ## Contributing
 
