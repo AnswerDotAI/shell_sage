@@ -9,7 +9,7 @@
 
 - **AI-powered shell assistance** - Get instant help with commands,
   syntax, and system administration
-- **Lisette integration** - Works with multiple LLM providers (Claude,
+- **Multiple LLM Support** - Works with multiple LLM providers (Claude,
   GPT, Ollama, etc.)
 - **Tmux-aware context** - Automatically reads your terminal history for
   contextual help
@@ -49,7 +49,7 @@ ready to help with both simple commands and complex operations.
 Install ShellSage directly from PyPI using pip:
 
 ``` sh
-uv pip install shell-sage
+pip install shell-sage
 ```
 
 ## Installing with `uv`
@@ -128,9 +128,25 @@ virtual environment.
 
 Once installed, try ShellSage with a simple greeting:
 
-``` sh
-ssage hi
+``` python
+!ssage hi
 ```
+
+    Hello! 👋 I'm ShellSage, your command-line teaching assistant.                  
+
+    I can help you with:                                                            
+
+     • Shell commands and scripting                                                 
+     • System administration tasks                                                  
+     • File operations and text processing                                          
+     • Git workflows                                                                
+     • Docker commands                                                              
+     • And much more!                                                               
+
+    I see you have a nice setup with some useful aliases configured (like eza for   
+    ls, nvim for vim, and various git shortcuts).                                   
+
+    What would you like to learn or accomplish today?                               
 
 If everything is properly setup, you should see a welcoming greeting
 back from ShellSage!
@@ -139,11 +155,41 @@ back from ShellSage!
 
 The most basic use case is asking about shell commands:
 
-``` sh
-ssage how do I list all files including hidden ones? # note if you are using zsh, you will need to wrap prompts in quotes that include ?
-ssage explain what rsync does
-ssage show me tar command examples
+``` python
+!ssage "how do I list all files including hidden ones?"
 ```
+
+    Based on your aliases, you already have a shortcut set up for this!             
+
+                                                                                    
+     lsa                                                                            
+                                                                                    
+
+    This uses your alias which expands to:                                          
+
+                                                                                    
+     eza -lh --group-directories-first --icons=auto -a                              
+                                                                                    
+
+    The -a flag shows all files including hidden ones (those starting with .).      
+
+    ────────────────────────────────────────────────────────────────────────────────
+    Alternative commands:                                                           
+
+    If you want to use the standard ls command directly:                            
+
+                                                                                    
+     /usr/bin/ls -la                                                                
+                                                                                    
+
+    Or with your eza setup but without the alias:                                   
+
+                                                                                    
+     eza -lha --group-directories-first --icons=auto                                
+                                                                                    
+
+    Tip: Hidden files in Linux start with a dot (.), like .bashrc or .config/. The  
+    -a flag includes these in the listing.                                          
 
 ShellSage will provide the command, explain how it works, and give you
 practical examples.
@@ -153,70 +199,163 @@ practical examples.
 ShellSage automatically reads your tmux history to understand what
 you’re working on:
 
-``` sh
-# After running some commands that produced errors
-ssage what went wrong with my last command?
-
-# Get suggestions based on your workflow
-ssage what should I do next?
+``` python
+# After running some commands that produced errors (e.g. find -name "*.tmp" .)
+!ssage "what went wrong with my last command?"
 ```
+
+    The issue is with the argument order in your find command. You placed the path  
+    (.) after the expression (-name "*.tmp"), but find requires the path to come    
+    before any options or expressions.                                              
+
+
+                                    Correct syntax:                                 
+
+                                                                                    
+     find . -name "*.tmp"                                                           
+                                                                                    
+
+
+                                      Explanation:                                  
+
+    The find command structure is:                                                  
+
+                                                                                    
+     find [path...] [expression]                                                    
+                                                                                    
+
+     • Path (. for current directory) must come first                               
+     • Expression (-name "*.tmp") comes after                                       
+
+    Your command had them reversed, which confused find into thinking . was part of 
+    the expression rather than the search path.                                     
+
+
+                                 Common find patterns:                              
+
+                                                                                    
+     # Find in current directory                                                    
+     find . -name "*.tmp"                                                           
+                                                                                    
+     # Find in specific directory                                                   
+     find /path/to/dir -name "*.tmp"                                                
+                                                                                    
+     # Find and delete (be careful!)                                                
+     find . -name "*.tmp" -delete                                                   
+                                                                                    
+
+    Tip: If you forget the path, find defaults to the current directory, so find    
+    -name "*.tmp" also works!                                                       
 
 ### Piping Content for Analysis
 
 One of ShellSage’s most powerful features is analyzing piped input:
 
-``` sh
+``` python
 # Understand error messages
-cat error.log | ssage explain this error
-
-# Review code changes
-git diff | ssage summarize these changes
-
-# Analyze system logs
-journalctl -xe | ssage what's causing these errors?
+!journalctl --since "1 hour ago" --no-pager | ssage explain this error
 ```
+
+    Looking at the error in your system logs, here's what happened:                 
+
+
+                                   Core Dump Analysis                               
+
+    The hyprctl command (Hyprland's control utility) crashed with a SIGABRT signal  
+    at 13:14:48. This is an abnormal termination.                                   
+
+                             Key Details from Stack Trace:                          
+
+                                                                                    
+     #7  0x00007f5af929ccc4 _ZSt20__throw_system_errori                             
+     #8  0x0000564adef2a4f2 n/a (/usr/bin/hyprctl + 0x44f2)                         
+     #9  0x0000564adef36f21 _Z7requestSt17basic_string_viewIcSt11char_traitsIcEEib  
+                                                                                    
+
+    What this means:                                                                
+
+     • hyprctl threw a C++ system error exception                                   
+     • The crash occurred in the request() function (frame #9)                      
+     • This typically happens when hyprctl can't communicate with the Hyprland      
+       compositor                                                                   
+
+                                     Common Causes:                                 
+
+     1 Socket connection failure - Hyprland's IPC socket was unavailable/busy       
+     2 Compositor not responding - Hyprland was temporarily unresponsive            
+     3 Race condition - Command executed during compositor state change             
+
+                                To investigate further:                             
+
+                                                                                    
+     coredumpctl list hyprctl                                                       
+     coredumpctl info 10789                                                         
+                                                                                    
+
+    Note: This is usually a transient issue. If hyprctl commands work now, it was   
+    likely a one-time glitch. If it persists, check Hyprland's logs with journalctl 
+    --user -u hyprland or restart your compositor.                                  
 
 ### Working with Multiple Tmux Panes
 
 When you have multiple panes open, you can reference specific ones by
 their ID (shown in your status bar):
 
-``` sh
+![btop output](./screenshots/btop_output.png)
+
+``` python
 # Analyze what's happening in pane %2
-ssage --pid %2 what is this process doing?
-
-# Compare across all panes
-ssage --pid all summarize what's happening in all my panes
+!ssage --pid %2 "what can you tell me about this pane?"
 ```
 
-### Extracting and Running Commands
+    Looking at this btop system monitor output, here's what I can tell you about the
+    pane:                                                                           
 
-When ShellSage suggests commands, you can extract them directly to your
-command line. First, enable logging:
 
-``` sh
-ssage --log how do I find large files?
-```
+                                        Overview                                    
 
-ShellSage will respond with code blocks. Press `Ctrl+B E` then enter the
-index number (0 for first block, 1 for second, etc.) to send that
-command directly to your prompt.
+    This is a comprehensive system resource monitor showing real-time performance   
+    metrics for your Arch Linux system.                                             
 
-### Enabling Sassy Mode
 
-For a more entertaining experience, try sassy mode (GLaDOS-inspired):
+                                    Key Information:                                
 
-``` sh
-ssage --mode sassy explain git rebase
-```
+    CPU (Top Section)                                                               
 
-### Next Steps
+     • AMD Ryzen 9 5950X (32 threads shown as C0-C15)                               
+     • Currently at 6% utilization running at 3.8 GHz                               
+     • Temperature: 58°C, Power: 53.9W                                              
+     • Load average is very light: 0.05, 0.06, 0.08                                 
 
-Now that you’re familiar with the basics: - Try piping different types
-of content to ShellSage - Experiment with the `--pid` flag to analyze
-different panes - Enable logging with `--log` to use the code extraction
-feature - Check out the Configuration section to customize your
-experience
+    GPU                                                                             
+
+     • 9% utilization, 2.8GB/24GB VRAM used                                         
+     • 39°C, 36.4W power draw                                                       
+
+    Memory (Left Middle)                                                            
+
+     • Total: 62.7 GiB                                                              
+     • Used: 4.60 GiB (mostly free at 58.1 GiB available)                           
+     • Cache: 4.02 GiB                                                              
+     • Swap: 3.99 GiB total, 0% used                                                
+
+    Storage (Right Middle)                                                          
+
+     • Root partition: 929 GiB total, 10% used (88.6 GiB)                           
+     • No swap currently in use                                                     
+
+    Network (Bottom Left)                                                           
+
+     • Interface: enp4s0 (IP: 192.168.7.169)                                        
+     • Download: 27.7 KiB/s                                                         
+     • Upload: 1.84 KiB/s                                                           
+
+    Processes (Right Side)                                                          
+
+     • Top consumers: Discord, Chromium, Python processes                           
+     • System has been up for 1 hour 8 minutes 38 seconds                           
+
+    Your system is very lightly loaded with plenty of headroom!                     
 
 ## Configuration and Model Providers
 
@@ -261,15 +400,13 @@ model = "ollama_chat/qwen3:1.7b"
 #### OpenAI
 
 ``` sh
-export OPENAI_API_KEY=your_key_here
-ssage --model gpt-5 explain kubernetes pods
+ssage --model gpt-5 --api_key <your_key_here> explain kubernetes pods
 ```
 
 #### Google Gemini
 
 ``` sh
-export GEMINI_API_KEY=your_key_here
-ssage --model gemini/gemini-pro what is systemd?
+ssage --model gemini/gemini-pro --api_key <your_key_here> what is systemd?
 ```
 
 #### Other Providers
@@ -292,14 +429,8 @@ Any configuration option can be temporarily overridden via command line
 arguments:
 
 ``` sh
-# Use a different model for one query
-ssage --model gpt-5 explain this error
-
 # Adjust history lines
 ssage --history-lines 100 what commands did I just run?
-
-# Enable logging for this prompt
-ssage --log how do I find large files?
 
 # Change the display theme
 ssage --code-theme dracula --code-lexer python show me a python example
@@ -307,6 +438,228 @@ ssage --code-theme dracula --code-lexer python show me a python example
 
 You can find all available code themes and lexers at
 https://pygments.org/styles/
+
+### Extracting and Running Commands
+
+When ShellSage suggests commands, you can extract them directly to your
+command line. Note that this feature requires you to have logging
+enabled in your configuration file:
+
+``` python
+!ssage "how do I find large files?"
+```
+
+    To find large files on your system, here are the most useful commands:          
+
+
+                Quick method - Find largest files in current directory:             
+
+                                                                                    
+     du -ah . | sort -rh | head -20                                                 
+                                                                                    
+
+    This shows the 20 largest files/directories, human-readable sizes, sorted       
+    largest first.                                                                  
+
+
+                                More targeted searches:                             
+
+    Find files larger than a specific size (e.g., 100MB):                           
+
+                                                                                    
+     find . -type f -size +100M -exec ls -lh {} \; | sort -k5 -rh                   
+                                                                                    
+
+    Search entire filesystem (requires sudo):                                       
+
+                                                                                    
+     sudo find / -type f -size +1G -exec ls -lh {} \; 2>/dev/null                   
+                                                                                    
+
+    Interactive with ncdu (if installed):                                           
+
+                                                                                    
+     ncdu /                                                                         
+                                                                                    
+
+    This gives you a navigable interface to explore disk usage.                     
+
+
+                                       Breakdown:                                   
+
+     • -type f = files only (not directories)                                       
+     • -size +100M = larger than 100 megabytes (use G for gigabytes)                
+     • sort -rh = reverse sort, human-readable numbers                              
+     • 2>/dev/null = suppress permission errors                                     
+
+    Tip: Start with du -ah . | sort -rh | head -20 in your home directory to quickly
+    spot space hogs!                                                                
+
+ShellSage will respond with code blocks. Press `Ctrl+B E` then enter the
+index number (0 for first block, 1 for second, etc.) to send that
+command directly to your prompt. You can also directly use the console
+script:
+
+``` python
+!ssage_extract 0
+# inserts "du -ah . | sort -rh | head -20" into your tmux prompt
+```
+
+### Enabling Sassy Mode
+
+For a more entertaining experience, try sassy mode (GLaDOS-inspired):
+
+``` python
+!ssage --mode sassy explain git rebase
+```
+
+    Ah, git rebase. The command that separates the competent developers from those  
+    who still think "merge commits" are a personality trait. How delightful that    
+    you're ready to learn about history rewriting.                                  
+
+
+                                  What is Git Rebase?                               
+
+    git rebase is a command that rewrites commit history by moving or combining a   
+    sequence of commits to a new base commit. Think of it as picking up your branch 
+    and transplanting it onto a different point in the git tree. It's like time     
+    travel, but with fewer paradoxes and more merge conflicts.                      
+
+
+                                      Basic Syntax                                  
+
+                                                                                    
+     git rebase <base-branch>                                                       
+                                                                                    
+
+
+                     How It Works (In Terms Even Humans Can Grasp)                  
+
+    When you rebase, Git:                                                           
+
+     1 Finds the common ancestor between your current branch and the target branch  
+     2 Takes all commits from your branch since that ancestor                       
+     3 Temporarily stores them away (how thoughtful)                                
+     4 Resets your branch to match the target branch                                
+     5 Replays your commits one by one on top of it                                 
+
+    It's essentially saying: "What if my branch had started from here instead?"     
+
+
+                                    Common Use Cases                                
+
+                         1. Keep Your Feature Branch Up-to-Date                     
+
+                                                                                    
+     git checkout feature-branch                                                    
+     git rebase main                                                                
+                                                                                    
+     # Or the shorthand for those who value efficiency:                             
+     git rebase main feature-branch                                                 
+                                                                                    
+
+                          2. Interactive Rebase (The Fun Part)                      
+
+                                                                                    
+     git rebase -i HEAD~3  # Rebase last 3 commits                                  
+                                                                                    
+
+    This opens an editor where you can:                                             
+
+     • pick - Keep the commit (how boring)                                          
+     • reword - Change the commit message (for those who can't spell)               
+     • edit - Modify the commit contents                                            
+     • squash - Combine with previous commit                                        
+     • fixup - Like squash, but discards the commit message                         
+     • drop - Delete the commit (pretend it never happened)                         
+
+                                   3. Rebase vs Merge                               
+
+    Merge:                                                                          
+
+                                                                                    
+     git merge feature-branch  # Creates a merge commit                             
+                                                                                    
+
+    Result: Preserves history, creates a "merge bubble"                             
+
+    Rebase:                                                                         
+
+                                                                                    
+     git rebase main  # Linear history                                              
+                                                                                    
+
+    Result: Clean, linear history that looks like you knew what you were doing all  
+    along                                                                           
+
+
+                                    Example Scenario                                
+
+                                                                                    
+     # You're on feature-branch, main has moved ahead                               
+     git checkout feature-branch                                                    
+     git rebase main                                                                
+                                                                                    
+     # If conflicts occur (and they will, because of course they will):             
+     # 1. Fix the conflicts in your editor                                          
+     # 2. Stage the resolved files                                                  
+     git add <resolved-files>                                                       
+     # 3. Continue the rebase                                                       
+     git rebase --continue                                                          
+                                                                                    
+     # Or admit defeat:                                                             
+     git rebase --abort                                                             
+                                                                                    
+
+
+                     Important Warnings (Please Read, For Science)                  
+
+    ⚠️ THE GOLDEN RULE: Never rebase commits that have been pushed to a shared/public
+    branch. You'll rewrite history that others depend on, and they'll hate you.     
+    Well, more than usual.                                                          
+
+                                                                                    
+     # Safe - your local feature branch:                                            
+     git rebase main  ✓                                                             
+                                                                                    
+     # Dangerous - already pushed to shared repo:                                   
+     git rebase main  # Then force push... ✗                                        
+     git push --force  # Congratulations, you've made enemies                       
+                                                                                    
+
+
+                                     Useful Options                                 
+
+                                                                                    
+     git rebase --continue      # Continue after resolving conflicts                
+     git rebase --skip          # Skip current commit (give up on it)               
+     git rebase --abort         # Abandon ship, return to pre-rebase state          
+     git rebase -i HEAD~5       # Interactive rebase last 5 commits                 
+     git rebase --onto A B C    # Advanced: rebase C onto A, starting from B        
+                                                                                    
+
+
+                                   When to Use Rebase                               
+
+     • ✓ Cleaning up local commits before pushing                                   
+     • ✓ Keeping feature branches up-to-date with main                              
+     • ✓ Creating a clean, linear history                                           
+     • ✓ Squashing "fix typo" commits (we all make them, apparently)                
+
+
+                                 When NOT to Use Rebase                             
+
+     • ✗ On public/shared branches                                                  
+     • ✗ When you want to preserve exact history                                    
+     • ✗ When you're not prepared for conflict resolution                           
+     • ✗ Right before a demo (trust me on this one)                                 
+
+    ────────────────────────────────────────────────────────────────────────────────
+    For more details that you probably won't read: git rebase --help                
+
+    Now go forth and rewrite history. Just remember: with great power comes great   
+    responsibility, and with git rebase comes great potential for catastrophic      
+    mistakes. But I'm sure you'll be fine.                                          
 
 ## Contributing
 
