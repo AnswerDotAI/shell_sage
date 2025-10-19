@@ -2,43 +2,12 @@
 
 <!-- do not remove -->
 
-## 0.1.1
+## 1.0.0
 
-### Bugs Squashed
+### New Features
 
-- AttributeError: module 'cosette' has no attribute 'contents' with cosette 0.2.0 ([#53](https://github.com/AnswerDotAI/shell_sage/issues/53))
-  - ## Bug Report
-
-### Environment
-- shell-sage version: 0.1.0
-- cosette version: 0.2.0 (installed by default)
-- Python version: 3.10
-
-### Problem
-When running `ssage` after installation, it fails with:
-```
-AttributeError: module 'cosette' has no attribute 'contents'
-```
-
-### Root Cause
-Line 252 in `shell_sage/core.py` tries to access `cos.contents`:
-```python
-conts = {'anthropic': cla.contents, 'openai': cos.contents}
-```
-
-However, cosette 0.2.0 appears to have removed the `contents` attribute.
-
-### Workaround
-Install with cosette 0.1.0:
-```bash
-uv tool uninstall shell-sage
-uv tool install shell-sage --with cosette==0.1.0
-```
-
-### Suggested Fix
-Either:
-1. Pin cosette to `<0.2.0` in dependencies, or 
-2. Update code to work with cosette 0.2.0's new API
+- Rewrite shell sage to use lisette ([#56](https://github.com/AnswerDotAI/shell_sage/pull/56)), thanks to [@ncoop57](https://github.com/ncoop57)
+  - This PR is a major rewrite of shell sage to now use lisette which make it easier to use other llm providers. Additionally, we have done away with command and agent mode and having the default mode subsume these. Added additional tools and web search as well.
 
 
 ## 0.1.1
