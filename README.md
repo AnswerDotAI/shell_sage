@@ -5,44 +5,19 @@
 
 ## Overview
 
-**Core Features:**
+ShellSage is an AI-powered command-line assistant that integrates
+seamlessly with your terminal workflow through tmux. It provides
+contextual help for shell operations, making it easier to navigate
+complex command-line tasks, debug scripts, and manage your system.
 
-- **AI-powered shell assistance** - Get instant help with commands,
-  syntax, and system administration
-- **Multiple LLM Support** - Works with multiple LLM providers (Claude,
-  GPT, Ollama, etc.)
-- **Tmux-aware context** - Automatically reads your terminal history for
-  contextual help
-- **Tool integration** - Can view files, search code, create files, and
-  make edits with your permission
-- **Web search capability** - Search the internet for up-to-date
-  information when needed
-- **Piped input support** - Pipe command output or file contents
-  directly to ShellSage
-- **SQLite logging** - Save all interactions for later reference
-
-**Tmux Workflow:**
-
-- **Code block extraction** - Extract and send LLM-suggested commands
-  directly to your tmux pane
-- **Multi-pane support** - Can analyze context from all visible tmux
-  panes
-
-**Modes:**
-
-- **Default mode** - Educational, friendly tone focused on teaching
-- **Sassy mode** - GLaDOS-inspired personality with dry wit (still
-  helpful!)
-
-**Display:**
-
-- **Rich markdown rendering** - Beautiful, syntax-highlighted output
-- **Customizable themes** - Configure code highlighting to match your
-  preferences
-
-Whether you’re a seasoned sadmin or just getting started with the
-command line, ShellSage acts as your intelligent terminal companion,
-ready to help with both simple commands and complex operations.
+ShellSage works with multiple LLM providers including Claude, GPT, and
+Ollama. It uses tmux to automatically read your terminal history or
+multiple pane histories to provide contextual assistance. You can pipe
+command output or file contents directly to ShellSage, and it can view
+files, search code, create files, and make edits with your permission.
+When needed, it can even search the internet for up-to-date information.
+You can also log all your interactions directly to SQLite for later
+reference.
 
 ## Installation
 
@@ -101,26 +76,31 @@ virtual environment.
 
 ## Prerequisites
 
-1.  **API Key Setup**
+Before using ShellSage, you’ll need to set up an API key for your chosen
+LLM provider. By default, ShellSage uses Claude, so you’ll want to
+export your Anthropic API key:
 
-    ``` sh
-    # For Claude (default)
-    export ANTHROPIC_API_KEY=sk...
+``` sh
+export ANTHROPIC_API_KEY=sk...
+```
 
-    # For OpenAI (optional)
-    export OPENAI_API_KEY=sk...
-    ```
+If you prefer to use OpenAI instead, you can export your OpenAI API key
+and update your shell sage config to use openai (see the Configuration
+section below for details):
 
-2.  **tmux Configuration**
+``` sh
+export OPENAI_API_KEY=sk...
+```
 
-    I created a preconfigured [tmux configuration](.tmux.conf) that I
-    found works well with shell sage. It enables things like mouse
-    support, adds pane ids to your status bar so you can quickly
-    reference them to have ShellSage read from them, turns off
-    alternative-screen so editor content like vim will stay in the tmux
-    buffer for ShellSage to see, and adds a shortcut for automatically
-    extracting out code fence blocks into your command prompt (CTRL+B+E
-    then the index of the code fence block you want).
+ShellSage works best with a properly configured tmux environment. I’ve
+created a preconfigured [tmux configuration](.tmux.conf) that works well
+with ShellSage. This configuration enables mouse support, adds pane IDs
+to your status bar so you can quickly reference them when having
+ShellSage read from specific panes, turns off alternative-screen so
+editor content like vim stays in the tmux buffer where ShellSage can see
+it, and adds a convenient shortcut (CTRL+B+E followed by the index
+number) for automatically extracting code fence blocks into your command
+prompt.
 
 ## Getting Started
 
