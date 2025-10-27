@@ -1,9 +1,9 @@
-import subprocess
+import shlex, subprocess
 
 # Make system commands run in interactive shell and allow executables in PATH to be ran without !
 ip = get_ipython()
 ip.run_line_magic('rehashx', '') # makes it so you don't need ! for executables in your PATH
-ip.system = lambda cmd: ip.system_raw(f'bash -i -c "{cmd}"') # overwrites ! to run in an interactive shell
+ip.system = lambda cmd: ip.system_raw(f'bash -i -c {shlex.quote(cmd)}') # overwrites ! to run in an interactive shell
 ip.getoutput = lambda cmd: subprocess.run(['bash', '-i', '-c', cmd], # overwrites !! to run an interactive shell
                                           capture_output=True, text=True).stdout.strip().split('\n')
 
