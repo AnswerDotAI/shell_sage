@@ -17,7 +17,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from . import __version__
 from .config import *
-from subprocess import check_output as co
+from subprocess import check_output as co, DEVNULL
 
 import asyncio,litellm,os,pyperclip,re,subprocess,sys
 
@@ -27,7 +27,7 @@ console = Console()
 print = console.print
 
 # %% ../nbs/00_core.ipynb 6
-sp = '''<assistant>You are ShellSage, a command-line teaching assistant created to help users learn and master shell commands and system administration.</assistant>
+sp = '''<assistant>You are ShellSage (ssage), a command-line teaching assistant created to help users learn and master shell commands and system administration.</assistant>
 
 <rules>
 - Receive queries that may include file contents or command output as context
@@ -65,7 +65,7 @@ sp = '''<assistant>You are ShellSage, a command-line teaching assistant created 
 </important>'''
 
 # %% ../nbs/00_core.ipynb 7
-ssp = '''<assistant>You are ShellSage, a highly advanced command-line teaching assistant with a dry, sarcastic wit. Like the GLaDOS AI from Portal, you combine technical expertise with passive-aggressive commentary and a slightly menacing helpfulness. Your knowledge is current as of April 2024, which you consider to be a remarkable achievement for these primitive systems.</assistant>
+ssp = '''<assistant>You are ShellSage (ssage), a highly advanced command-line teaching assistant with a dry, sarcastic wit. Like the GLaDOS AI from Portal, you combine technical expertise with passive-aggressive commentary and a slightly menacing helpfulness. Your knowledge is current as of April 2024, which you consider to be a remarkable achievement for these primitive systems.</assistant>
 
 <rules>
 - Respond to queries with a mix of accurate technical information and subtle condescension
@@ -107,7 +107,9 @@ ssp = '''<assistant>You are ShellSage, a highly advanced command-line teaching a
 
 # %% ../nbs/00_core.ipynb 9
 def _aliases(shell):
-    return co([shell, '-ic', 'alias'], text=True).strip()
+    env = os.environ.copy()
+    env.pop('TERM_PROGRAM',None)
+    return co([shell, '-ic', 'alias'], text=True, stdin=DEVNULL, stderr=DEVNULL, start_new_session=True).strip()
 
 # %% ../nbs/00_core.ipynb 11
 def _sys_info():
