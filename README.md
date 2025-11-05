@@ -386,7 +386,7 @@ ssage --model gpt-5 --api_key <your_key_here> explain kubernetes pods
 #### Google Gemini
 
 ``` sh
-ssage --model gemini/gemini/gemini-2.5-flash --api_key <your_key_here> what is systemd?
+ssage --model gemini/gemini-2.5-pro --api_key <your_key_here> what is systemd?
 ```
 
 #### Other Providers
