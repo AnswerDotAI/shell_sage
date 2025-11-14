@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Core – shell_sage</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-000f0825b9c55ed21d14970d810c14a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Core – shell_sage">
+<meta property="og:description" content="Your favorite AI buddy right in your terminal">
+<meta property="og:site_name" content="shell_sage">
+<meta name="twitter:title" content="Core – shell_sage">
+<meta name="twitter:description" content="Your favorite AI buddy right in your terminal">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">shell_sage</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./core.html">Core</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ShellSage</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configuration</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#imports" id="toc-imports" class="nav-link active" data-scroll-target="#imports">Imports</a></li>
+  <li><a href="#model-setup" id="toc-model-setup" class="nav-link" data-scroll-target="#model-setup">Model Setup</a></li>
+  <li><a href="#system-environment" id="toc-system-environment" class="nav-link" data-scroll-target="#system-environment">System Environment</a></li>
+  <li><a href="#tmux" id="toc-tmux" class="nav-link" data-scroll-target="#tmux">Tmux</a>
+  <ul class="collapse">
+  <li><a href="#get_pane" id="toc-get_pane" class="nav-link" data-scroll-target="#get_pane">get_pane</a></li>
+  <li><a href="#get_panes" id="toc-get_panes" class="nav-link" data-scroll-target="#get_panes">get_panes</a></li>
+  <li><a href="#tmux_history_lim" id="toc-tmux_history_lim" class="nav-link" data-scroll-target="#tmux_history_lim">tmux_history_lim</a></li>
+  <li><a href="#get_history" id="toc-get_history" class="nav-link" data-scroll-target="#get_history">get_history</a></li>
+  </ul></li>
+  <li><a href="#options-and-shellsage" id="toc-options-and-shellsage" class="nav-link" data-scroll-target="#options-and-shellsage">Options and ShellSage</a>
+  <ul class="collapse">
+  <li><a href="#get_opts" id="toc-get_opts" class="nav-link" data-scroll-target="#get_opts">get_opts</a></li>
+  <li><a href="#with_permission" id="toc-with_permission" class="nav-link" data-scroll-target="#with_permission">with_permission</a></li>
+  <li><a href="#get_sage" id="toc-get_sage" class="nav-link" data-scroll-target="#get_sage">get_sage</a></li>
+  <li><a href="#get_res" id="toc-get_res" class="nav-link" data-scroll-target="#get_res">get_res</a></li>
+  </ul></li>
+  <li><a href="#logging" id="toc-logging" class="nav-link" data-scroll-target="#logging">Logging</a>
+  <ul class="collapse">
+  <li><a href="#mk_db" id="toc-mk_db" class="nav-link" data-scroll-target="#mk_db">mk_db</a></li>
+  <li><a href="#log" id="toc-log" class="nav-link" data-scroll-target="#log">Log</a></li>
+  </ul></li>
+  <li><a href="#main" id="toc-main" class="nav-link" data-scroll-target="#main">Main</a>
+  <ul class="collapse">
+  <li><a href="#main-1" id="toc-main-1" class="nav-link" data-scroll-target="#main-1">main</a></li>
+  <li><a href="#extract_cf" id="toc-extract_cf" class="nav-link" data-scroll-target="#extract_cf">extract_cf</a></li>
+  <li><a href="#extract" id="toc-extract" class="nav-link" data-scroll-target="#extract">extract</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="core.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Core</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="imports" class="level2">
+<h2 class="anchored" data-anchor-id="imports">Imports</h2>
+</section>
+<section id="model-setup" class="level2">
+<h2 class="anchored" data-anchor-id="model-setup">Model Setup</h2>
+</section>
+<section id="system-environment" class="level2">
+<h2 class="anchored" data-anchor-id="system-environment">System Environment</h2>
+<div id="568b5429" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># aliases = _aliases('bash')</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(aliases)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="bc002bdd" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print(_sys_info())</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="tmux" class="level2">
+<h2 class="anchored" data-anchor-id="tmux">Tmux</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L124" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_pane" class="level3">
+<h3 class="anchored" data-anchor-id="get_pane">get_pane</h3>
+<blockquote class="blockquote">
+<pre><code> get_pane (n, pid=None)</code></pre>
+</blockquote>
+<p><em>Get output from a tmux pane</em></p>
+<div id="e799e039" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p = get_pane(20)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(p[:512])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L131" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_panes" class="level3">
+<h3 class="anchored" data-anchor-id="get_panes">get_panes</h3>
+<blockquote class="blockquote">
+<pre><code> get_panes (n)</code></pre>
+</blockquote>
+<div id="a537f788" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ps = get_panes(20)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(ps[:512])</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="28e60780" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>co([<span class="st">'tmux'</span>, <span class="st">'display-message'</span>, <span class="st">'-p'</span>, <span class="st">'#{history-limit}'</span>], text<span class="op">=</span><span class="va">True</span>).strip()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'2000'</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L137" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="tmux_history_lim" class="level3">
+<h3 class="anchored" data-anchor-id="tmux_history_lim">tmux_history_lim</h3>
+<blockquote class="blockquote">
+<pre><code> tmux_history_lim ()</code></pre>
+</blockquote>
+<div id="3d02fa60" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tmux_history_lim()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>2000</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L143" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_history" class="level3">
+<h3 class="anchored" data-anchor-id="get_history">get_history</h3>
+<blockquote class="blockquote">
+<pre><code> get_history (n, pid='current')</code></pre>
+</blockquote>
+</section>
+</section>
+<section id="options-and-shellsage" class="level2">
+<h2 class="anchored" data-anchor-id="options-and-shellsage">Options and ShellSage</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L152" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="get_opts" class="level3">
+<h3 class="anchored" data-anchor-id="get_opts">get_opts</h3>
+<blockquote class="blockquote">
+<pre><code> get_opts (**opts)</code></pre>
+</blockquote>
+<div id="366bbf4d" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># opts = get_opts(model=None, log=None, api_base=None, api_key=''); opts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L159" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="with_permission" class="level3">
+<h3 class="anchored" data-anchor-id="with_permission">with_permission</h3>
+<blockquote class="blockquote">
+<pre><code> with_permission (action_desc)</code></pre>
+</blockquote>
+<div id="c758b536" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tools[<span class="dv">1</span>](<span class="st">'.'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Directory contents of <span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">nbs</span>:
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">CNAME</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">_quarto.yml</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">nbdev.yml</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">styles.css</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">01_config.ipynb</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">index.ipynb</span>
+<span style="color: #800080; text-decoration-color: #800080">/home/natedawg/aai-ws/shell_sage/nbs/</span><span style="color: #ff00ff; text-decoration-color: #ff00ff">00_core.ipynb</span>
+</pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L188" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_sage" class="level3">
+<h3 class="anchored" data-anchor-id="get_sage">get_sage</h3>
+<blockquote class="blockquote">
+<pre><code> get_sage (model, mode='default', search=False)</code></pre>
+</blockquote>
+<div id="7f0e731a" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="st">'ollama_chat/qwen3:8b'</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>ssage <span class="op">=</span> get_sage(m)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>ssage(<span class="st">'Howdy!'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p><think> Okay, the user said “Howdy!” which is a friendly greeting. I need to respond in a welcoming manner. Since there’s no specific query or command requested, I should just greet them back and offer help. Let me make sure to keep the tone friendly and educational. Maybe add an emoji to keep it approachable. No need for any function calls here since they’re just saying hello. Alright, time to reply. </think></p>
+<p>Howdy! 😊 I’m ShellSage, your command-line teaching assistant. How can I help you master shell commands and system administration? Just ask away!</p>
+<details>
+<ul>
+<li>id: <code>chatcmpl-c0d4b4c4-6058-4e27-be10-d43194b6f46d</code></li>
+<li>model: <code>ollama_chat/qwen3:8b</code></li>
+<li>finish_reason: <code>stop</code></li>
+<li>usage: <code>Usage(completion_tokens=124, prompt_tokens=940, total_tokens=1064, completion_tokens_details=None, prompt_tokens_details=None)</code></li>
+</ul>
+</details>
+</div>
+</div>
+<div id="138cfe81" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="st">'claude-sonnet-4-20250514'</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>ssage <span class="op">=</span> get_sage(m, search<span class="op">=</span><span class="st">'l'</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>ssage(<span class="st">'Hi, how are ya?'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display cell-output-markdown">
+<p>Hey there! I’m doing great and ready to help you with shell commands and system administration tasks!</p>
+<p>Whether you need help with: - <strong>Command syntax</strong> and usage - <strong>File operations</strong> and text processing - <strong>System monitoring</strong> and troubleshooting - <strong>Scripting</strong> and automation - <strong>Understanding command output</strong> or error messages</p>
+<p>Just let me know what you’re working on or what you’d like to learn. Feel free to share any command output, file contents, or specific problems you’re facing - I’m here to help you master the command line! 🐚</p>
+<p>What can I help you with today?</p>
+<details>
+<ul>
+<li>id: <code>chatcmpl-70da748f-9164-4692-849d-96e7bf0d22ae</code></li>
+<li>model: <code>claude-sonnet-4-20250514</code></li>
+<li>finish_reason: <code>stop</code></li>
+<li>usage: <code>Usage(completion_tokens=138, prompt_tokens=3099, total_tokens=3237, completion_tokens_details=None, prompt_tokens_details=PromptTokensDetailsWrapper(audio_tokens=None, cached_tokens=0, text_tokens=None, image_tokens=None), cache_creation_input_tokens=0, cache_read_input_tokens=0)</code></li>
+</ul>
+</details>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L191" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="get_res" class="level3">
+<h3 class="anchored" data-anchor-id="get_res">get_res</h3>
+<blockquote class="blockquote">
+<pre><code> get_res (sage, q, opts)</code></pre>
+</blockquote>
+<div id="eae5c2c7" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>opts<span class="op">=</span>NS(api_base<span class="op">=</span><span class="st">''</span>, api_key<span class="op">=</span><span class="st">''</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Markdown(get_res(ssage, <span class="st">'Hi!'</span>, opts)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Hello! 👋                                                                                                          
+
+I'm ShellSage, your command-line teaching assistant. I'm here to help you learn and master shell commands, system  
+administration, and anything related to working in the terminal.                                                   
+
+What would you like to work on today? You can:                                                                     
+
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Ask about specific commands or their usage                                                                      
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Share command output or file contents you need help understanding                                               
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Get help troubleshooting system issues                                                                          
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Learn about scripting and automation                                                                            
+<span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Or just ask any shell/system administration question!                                                           
+
+What's on your mind?                                                                                               
+</pre>
+</div>
+</div>
+<div id="0f688f34" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Markdown(get_res(ssage, <span class="st">'Please use your view command to see what files are in the current directory. Only respond with a single paragraph'</span>, opts)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">The current directory contains several configuration and documentation files for what appears to be a Python       
+project using nbdev, including Jupyter notebooks (<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">01_config.ipynb</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">index.ipynb</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">00_core.ipynb</span>), configuration files
+(<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">_quarto.yml</span>, <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">nbdev.yml</span>), a custom stylesheet (<span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">styles.css</span>), and a <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">CNAME</span> file likely for GitHub Pages hosting - you 
+could explore these files using commands like <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">cat</span> for text files or <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">jupyter notebook</span> to open the <span style="color: #008080; text-decoration-color: #008080; background-color: #000000; font-weight: bold">.ipynb</span> files.     
+</pre>
+</div>
+</div>
+<div id="c3183bc8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(Markdown(get_res(ssage, <span class="st">'Please search the web for interesting facts about Linux. Only respond with a single paragraph.'</span>, opts)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">Here are some fascinating facts about Linux that showcase its incredible impact on technology: <a href="https://www.geeksforgeeks.org/interesting-facts-about-linux/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://jasoneckert.github.io/myblog/linux-fun-facts/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> The first Linux 
+kernel was only 65 KB in size, yet today <a href="https://www.geeksforgeeks.org/interesting-facts-about-linux/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://jasoneckert.github.io/myblog/linux-fun-facts/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> it has grown to over 30 million lines of code, making it <a href="https://www.omgubuntu.co.uk/2018/08/interesting-facts-about-linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://www.omgubuntu.co.uk/2018/08/interesting-facts-about-linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> the      
+single largest open source project on the planet. <a href="https://www.geeksforgeeks.org/interesting-facts-about-linux/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://www.geeksforgeeks.org/interesting-facts-about-linux/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://jasoneckert.github.io/myblog/linux-fun-facts/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> All of the top 500 fastest supercomputers run Linux, and it
+powers everything from <a href="https://www.geeksforgeeks.org/interesting-facts-about-linux/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://www.omgubuntu.co.uk/2018/08/interesting-facts-about-linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> smartphones and servers to submarines and space rockets, with <a href="https://www.omgubuntu.co.uk/2018/08/interesting-facts-about-linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> <a href="https://itsfoss.com/facts-linux-kernel/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> NASA, SpaceX, and the 
+International Space Station all relying on Linux. Interestingly, <a href="https://www.omgubuntu.co.uk/2018/08/interesting-facts-about-linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> Linux almost wasn't called Linux - Linus        
+Torvalds originally wanted to name it "Freax" but was convinced otherwise, and <a href="https://en.wikipedia.org/wiki/Linux" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">*</span></a> the film industry has embraced    
+Linux so thoroughly that over 95% of servers at major animation companies use it, starting with Titanic in 1997.   
+</pre>
+</div>
+</div>
+</section>
+</section>
+<section id="logging" class="level2">
+<h2 class="anchored" data-anchor-id="logging">Logging</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L200" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="mk_db" class="level3">
+<h3 class="anchored" data-anchor-id="mk_db">mk_db</h3>
+<blockquote class="blockquote">
+<pre><code> mk_db ()</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L197" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="log" class="level3">
+<h3 class="anchored" data-anchor-id="log">Log</h3>
+<blockquote class="blockquote">
+<pre><code> Log ()</code></pre>
+</blockquote>
+<p><em>Initialize self. See help(type(self)) for accurate signature.</em></p>
+<div id="31a6bba8" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># db = mk_db()</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># log = db.logs.insert(Log(timestamp=datetime.now().isoformat(), query='Hi, who are you?', model='llama3.2',</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                          response='I am ShellSage, a command-line teaching assistant!', mode='default'))</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># log</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="main" class="level2">
+<h2 class="anchored" data-anchor-id="main">Main</h2>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L208" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="main-1" class="level3">
+<h3 class="anchored" data-anchor-id="main-1">main</h3>
+<blockquote class="blockquote">
+<pre><code> main (query:str&lt;ThequerytosendtotheLLM&gt;, v:&lt;Printversion&gt;='%(prog)s
+       1.0.1', pid:str='current', skip_system:bool=False,
+       history_lines:int=None, mode:str='default', model:str=None,
+       search:str=None, api_base:str=None, api_key:str=None,
+       code_theme:str=None, code_lexer:str=None)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>query</td>
+<td>str <the query="" to="" send="" the="" llm=""></the></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>v</td>
+<td><print version=""></print></td>
+<td>%(prog)s 1.0.1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>pid</td>
+<td>str</td>
+<td>current</td>
+<td><code>current</code>, <code>all</code> or tmux pane_id (e.g.&nbsp;%0) for context</td>
+</tr>
+<tr class="even">
+<td>skip_system</td>
+<td>bool</td>
+<td>False</td>
+<td>Whether to skip system information in the AI’s context</td>
+</tr>
+<tr class="odd">
+<td>history_lines</td>
+<td>int</td>
+<td>None</td>
+<td>Number of history lines. Defaults to tmux scrollback history length</td>
+</tr>
+<tr class="even">
+<td>mode</td>
+<td>str</td>
+<td>default</td>
+<td>Available ShellSage modes: [‘default’, ‘sassy’]</td>
+</tr>
+<tr class="odd">
+<td>model</td>
+<td>str</td>
+<td>None</td>
+<td>The LLM model that will be invoked on the LLM provider</td>
+</tr>
+<tr class="even">
+<td>search</td>
+<td>str</td>
+<td>None</td>
+<td>Wheather to allow the LLM to search the internet</td>
+</tr>
+<tr class="odd">
+<td>api_base</td>
+<td>str</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>api_key</td>
+<td>str</td>
+<td>None</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>code_theme</td>
+<td>str</td>
+<td>None</td>
+<td>The code theme to use when rendering ShellSage’s responses</td>
+</tr>
+<tr class="even">
+<td>code_lexer</td>
+<td>str</td>
+<td>None</td>
+<td>The lexer to use for inline code markdown blocks</td>
+</tr>
+</tbody>
+</table>
+<div id="c6bd74f6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>main(<span class="st">'Teach me about rsync. Reply with a single paragraph.'</span>, history_lines<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>bash: cannot set terminal process group (25798): Inappropriate ioctl for device
+bash: no job control in this shell</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">rsync is a fast, incremental file copy and synchronization tool that compares files (by size and mtime by default) 
+and transfers only the differences, locally or over the network (commonly via SSH), making backups and mirroring   
+efficient; key options include -a “archive” mode (preserves permissions, ownership, times, symlinks), -v for       
+verbosity, -h for human-readable sizes, -n for a dry run (great for previewing changes), -z to compress data in    
+transit, -P for progress/partial transfers, and -c to verify by checksum (slower but safer); it supports powerful  
+filtering with --include/--exclude and files via --exclude-from, and understands trailing slash semantics (src/    
+syncs contents, src syncs the directory itself); use -A and -X to preserve ACLs and xattrs, -H for hard links, and 
+note that preserving owners/permissions across systems may require sudo; the remote form (host:path) uses SSH by   
+default, and you can tune it with -e ssh or SSH options; <span style="font-weight: bold">be cautious with --delete</span>, which removes destination files
+not present at the source; see documentation with man rsync or rsync --help for full details and examples.         
+</pre>
+</div>
+</div>
+<div id="09d57258" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> <span class="ss">f'''</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ss">Hello, user! Here are some code blocks:</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="ss">```python</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="ss">for i in range(10): print(i)</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="ss">This doesn't even have a language definition!</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="ss">```bash</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="ss">ls **/*</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="ss">'''</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="8a160b73" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> mk_db()</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>db.logs.insert(Log(timestamp<span class="op">=</span>datetime.now().isoformat(), query<span class="op">=</span><span class="st">''</span>, response<span class="op">=</span>r, model<span class="op">=</span><span class="st">''</span>, mode<span class="op">=</span><span class="st">''</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>Log(id=36, timestamp='2025-10-07T17:51:16.549279', query='', response="\nHello, user! Here are some code blocks:\n\n```python\nfor i in range(10): print(i)\n```\n\n```\nThis doesn't even have a language definition!\n```\n\n```bash\nls **/*\n```\n", model='', mode='')</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L258" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="extract_cf" class="level3">
+<h3 class="anchored" data-anchor-id="extract_cf">extract_cf</h3>
+<blockquote class="blockquote">
+<pre><code> extract_cf (idx)</code></pre>
+</blockquote>
+<div id="e2489414" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>extract_cf(<span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>'for i in range(10): print(i)'</code></pre>
+</div>
+</div>
+<hr>
+<p><a href="https://github.com/AnswerDotAI/shell_sage/blob/main/shell_sage/core.py#L262" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="extract" class="level3">
+<h3 class="anchored" data-anchor-id="extract">extract</h3>
+<blockquote class="blockquote">
+<pre><code> extract (idx:int, copy:bool=False)</code></pre>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>idx</td>
+<td>int</td>
+<td></td>
+<td>Index of code block to extract</td>
+</tr>
+<tr class="even">
+<td>copy</td>
+<td>bool</td>
+<td>False</td>
+<td>Copy to clipboard vs send to tmux</td>
+</tr>
+</tbody>
+</table>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/AnswerDotAI\.github\.io\/shell_sage");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
