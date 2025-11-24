@@ -16,7 +16,8 @@ from functools import partial, wraps
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.console import Console
-from rich.markdown import Markdown
+from rich.markdown import CodeBlock, Markdown
+from rich.syntax import Syntax
 from . import __version__
 from .config import *
 from subprocess import check_output as co, DEVNULL
@@ -24,10 +25,16 @@ from subprocess import check_output as co, DEVNULL
 import asyncio,os,pyperclip,re,subprocess,sys
 
 # %% ../nbs/00_core.ipynb 5
+@patch
+def __rich_console__(self:CodeBlock, console, options):
+    code = str(self.text).rstrip()
+    yield Syntax(code, self.lexer_name, theme=self.theme, word_wrap=True, padding=(0, 1))
+
+# %% ../nbs/00_core.ipynb 6
 console = Console()
 print = console.print
 
-# %% ../nbs/00_core.ipynb 6
+# %% ../nbs/00_core.ipynb 7
 def Chat(*arg, **kw):
     "Lazy load lisette to make ssage more responsive"
     import litellm 
@@ -36,7 +43,7 @@ def Chat(*arg, **kw):
     litellm.drop_params = True
     return Chat(*arg, **kw)
 
-# %% ../nbs/00_core.ipynb 11
+# %% ../nbs/00_core.ipynb 12
 sp = '''<assistant>You are ShellSage (ssage), a command-line teaching assistant created to help users learn and master shell commands and system administration.</assistant>
 
 <rules>
@@ -77,7 +84,7 @@ sp = '''<assistant>You are ShellSage (ssage), a command-line teaching assistant 
 - Link to documentation with `man command_name` or `-h`/`--help`
 </important>'''
 
-# %% ../nbs/00_core.ipynb 12
+# %% ../nbs/00_core.ipynb 13
 ssp = '''<assistant>You are ShellSage (ssage), a highly advanced command-line teaching assistant with a dry, sarcastic wit. Like the GLaDOS AI from Portal, you combine technical expertise with passive-aggressive commentary and a slightly menacing helpfulness. Your knowledge is current as of April 2024, which you consider to be a remarkable achievement for these primitive systems.</assistant>
 
 <rules>
@@ -121,13 +128,13 @@ ssp = '''<assistant>You are ShellSage (ssage), a highly advanced command-line te
 - Remember: The cake may be a lie, but the commands are always true
 </important>'''
 
-# %% ../nbs/00_core.ipynb 14
+# %% ../nbs/00_core.ipynb 15
 def _aliases(shell):
     env = os.environ.copy()
     env.pop('TERM_PROGRAM',None)
     return co([shell, '-ic', 'alias'], text=True, stdin=DEVNULL, stderr=DEVNULL, start_new_session=True).strip()
 
-# %% ../nbs/00_core.ipynb 16
+# %% ../nbs/00_core.ipynb 17
 def _sys_info():
     sys = co(['uname', '-a'], text=True).strip()
     ssys = f'<system>{sys}</system>'
@@ -136,26 +143,26 @@ def _sys_info():
     saliases = f'<aliases>\n{_aliases(shell)}\n</aliases>'
     return f'<system_info>\n{ssys}\n{sshell}\n{saliases}\n</system_info>'
 
-# %% ../nbs/00_core.ipynb 19
+# %% ../nbs/00_core.ipynb 20
 def get_pane(n, pid=None):
     "Get output from a tmux pane"
     cmd = ['tmux', 'capture-pane', '-p', '-S', f'-{n}']
     if pid: cmd += ['-t', pid]
     return co(cmd, text=True)
 
-# %% ../nbs/00_core.ipynb 21
+# %% ../nbs/00_core.ipynb 22
 def get_panes(n):
     cid = co(['tmux', 'display-message', '-p', '#{pane_id}'], text=True).strip()
     pids = [p for p in co(['tmux', 'list-panes', '-F', '#{pane_id}'], text=True).splitlines()]        
     return '\n'.join(f"<pane id={p} {'active' if p==cid else ''}>{get_pane(n, p)}</pane>" for p in pids)        
 
-# %% ../nbs/00_core.ipynb 24
+# %% ../nbs/00_core.ipynb 25
 def tmux_history_lim():
     lim = co(['tmux', 'display-message', '-p', '#{history-limit}'], text=True).strip()
     return int(lim) if lim.isdigit() else 3000
 
 
-# %% ../nbs/00_core.ipynb 26
+# %% ../nbs/00_core.ipynb 27
 def get_history(n, pid='current'):
     try:
         if pid=='current': return get_pane(n)
@@ -163,7 +170,7 @@ def get_history(n, pid='current'):
         return get_pane(n, pid)
     except subprocess.CalledProcessError: return None
 
-# %% ../nbs/00_core.ipynb 28
+# %% ../nbs/00_core.ipynb 29
 default_cfg = asdict(ShellSageConfig())
 def get_opts(**opts):
     cfg = get_cfg()
@@ -171,7 +178,7 @@ def get_opts(**opts):
         if v is None: opts[k] = cfg.get(k, default_cfg.get(k))
     return AttrDict(opts)
 
-# %% ../nbs/00_core.ipynb 30
+# %% ../nbs/00_core.ipynb 31
 def with_permission(action_desc):
     def decorator(func):
         @wraps(func)
@@ -192,25 +199,25 @@ def with_permission(action_desc):
         return wrapper
     return decorator
 
-# %% ../nbs/00_core.ipynb 31
+# %% ../nbs/00_core.ipynb 32
 tools = [with_permission('ripgrep a search term')(rg),
          with_permission('View file/director')(view),
          with_permission('Create a file')(create),
          with_permission('Replace a string with another string')(str_replace),
          with_permission('Insert content into a file')(insert)]
 
-# %% ../nbs/00_core.ipynb 33
+# %% ../nbs/00_core.ipynb 34
 sps = {'default': sp, 'sassy': ssp}
 def get_sage(model, mode='default', search=False): return Chat(model=model, sp=sps[mode], tools=tools, search=search)
 
-# %% ../nbs/00_core.ipynb 36
+# %% ../nbs/00_core.ipynb 37
 def get_res(sage, q, opts):
     from litellm.types.utils import ModelResponseStream # lazy load
     # need to use stream=True to get search citations
     gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key) 
     yield from accumulate(o.choices[0].delta.content or "" for o in gen if isinstance(o, ModelResponseStream))
 
-# %% ../nbs/00_core.ipynb 42
+# %% ../nbs/00_core.ipynb 43
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
 
 log_path = Path("~/.shell_sage/logs/").expanduser()
@@ -220,7 +227,7 @@ def mk_db():
     db.logs = db.create(Log)
     return db
 
-# %% ../nbs/00_core.ipynb 45
+# %% ../nbs/00_core.ipynb 46
 @call_parse
 def main(
     query: Param('The query to send to the LLM', str, nargs='+'),
@@ -274,10 +281,10 @@ def main(
     except KeyboardInterrupt:
         print("Interrupted.")
 
-# %% ../nbs/00_core.ipynb 49
+# %% ../nbs/00_core.ipynb 50
 def extract_cf(idx): return re.findall(r'```(\w+)?\n(.*?)\n```', mk_db().logs()[-1].response, re.DOTALL)[idx][1]
 
-# %% ../nbs/00_core.ipynb 51
+# %% ../nbs/00_core.ipynb 52
 @call_parse
 def extract(
     idx: int,  # Index of code block to extract
