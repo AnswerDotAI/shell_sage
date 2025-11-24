@@ -2,6 +2,16 @@
 
 <!-- do not remove -->
 
+## 1.0.1
+
+### New Features
+
+- Show spinner, then stream, add ctrl+c support ([#63](https://github.com/AnswerDotAI/shell_sage/pull/63)), thanks to [@PiotrCzapla](https://github.com/PiotrCzapla)
+
+### Bugs Squashed
+
+- Fix macos terminal issues and teach ssage it name ([#57](https://github.com/AnswerDotAI/shell_sage/pull/57)), thanks to [@PiotrCzapla](https://github.com/PiotrCzapla)
+
 ## 1.0.0
 
 ### New Features
