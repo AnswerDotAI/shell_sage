@@ -21,6 +21,7 @@ def _cfg_path(): return xdg_config_home() / _shell_sage_home_dir / _shell_sage_c
 class ShellSageConfig:
     model: str = 'claude-sonnet-4-5-20250929'
     search: str = ''
+    think: str = ''
     mode: str = 'default'
     api_base: str = ''
     api_key: str = ''
