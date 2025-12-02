@@ -22,6 +22,7 @@ class ShellSageConfig:
     model: str = 'claude-sonnet-4-5-20250929'
     search: str = ''
     think: str = ''
+    trust: str = ''
     mode: str = 'default'
     api_base: str = ''
     api_key: str = ''

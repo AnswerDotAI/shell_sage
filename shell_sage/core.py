@@ -245,12 +245,14 @@ def main(
     api_base: str = None,
     api_key: str = None,
     think: str = None,  # Reasoning effort level: 'l', 'm', 'h' (for supported models)
+    trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "view,rg")
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
 ):
     opts = get_opts(history_lines=history_lines, model=model, search=search,
                     api_base=api_base, api_key=api_key, code_theme=code_theme,
-                    code_lexer=code_lexer, think=think, log=None)
+                    code_lexer=code_lexer, think=think, trust=trust, log=None)
+    if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
         with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
