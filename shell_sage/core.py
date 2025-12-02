@@ -179,11 +179,13 @@ def get_opts(**opts):
     return AttrDict(opts)
 
 # %% ../nbs/00_core.ipynb 31
+_always_allow = set()  # Session-level tracking of auto-approved tools
+
 def with_permission(action_desc):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if IN_NOTEBOOK: return func(*args, **kwargs)
+            if IN_NOTEBOOK or func.__name__ in _always_allow: return func(*args, **kwargs)
             limit = 50
             details_dict = {
                 "args": [str(arg)[:limit] + ("..." if len(str(arg)) > limit else "") for arg in args],
@@ -191,9 +193,10 @@ def with_permission(action_desc):
             }
             print(f"About to {action_desc} with the following arguments:")
             print(details_dict if args else kwargs)
-            res = input("Execute this? (y/n/suggestion): ").lower().strip()
+            res = input("Execute this? (y/n/a=always/suggestion): ").lower().strip()
 
-            if res == 'y': return func(*args, **kwargs)
+            if res == 'a': _always_allow.add(func.__name__)
+            if res in ('y','a'): return func(*args, **kwargs)
             elif res == 'n': return "[Command cancelled by user]"
             else: return res
         return wrapper
@@ -201,20 +204,21 @@ def with_permission(action_desc):
 
 # %% ../nbs/00_core.ipynb 32
 tools = [with_permission('ripgrep a search term')(rg),
-         with_permission('View file/director')(view),
+         with_permission('View file/directory')(view),
          with_permission('Create a file')(create),
          with_permission('Replace a string with another string')(str_replace),
          with_permission('Insert content into a file')(insert)]
 
 # %% ../nbs/00_core.ipynb 34
 sps = {'default': sp, 'sassy': ssp}
-def get_sage(model, mode='default', search=False): return Chat(model=model, sp=sps[mode], tools=tools, search=search)
+def get_sage(model, mode='default', search=False):
+    return Chat(model=model, sp=sps[mode], tools=tools, search=search)
 
 # %% ../nbs/00_core.ipynb 37
 def get_res(sage, q, opts):
     from litellm.types.utils import ModelResponseStream # lazy load
     # need to use stream=True to get search citations
-    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key) 
+    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key, think=opts.think) 
     yield from accumulate(o.choices[0].delta.content or "" for o in gen if isinstance(o, ModelResponseStream))
 
 # %% ../nbs/00_core.ipynb 43
@@ -240,16 +244,16 @@ def main(
     search: str = None, # Wheather to allow the LLM to search the internet
     api_base: str = None,
     api_key: str = None,
+    think: str = None,  # Reasoning effort level: 'l', 'm', 'h' (for supported models)
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
 ):
     opts = get_opts(history_lines=history_lines, model=model, search=search,
                     api_base=api_base, api_key=api_key, code_theme=code_theme,
-                    code_lexer=code_lexer, log=None)
+                    code_lexer=code_lexer, think=think, log=None)
     res=""
     try:
         with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
-        
             if mode not in ['default', 'sassy']:
                 raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
             
@@ -278,8 +282,7 @@ def main(
             db = mk_db()
             db.logs.insert(Log(timestamp=datetime.now().isoformat(), query=query,
                             response=res, model=opts.model, mode=mode))
-    except KeyboardInterrupt:
-        print("Interrupted.")
+    except KeyboardInterrupt: print("Interrupted.")
 
 # %% ../nbs/00_core.ipynb 50
 def extract_cf(idx): return re.findall(r'```(\w+)?\n(.*?)\n```', mk_db().logs()[-1].response, re.DOTALL)[idx][1]
