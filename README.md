@@ -347,6 +347,8 @@ ShellSage can be customized through a configuration file located at
     [DEFAULT]
     model = 'claude-sonnet-4-5-20250929'    # Your preferred model
     search = ''                             # Enable web search capability (can be either l,m,h https://lisette.answer.ai/#web-search)
+    think = ''                              # Enable thinking capability (can be either l,m,h)
+    trust = ''                              # Comma-delimeted list of tools to not ask for confirmation about
     mode = 'default'                        # or "sassy"
     api_base = ''                           # alternative api url base
     api_key = ''                            # alternative api key to use instead of default env var
@@ -483,6 +485,19 @@ script:
 ``` python
 !ssage_extract 0
 # inserts "du -ah . | sort -rh | head -20" into your tmux prompt
+```
+
+You can also bind a keyboard shortcut in Bash to insert code fences
+directly into your prompt. Type a block number (or leave empty for 0),
+then press `Ctrl+J` to insert that code block. To use this, add the
+following to your `~/.bashrc`:
+
+``` bash
+ssage-insert() {
+  local r=$(ssage_extract --do_print "${READLINE_LINE:-0}")
+  READLINE_LINE="$r" READLINE_POINT=${#r}
+}
+bind -x '"\C-j": ssage-insert'
 ```
 
 ### Enabling Sassy Mode
