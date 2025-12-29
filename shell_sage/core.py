@@ -2,8 +2,8 @@
 
 # %% auto 0
 __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_path', 'Chat', 'get_pane', 'get_panes',
-           'tmux_history_lim', 'get_history', 'get_opts', 'with_permission', 'get_sage', 'Log', 'mk_db', 'main',
-           'extract_cf', 'extract']
+           'tmux_history_lim', 'get_history', 'get_opts', 'with_permission', 'get_sage', 'get_res', 'Log', 'mk_db',
+           'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb 3
 from datetime import datetime
@@ -216,6 +216,13 @@ def get_sage(model, mode='default', search=False, use_safecmd=False):
     t = tools + [bash] if use_safecmd else tools
     if use_safecmd: _always_allow.add('bash')
     return Chat(model=model, sp=sps[mode], tools=t, search=search)
+
+# %% ../nbs/00_core.ipynb 37
+def get_res(sage, q, opts):
+    from litellm.types.utils import ModelResponseStream # lazy load
+    # need to use stream=True to get search citations
+    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key, think=opts.think) 
+    yield from accumulate(o.choices[0].delta.content or "" for o in gen if isinstance(o, ModelResponseStream))
 
 # %% ../nbs/00_core.ipynb 43
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
