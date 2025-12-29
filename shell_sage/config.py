@@ -30,6 +30,7 @@ class ShellSageConfig:
     code_theme: str = "monokai"
     code_lexer: str = "python"
     log: bool = False
+    safecmd: bool = False
 
 # %% ../nbs/01_config.ipynb 9
 def get_cfg():

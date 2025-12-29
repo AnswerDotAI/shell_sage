@@ -2,8 +2,8 @@
 
 # %% auto 0
 __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_path', 'Chat', 'get_pane', 'get_panes',
-           'tmux_history_lim', 'get_history', 'get_opts', 'with_permission', 'get_sage', 'get_res', 'Log', 'mk_db',
-           'main', 'extract_cf', 'extract']
+           'tmux_history_lim', 'get_history', 'get_opts', 'with_permission', 'get_sage', 'Log', 'mk_db', 'main',
+           'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb 3
 from datetime import datetime
@@ -21,6 +21,7 @@ from rich.syntax import Syntax
 from . import __version__
 from .config import *
 from subprocess import check_output as co, DEVNULL
+from safecmd import bash
 
 import asyncio,os,pyperclip,re,subprocess,sys
 
@@ -211,15 +212,10 @@ tools = [with_permission('ripgrep a search term')(rg),
 
 # %% ../nbs/00_core.ipynb 34
 sps = {'default': sp, 'sassy': ssp}
-def get_sage(model, mode='default', search=False):
-    return Chat(model=model, sp=sps[mode], tools=tools, search=search)
-
-# %% ../nbs/00_core.ipynb 37
-def get_res(sage, q, opts):
-    from litellm.types.utils import ModelResponseStream # lazy load
-    # need to use stream=True to get search citations
-    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key, think=opts.think) 
-    yield from accumulate(o.choices[0].delta.content or "" for o in gen if isinstance(o, ModelResponseStream))
+def get_sage(model, mode='default', search=False, use_safecmd=False):
+    t = tools + [bash] if use_safecmd else tools
+    if use_safecmd: _always_allow.add('bash')
+    return Chat(model=model, sp=sps[mode], tools=t, search=search)
 
 # %% ../nbs/00_core.ipynb 43
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
@@ -249,9 +245,10 @@ def main(
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
 ):
+    safecmd = None
     opts = get_opts(history_lines=history_lines, model=model, search=search,
                     api_base=api_base, api_key=api_key, code_theme=code_theme,
-                    code_lexer=code_lexer, think=think, trust=trust, log=None)
+                    code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd, log=None)
     if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
@@ -276,7 +273,7 @@ def main(
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
-            sage = get_sage(opts.model, mode, search=opts.search)
+            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd)
             for res in get_res(sage, query, opts): live.update(md(res), refresh=True)
             
         # Handle logging if the log flag is set
