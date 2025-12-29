@@ -2,6 +2,16 @@
 
 <!-- do not remove -->
 
+## 1.0.2
+
+### New Features
+
+- Add optional `safecmd` ([#68](https://github.com/AnswerDotAI/shell_sage/issues/68))
+- add bash keyboard shortcut to extract codefences ([#67](https://github.com/AnswerDotAI/shell_sage/pull/67)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
+- Add `trust` ([#65](https://github.com/AnswerDotAI/shell_sage/issues/65))
+- Optional reasoning; add `a` to always allow tool call ([#64](https://github.com/AnswerDotAI/shell_sage/issues/64))
+
+
 ## 1.0.1
 
 ### New Features
