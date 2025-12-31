@@ -275,8 +275,12 @@ def main(
                 history = get_history(opts.history_lines, pid)
                 if history: ctxt += f'<terminal_history>\n{history}\n</terminal_history>'
 
-            # Read from stdin if available
-            if not sys.stdin.isatty() and not IN_NOTEBOOK: ctxt += f'\n<context>\n{sys.stdin.read()}</context>'
+            # Read from redirect stdin if available
+            if not sys.stdin.isatty() and not IN_NOTEBOOK:
+                ctxt += f'\n<context>\n{sys.stdin.read()}</context>'
+                # Restore stdin to tty
+                try: sys.stdin = open('/dev/tty')
+                except OSError: pass
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
