@@ -2,7 +2,7 @@
 
 <!-- do not remove -->
 
-## 1.0.3
+## 1.0.4
 
 ### New Features
 
@@ -10,6 +10,11 @@
 - add bash keyboard shortcut to extract codefences ([#67](https://github.com/AnswerDotAI/shell_sage/pull/67)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
 - Add `trust` ([#65](https://github.com/AnswerDotAI/shell_sage/issues/65))
 - Optional reasoning; add `a` to always allow tool call ([#64](https://github.com/AnswerDotAI/shell_sage/issues/64))
+
+
+### Bugs Squashed
+
+- fix: EOFError when redirecting input and using tools ([#69](https://github.com/AnswerDotAI/shell_sage/pull/69)), thanks to [@ncoop57](https://github.com/ncoop57)
 
 
 ## 1.0.1
