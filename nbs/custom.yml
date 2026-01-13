@@ -1,0 +1,3 @@
+project:
+  resources:
+    - ../.tmux.conf
