@@ -3,7 +3,9 @@ project:
 
 website:
   title: "shell_sage"
-  site-url: "https://AnswerDotAI.github.io/shell_sage"
+  site-url: "https://yijinlee.github.io/shell_sage"
   description: "Your favorite AI buddy right in your terminal"
   repo-branch: main
-  repo-url: "https://github.com/AnswerDotAI/shell_sage"
+  repo-url: "https://github.com/yijinlee/shell_sage"
+  resources:
+    - ../.tmux.conf
