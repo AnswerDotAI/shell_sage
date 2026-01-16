@@ -405,6 +405,42 @@ See the [LiteLLM providers
 documentation](https://docs.litellm.ai/docs/providers) for the complete
 list of supported providers and their model naming conventions.
 
+### Bash Tool (Safe Command Execution)
+
+ShellSage can execute shell commands on your behalf using the [safecmd](https://github.com/AnswerDotAI/safecmd) library, which provides a safety layer via an allow-list approach.
+
+#### Enabling the Bash Tool
+
+Add to your config file (`~/.config/shell_sage/shell_sage.conf`):
+
+```
+safecmd = true
+```
+
+#### How It Works
+
+When enabled, ShellSage gains access to a `bash` tool that:
+
+- Validates commands against a curated allow-list before execution
+- Supports pipes, redirects, and shell operators
+- Blocks potentially destructive operations by default
+- Can be customized with `rm_cmds` and `rm_dests` parameters to restrict allowed commands/destinations
+
+#### Example Usage
+
+```sh
+ssage "what files are in this directory and how big are they?"
+# ShellSage can now run `ls -la` or `du -sh *` to answer
+```
+
+ShellSage will show you the command it's about to run. Unless you've added `bash` to your trust list, you'll be prompted to confirm before execution.
+
+#### Safety Considerations
+
+- Review commands before confirming – even with allow-lists, verify the command makes sense
+- To auto-approve bash commands, add `trust = bash` to your config (use with caution)
+- See the [safecmd documentation](https://github.com/AnswerDotAI/safecmd) for details on the allow-list
+
 ### Command Line Overrides
 
 Any configuration option can be temporarily overridden via command line
