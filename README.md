@@ -106,7 +106,7 @@ export OPENAI_API_KEY=sk...
 ```
 
 ShellSage works best with a properly configured tmux environment. I’ve
-created a preconfigured [tmux configuration](tmux.conf) that works well
+created a preconfigured [tmux configuration](./nbs/tmux.conf) that works well
 with ShellSage. This configuration enables mouse support, adds pane IDs
 to your status bar so you can quickly reference them when having
 ShellSage read from specific panes, turns off alternative-screen so
