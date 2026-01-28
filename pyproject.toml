@@ -3,19 +3,16 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="shell_sage"
+name = "shell-sage"
 dynamic = ["version"]
 description = "Your favorite AI buddy right in your terminal"
 readme = "README.md"
-requires-python=">=3.10"
+requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
 authors = [{name = "ncoop57", email = "nc@answer.ai"}]
 keywords = ['nbdev', 'jupyter', 'notebook', 'python']
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-]
-dependencies = ["fastcore>=1.7.29","fastlite","lisette>=0.0.6","msglm","pyperclip","rich","safecmd"]
+classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['fastcore>=1.7.29', 'fastlite', 'lisette>=0.0.6', 'msglm', 'pyperclip', 'rich', 'safecmd']
 
 [project.urls]
 Repository = "https://github.com/AnswerDotAI/shell_sage"
@@ -24,8 +21,11 @@ Documentation = "https://AnswerDotAI.github.io/shell_sage"
 [project.entry-points.nbdev]
 shell_sage = "shell_sage._modidx:d"
 
+
 [project.scripts]
 ssage = "shell_sage.core:main"
+ssage_extract = "shell_sage.core:extract"
+
 [tool.setuptools.dynamic]
 version = {attr = "shell_sage.__version__"}
 
