@@ -25,13 +25,9 @@ Documentation = "https://AnswerDotAI.github.io/shell_sage"
 shell_sage = "shell_sage._modidx:d"
 
 [project.scripts]
-ssage=shell_sage.core:main
-
+ssage = "shell_sage.core:main"
 [tool.setuptools.dynamic]
 version = {attr = "shell_sage.__version__"}
-
-[project.scripts]
-ssage=shell_sage.core:main
 
 [tool.setuptools.packages.find]
 include = ["shell_sage"]
