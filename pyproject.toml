@@ -1,11 +1,34 @@
 [build-system]
-requires = ["setuptools>=64.0"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="shell-sage"
+name="shell_sage"
+dynamic = ["version"]
+description = "Your favorite AI buddy right in your terminal"
+readme = "README.md"
 requires-python=">=3.10"
-dynamic = [ "keywords", "description", "version", "dependencies", "optional-dependencies", "readme", "license", "authors", "classifiers", "entry-points", "scripts", "urls"]
+license = {text = "Apache-2.0"}
+authors = [{name = "ncoop57", email = "nc@answer.ai"}]
+keywords = ['nbdev', 'jupyter', 'notebook', 'python']
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = []
 
-[tool.uv]
-cache-keys = [{ file = "pyproject.toml" }, { file = "settings.ini" }, { file = "setup.py" }]
+[project.urls]
+Repository = "https://github.com/AnswerDotAI/shell_sage"
+Documentation = "https://AnswerDotAI.github.io/shell_sage"
+
+[project.entry-points.nbdev]
+shell_sage = "shell_sage._modidx:d"
+
+[tool.setuptools.dynamic]
+version = {attr = "shell_sage.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["shell_sage"]
+
+[tool.nbdev]
+custom_sidebar = false
