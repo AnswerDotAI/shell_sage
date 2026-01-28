@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
-dependencies = []
+dependencies = ["fastcore>=1.7.29","fastlite","lisette>=0.0.6","msglm","pyperclip","rich","safecmd"]
 
 [project.urls]
 Repository = "https://github.com/AnswerDotAI/shell_sage"
