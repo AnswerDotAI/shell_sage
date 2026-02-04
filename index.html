@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="ShellSage saves sysadmins’ sanity by solving shell script snafus super swiftly">
+
+<title>ShellSage – shell-sage</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-000f0825b9c55ed21d14970d810c14a9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="ShellSage – shell-sage">
+<meta property="og:description" content="ShellSage saves sysadmins’ sanity by solving shell script snafus super swiftly">
+<meta property="og:image" content="https://AnswerDotAI.github.io/shell_sage/screenshots/btop_output.png">
+<meta property="og:site_name" content="shell-sage">
+<meta name="twitter:title" content="ShellSage – shell-sage">
+<meta name="twitter:description" content="ShellSage saves sysadmins’ sanity by solving shell script snafus super swiftly">
+<meta name="twitter:image" content="https://AnswerDotAI.github.io/shell_sage/screenshots/btop_output.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">shell-sage</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">ShellSage</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">ShellSage</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./config.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configuration</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#installing-with-uv" id="toc-installing-with-uv" class="nav-link" data-scroll-target="#installing-with-uv">Installing with <code>uv</code></a>
+  <ul class="collapse">
+  <li><a href="#upgrade" id="toc-upgrade" class="nav-link" data-scroll-target="#upgrade">Upgrade</a></li>
+  <li><a href="#list-all-installed-tools" id="toc-list-all-installed-tools" class="nav-link" data-scroll-target="#list-all-installed-tools">List All Installed Tools</a></li>
+  <li><a href="#uninstall" id="toc-uninstall" class="nav-link" data-scroll-target="#uninstall">Uninstall</a></li>
+  </ul></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#your-first-command" id="toc-your-first-command" class="nav-link" data-scroll-target="#your-first-command">Your First Command</a></li>
+  <li><a href="#getting-help-with-commands" id="toc-getting-help-with-commands" class="nav-link" data-scroll-target="#getting-help-with-commands">Getting Help with Commands</a></li>
+  <li><a href="#using-terminal-context" id="toc-using-terminal-context" class="nav-link" data-scroll-target="#using-terminal-context">Using Terminal Context</a></li>
+  <li><a href="#piping-content-for-analysis" id="toc-piping-content-for-analysis" class="nav-link" data-scroll-target="#piping-content-for-analysis">Piping Content for Analysis</a></li>
+  <li><a href="#working-with-multiple-tmux-panes" id="toc-working-with-multiple-tmux-panes" class="nav-link" data-scroll-target="#working-with-multiple-tmux-panes">Working with Multiple Tmux Panes</a></li>
+  </ul></li>
+  <li><a href="#configuration-and-model-providers" id="toc-configuration-and-model-providers" class="nav-link" data-scroll-target="#configuration-and-model-providers">Configuration and Model Providers</a>
+  <ul class="collapse">
+  <li><a href="#configuration-file" id="toc-configuration-file" class="nav-link" data-scroll-target="#configuration-file">Configuration File</a></li>
+  <li><a href="#using-different-model-providers" id="toc-using-different-model-providers" class="nav-link" data-scroll-target="#using-different-model-providers">Using Different Model Providers</a></li>
+  <li><a href="#command-line-overrides" id="toc-command-line-overrides" class="nav-link" data-scroll-target="#command-line-overrides">Command Line Overrides</a></li>
+  <li><a href="#bash-tool-safe-command-execution" id="toc-bash-tool-safe-command-execution" class="nav-link" data-scroll-target="#bash-tool-safe-command-execution">Bash Tool (Safe Command Execution)</a></li>
+  <li><a href="#extracting-and-running-commands" id="toc-extracting-and-running-commands" class="nav-link" data-scroll-target="#extracting-and-running-commands">Extracting and Running Commands</a></li>
+  <li><a href="#enabling-sassy-mode" id="toc-enabling-sassy-mode" class="nav-link" data-scroll-target="#enabling-sassy-mode">Enabling Sassy Mode</a></li>
+  </ul></li>
+  <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ShellSage</h1>
+</div>
+
+<div>
+  <div class="description">
+    ShellSage saves sysadmins’ sanity by solving shell script snafus super swiftly
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<p>ShellSage is an AI-powered command-line assistant that integrates seamlessly with your terminal workflow through tmux. It provides contextual help for shell operations, making it easier to navigate complex command-line tasks, debug scripts, and manage your system.</p>
+<p><a href="https://badge.fury.io/py/shell-sage"><img src="https://badge.fury.io/py/shell-sage.svg" class="img-fluid" alt="PyPI version"></a> <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" class="img-fluid" alt="Python 3.8+"></a> <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" class="img-fluid" alt="License: MIT"></a> <a href="https://answerdotai.github.io/shell_sage/"><img src="https://img.shields.io/badge/docs-nbdev-blue.svg" class="img-fluid" alt="Documentation"></a></p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>ShellSage is an AI-powered command-line assistant that integrates seamlessly with your terminal workflow through tmux. It provides contextual help for shell operations, making it easier to navigate complex command-line tasks, debug scripts, and manage your system.</p>
+<p>ShellSage works with multiple LLM providers including Claude, GPT, and Ollama. It uses tmux to automatically read your terminal history or multiple pane histories to provide contextual assistance. You can pipe command output or file contents directly to ShellSage, and it can view files, search code, create files, and make edits with your permission. When needed, it can even search the internet for up-to-date information. You can also log all your interactions directly to SQLite for later reference.</p>
+</section>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">Installation</h2>
+<p>Install ShellSage directly from PyPI using pip:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install shell-sage</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="installing-with-uv" class="level2">
+<h2 class="anchored" data-anchor-id="installing-with-uv">Installing with <code>uv</code></h2>
+<p>If you have <code>uv</code> installed then you can use its powerful <code>tool</code> feature to install ShellSage as a global CLI — safely, with per-tool isolation and no need for manual virtualenv management.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install shell_sage</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This will make the <code>ssage</code> CLI available everywhere on your system.</p>
+<p>If you also want to install additional dependencies (for example <code>fastlite</code>), you can do it at install time:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool install <span class="at">--with</span> fastlite shell_sage</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="upgrade" class="level3">
+<h3 class="anchored" data-anchor-id="upgrade">Upgrade</h3>
+<p>To upgrade ShellSage to the latest version:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool upgrade shell_sage</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="list-all-installed-tools" class="level3">
+<h3 class="anchored" data-anchor-id="list-all-installed-tools">List All Installed Tools</h3>
+<p>See everything you’ve installed via <code>uv tool</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="uninstall" class="level3">
+<h3 class="anchored" data-anchor-id="uninstall">Uninstall</h3>
+<p>To completely remove ShellSage and its environment:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> tool uninstall shell_sage</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Using <code>uv tool</code> keeps ShellSage completely isolated from your project dependencies, so you can safely use <code>ssage</code> even when inside another virtual environment.</p>
+</section>
+</section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<p>Before using ShellSage, you’ll need to set up an API key for your chosen LLM provider. By default, ShellSage uses Claude, so you’ll want to export your Anthropic API key:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span>sk...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If you prefer to use OpenAI instead, you can export your OpenAI API key and update your shell sage config to use openai (see the Configuration section below for details):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span>sk...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>ShellSage works best with a properly configured tmux environment. I’ve created a preconfigured <a href="tmux.conf">tmux configuration</a> that works well with ShellSage. This configuration enables mouse support, adds pane IDs to your status bar so you can quickly reference them when having ShellSage read from specific panes, turns off alternative-screen so editor content like vim stays in the tmux buffer where ShellSage can see it, and adds a convenient shortcut (CTRL+B+E followed by the index number) for automatically extracting code fence blocks into your command prompt.</p>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<section id="your-first-command" class="level3">
+<h3 class="anchored" data-anchor-id="your-first-command">Your First Command</h3>
+<p>Once installed, try ShellSage with a simple greeting:</p>
+<div id="6588102c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage hi</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Hello! 👋 I'm ShellSage, your command-line teaching assistant.                  
+
+I can help you with:                                                            
+
+ • Shell commands and scripting                                                 
+ • System administration tasks                                                  
+ • File operations and text processing                                          
+ • Git workflows                                                                
+ • Docker commands                                                              
+ • And much more!                                                               
+
+I see you have a nice setup with some useful aliases configured (like eza for   
+ls, nvim for vim, and various git shortcuts).                                   
+
+What would you like to learn or accomplish today?                               </code></pre>
+</div>
+</div>
+<p>If everything is properly setup, you should see a welcoming greeting back from ShellSage!</p>
+</section>
+<section id="getting-help-with-commands" class="level3">
+<h3 class="anchored" data-anchor-id="getting-help-with-commands">Getting Help with Commands</h3>
+<p>The most basic use case is asking about shell commands:</p>
+<div id="83381389" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage <span class="st">"how do I list all files including hidden ones?"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Based on your aliases, you already have a shortcut set up for this!             
+
+                                                                                
+ lsa                                                                            
+                                                                                
+
+This uses your alias which expands to:                                          
+
+                                                                                
+ eza -lh --group-directories-first --icons=auto -a                              
+                                                                                
+
+The -a flag shows all files including hidden ones (those starting with .).      
+
+────────────────────────────────────────────────────────────────────────────────
+Alternative commands:                                                           
+
+If you want to use the standard ls command directly:                            
+
+                                                                                
+ /usr/bin/ls -la                                                                
+                                                                                
+
+Or with your eza setup but without the alias:                                   
+
+                                                                                
+ eza -lha --group-directories-first --icons=auto                                
+                                                                                
+
+Tip: Hidden files in Linux start with a dot (.), like .bashrc or .config/. The  
+-a flag includes these in the listing.                                          </code></pre>
+</div>
+</div>
+<p>ShellSage will provide the command, explain how it works, and give you practical examples.</p>
+</section>
+<section id="using-terminal-context" class="level3">
+<h3 class="anchored" data-anchor-id="using-terminal-context">Using Terminal Context</h3>
+<p>ShellSage automatically reads your tmux history to understand what you’re working on:</p>
+<div id="2b5ac11c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># After running some commands that produced errors (e.g. find -name "*.tmp" .)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage <span class="st">"what went wrong with my last command?"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The issue is with the argument order in your find command. You placed the path  
+(.) after the expression (-name "*.tmp"), but find requires the path to come    
+before any options or expressions.                                              
+
+
+                                Correct syntax:                                 
+
+                                                                                
+ find . -name "*.tmp"                                                           
+                                                                                
+
+
+                                  Explanation:                                  
+
+The find command structure is:                                                  
+
+                                                                                
+ find [path...] [expression]                                                    
+                                                                                
+
+ • Path (. for current directory) must come first                               
+ • Expression (-name "*.tmp") comes after                                       
+
+Your command had them reversed, which confused find into thinking . was part of 
+the expression rather than the search path.                                     
+
+
+                             Common find patterns:                              
+
+                                                                                
+ # Find in current directory                                                    
+ find . -name "*.tmp"                                                           
+                                                                                
+ # Find in specific directory                                                   
+ find /path/to/dir -name "*.tmp"                                                
+                                                                                
+ # Find and delete (be careful!)                                                
+ find . -name "*.tmp" -delete                                                   
+                                                                                
+
+Tip: If you forget the path, find defaults to the current directory, so find    
+-name "*.tmp" also works!                                                       </code></pre>
+</div>
+</div>
+</section>
+<section id="piping-content-for-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="piping-content-for-analysis">Piping Content for Analysis</h3>
+<p>One of ShellSage’s most powerful features is analyzing piped input:</p>
+<div id="b548a3e6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Understand error messages</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>journalctl <span class="op">--</span>since <span class="st">"1 hour ago"</span> <span class="op">--</span>no<span class="op">-</span>pager <span class="op">|</span> ssage explain this error</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Looking at the error in your system logs, here's what happened:                 
+
+
+                               Core Dump Analysis                               
+
+The hyprctl command (Hyprland's control utility) crashed with a SIGABRT signal  
+at 13:14:48. This is an abnormal termination.                                   
+
+                         Key Details from Stack Trace:                          
+
+                                                                                
+ #7  0x00007f5af929ccc4 _ZSt20__throw_system_errori                             
+ #8  0x0000564adef2a4f2 n/a (/usr/bin/hyprctl + 0x44f2)                         
+ #9  0x0000564adef36f21 _Z7requestSt17basic_string_viewIcSt11char_traitsIcEEib  
+                                                                                
+
+What this means:                                                                
+
+ • hyprctl threw a C++ system error exception                                   
+ • The crash occurred in the request() function (frame #9)                      
+ • This typically happens when hyprctl can't communicate with the Hyprland      
+   compositor                                                                   
+
+                                 Common Causes:                                 
+
+ 1 Socket connection failure - Hyprland's IPC socket was unavailable/busy       
+ 2 Compositor not responding - Hyprland was temporarily unresponsive            
+ 3 Race condition - Command executed during compositor state change             
+
+                            To investigate further:                             
+
+                                                                                
+ coredumpctl list hyprctl                                                       
+ coredumpctl info 10789                                                         
+                                                                                
+
+Note: This is usually a transient issue. If hyprctl commands work now, it was   
+likely a one-time glitch. If it persists, check Hyprland's logs with journalctl 
+--user -u hyprland or restart your compositor.                                  </code></pre>
+</div>
+</div>
+</section>
+<section id="working-with-multiple-tmux-panes" class="level3">
+<h3 class="anchored" data-anchor-id="working-with-multiple-tmux-panes">Working with Multiple Tmux Panes</h3>
+<p>When you have multiple panes open, you can reference specific ones by their ID (shown in your status bar):</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./screenshots/btop_output.png" class="img-fluid figure-img"></p>
+<figcaption>btop output</figcaption>
+</figure>
+</div>
+<div id="3ac57e1c" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyze what's happening in pane %2</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage <span class="op">--</span>pid <span class="op">%</span><span class="dv">2</span> <span class="st">"what can you tell me about this pane?"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Looking at this btop system monitor output, here's what I can tell you about the
+pane:                                                                           
+
+
+                                    Overview                                    
+
+This is a comprehensive system resource monitor showing real-time performance   
+metrics for your Arch Linux system.                                             
+
+
+                                Key Information:                                
+
+CPU (Top Section)                                                               
+
+ • AMD Ryzen 9 5950X (32 threads shown as C0-C15)                               
+ • Currently at 6% utilization running at 3.8 GHz                               
+ • Temperature: 58°C, Power: 53.9W                                              
+ • Load average is very light: 0.05, 0.06, 0.08                                 
+
+GPU                                                                             
+
+ • 9% utilization, 2.8GB/24GB VRAM used                                         
+ • 39°C, 36.4W power draw                                                       
+
+Memory (Left Middle)                                                            
+
+ • Total: 62.7 GiB                                                              
+ • Used: 4.60 GiB (mostly free at 58.1 GiB available)                           
+ • Cache: 4.02 GiB                                                              
+ • Swap: 3.99 GiB total, 0% used                                                
+
+Storage (Right Middle)                                                          
+
+ • Root partition: 929 GiB total, 10% used (88.6 GiB)                           
+ • No swap currently in use                                                     
+
+Network (Bottom Left)                                                           
+
+ • Interface: enp4s0 (IP: 192.168.7.169)                                        
+ • Download: 27.7 KiB/s                                                         
+ • Upload: 1.84 KiB/s                                                           
+
+Processes (Right Side)                                                          
+
+ • Top consumers: Discord, Chromium, Python processes                           
+ • System has been up for 1 hour 8 minutes 38 seconds                           
+
+Your system is very lightly loaded with plenty of headroom!                     </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="configuration-and-model-providers" class="level2">
+<h2 class="anchored" data-anchor-id="configuration-and-model-providers">Configuration and Model Providers</h2>
+<section id="configuration-file" class="level3">
+<h3 class="anchored" data-anchor-id="configuration-file">Configuration File</h3>
+<p>ShellSage can be customized through a configuration file located at <code>~/.config/shell_sage/shell_sage.conf</code>:</p>
+<pre><code>[DEFAULT]
+model = 'claude-sonnet-4-5-20250929'    # Your preferred model
+search = ''                             # Enable web search capability (can be either l,m,h https://lisette.answer.ai/#web-search)
+think = ''                              # Enable thinking capability (can be either l,m,h)
+trust = ''                              # Comma-delimeted list of tools to not ask for confirmation about
+mode = 'default'                        # or "sassy"
+api_base = ''                           # alternative api url base
+api_key = ''                            # alternative api key to use instead of default env var
+history_lines = -1                      # Lines of terminal history to include. -1 means include all
+code_theme = "monokai"                  # Syntax highlighting theme
+code_lexer = "python"                   # Default lexer for inline code blocks
+log = False                             # Enable SQLite logging (required for code extraction)</code></pre>
+</section>
+<section id="using-different-model-providers" class="level3">
+<h3 class="anchored" data-anchor-id="using-different-model-providers">Using Different Model Providers</h3>
+<p>ShellSage uses <a href="https://github.com/AnswerDotAI/lisette">lisette</a> under the hood, which supports any LLM provider via <a href="https://docs.litellm.ai/docs/providers">LiteLLM</a>. This means you can use Claude, GPT, Gemini, local models via Ollama, and many others.</p>
+<section id="local-models-with-ollama" class="level4">
+<h4 class="anchored" data-anchor-id="local-models-with-ollama">Local Models with Ollama</h4>
+<p>For privacy-conscious users or offline usage, run models locally:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First, install and start Ollama, then pull a model</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull qwen3:1.7b</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with ShellSage</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--model</span> ollama_chat/qwen3:1.7b how do I compress a directory<span class="pp">?</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Or set as default in your config.toml</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="ex">model</span> = <span class="st">"ollama_chat/qwen3:1.7b"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="openai" class="level4">
+<h4 class="anchored" data-anchor-id="openai">OpenAI</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--model</span> gpt-5 <span class="at">--api_key</span> <span class="op">&lt;</span>your_key_here<span class="op">&gt;</span> explain kubernetes pods</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="google-gemini" class="level4">
+<h4 class="anchored" data-anchor-id="google-gemini">Google Gemini</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--model</span> gemini/gemini-pro <span class="at">--api_key</span> <span class="op">&lt;</span>your_key_here<span class="op">&gt;</span> what is systemd<span class="pp">?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="other-providers" class="level4">
+<h4 class="anchored" data-anchor-id="other-providers">Other Providers</h4>
+<p>For any provider supported by LiteLLM, set the appropriate API key and use the provider’s model format:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom API base</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--api-base</span> https://your-api.com <span class="at">--api-key</span> your_key <span class="at">--model</span> your_model your query</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>See the <a href="https://docs.litellm.ai/docs/providers">LiteLLM providers documentation</a> for the complete list of supported providers and their model naming conventions.</p>
+</section>
+</section>
+<section id="command-line-overrides" class="level3">
+<h3 class="anchored" data-anchor-id="command-line-overrides">Command Line Overrides</h3>
+<p>Any configuration option can be temporarily overridden via command line arguments:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust history lines</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--history-lines</span> 100 what commands did I just run<span class="pp">?</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Change the display theme</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="at">--code-theme</span> dracula <span class="at">--code-lexer</span> python show me a python example</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can find all available code themes and lexers at https://pygments.org/styles/</p>
+</section>
+<section id="bash-tool-safe-command-execution" class="level3">
+<h3 class="anchored" data-anchor-id="bash-tool-safe-command-execution">Bash Tool (Safe Command Execution)</h3>
+<p>ShellSage can execute shell commands on your behalf using the <a href="https://github.com/AnswerDotAI/safecmd">safecmd</a> library, which provides a safety layer via an allow-list approach.</p>
+<section id="enabling-the-bash-tool" class="level4">
+<h4 class="anchored" data-anchor-id="enabling-the-bash-tool">Enabling the Bash Tool</h4>
+<p>Add to your config file (<code>~/.config/shell_sage/shell_sage.conf</code>):</p>
+<pre><code>safecmd = true</code></pre>
+</section>
+<section id="how-it-works" class="level4">
+<h4 class="anchored" data-anchor-id="how-it-works">How It Works</h4>
+<p>When enabled, ShellSage gains access to a <code>bash</code> tool that:</p>
+<ul>
+<li>Validates commands against a curated allow-list before execution</li>
+<li>Supports pipes, redirects, and shell operators</li>
+<li>Blocks potentially destructive operations by default</li>
+<li>Can be customized to allow or restrict allowed commands/destinations</li>
+</ul>
+</section>
+<section id="example-usage" class="level4">
+<h4 class="anchored" data-anchor-id="example-usage">Example Usage</h4>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ssage</span> <span class="st">"what files are in this directory and how big are they?"</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ShellSage can now run `ls -la` or `du -sh *` to answer</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p>See the <a href="https://github.com/AnswerDotAI/safecmd">safecmd documentation</a> for details on the allow-list</p>
+</blockquote>
+</section>
+</section>
+<section id="extracting-and-running-commands" class="level3">
+<h3 class="anchored" data-anchor-id="extracting-and-running-commands">Extracting and Running Commands</h3>
+<p>When ShellSage suggests commands, you can extract them directly to your command line. Note that this feature requires you to have logging enabled in your configuration file:</p>
+<div id="0d17331f" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage <span class="st">"how do I find large files?"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>To find large files on your system, here are the most useful commands:          
+
+
+            Quick method - Find largest files in current directory:             
+
+                                                                                
+ du -ah . | sort -rh | head -20                                                 
+                                                                                
+
+This shows the 20 largest files/directories, human-readable sizes, sorted       
+largest first.                                                                  
+
+
+                            More targeted searches:                             
+
+Find files larger than a specific size (e.g., 100MB):                           
+
+                                                                                
+ find . -type f -size +100M -exec ls -lh {} \; | sort -k5 -rh                   
+                                                                                
+
+Search entire filesystem (requires sudo):                                       
+
+                                                                                
+ sudo find / -type f -size +1G -exec ls -lh {} \; 2&gt;/dev/null                   
+                                                                                
+
+Interactive with ncdu (if installed):                                           
+
+                                                                                
+ ncdu /                                                                         
+                                                                                
+
+This gives you a navigable interface to explore disk usage.                     
+
+
+                                   Breakdown:                                   
+
+ • -type f = files only (not directories)                                       
+ • -size +100M = larger than 100 megabytes (use G for gigabytes)                
+ • sort -rh = reverse sort, human-readable numbers                              
+ • 2&gt;/dev/null = suppress permission errors                                     
+
+Tip: Start with du -ah . | sort -rh | head -20 in your home directory to quickly
+spot space hogs!                                                                </code></pre>
+</div>
+</div>
+<p>ShellSage will respond with code blocks. Press <code>Ctrl+B E</code> then enter the index number (0 for first block, 1 for second, etc.) to send that command directly to your prompt. You can also directly use the console script:</p>
+<div id="9fa509f9" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage_extract <span class="dv">0</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># inserts "du -ah . | sort -rh | head -20" into your tmux prompt</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>You can also bind a keyboard shortcut in Bash to insert code fences directly into your prompt. Type a block number (or leave empty for 0), then press <code>Ctrl+J</code> to insert that code block. To use this, add the following to your <code>~/.bashrc</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssage-insert()</span> <span class="kw">{</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">local</span> <span class="va">r</span><span class="op">=</span><span class="va">$(</span><span class="ex">ssage_extract</span> <span class="at">--do_print</span> <span class="st">"</span><span class="va">${READLINE_LINE</span><span class="op">:-</span>0<span class="va">}</span><span class="st">"</span><span class="va">)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">READLINE_LINE</span><span class="op">=</span><span class="st">"</span><span class="va">$r</span><span class="st">"</span> <span class="va">READLINE_POINT</span><span class="op">=</span><span class="va">${</span><span class="op">#</span><span class="va">r}</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="bu">bind</span> <span class="at">-x</span> <span class="st">'"\C-j": ssage-insert'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="enabling-sassy-mode" class="level3">
+<h3 class="anchored" data-anchor-id="enabling-sassy-mode">Enabling Sassy Mode</h3>
+<p>For a more entertaining experience, try sassy mode (GLaDOS-inspired):</p>
+<div id="a7f57de6" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>ssage <span class="op">--</span>mode sassy explain git rebase</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Ah, git rebase. The command that separates the competent developers from those  
+who still think "merge commits" are a personality trait. How delightful that    
+you're ready to learn about history rewriting.                                  
+
+
+                              What is Git Rebase?                               
+
+git rebase is a command that rewrites commit history by moving or combining a   
+sequence of commits to a new base commit. Think of it as picking up your branch 
+and transplanting it onto a different point in the git tree. It's like time     
+travel, but with fewer paradoxes and more merge conflicts.                      
+
+
+                                  Basic Syntax                                  
+
+                                                                                
+ git rebase &lt;base-branch&gt;                                                       
+                                                                                
+
+
+                 How It Works (In Terms Even Humans Can Grasp)                  
+
+When you rebase, Git:                                                           
+
+ 1 Finds the common ancestor between your current branch and the target branch  
+ 2 Takes all commits from your branch since that ancestor                       
+ 3 Temporarily stores them away (how thoughtful)                                
+ 4 Resets your branch to match the target branch                                
+ 5 Replays your commits one by one on top of it                                 
+
+It's essentially saying: "What if my branch had started from here instead?"     
+
+
+                                Common Use Cases                                
+
+                     1. Keep Your Feature Branch Up-to-Date                     
+
+                                                                                
+ git checkout feature-branch                                                    
+ git rebase main                                                                
+                                                                                
+ # Or the shorthand for those who value efficiency:                             
+ git rebase main feature-branch                                                 
+                                                                                
+
+                      2. Interactive Rebase (The Fun Part)                      
+
+                                                                                
+ git rebase -i HEAD~3  # Rebase last 3 commits                                  
+                                                                                
+
+This opens an editor where you can:                                             
+
+ • pick - Keep the commit (how boring)                                          
+ • reword - Change the commit message (for those who can't spell)               
+ • edit - Modify the commit contents                                            
+ • squash - Combine with previous commit                                        
+ • fixup - Like squash, but discards the commit message                         
+ • drop - Delete the commit (pretend it never happened)                         
+
+                               3. Rebase vs Merge                               
+
+Merge:                                                                          
+
+                                                                                
+ git merge feature-branch  # Creates a merge commit                             
+                                                                                
+
+Result: Preserves history, creates a "merge bubble"                             
+
+Rebase:                                                                         
+
+                                                                                
+ git rebase main  # Linear history                                              
+                                                                                
+
+Result: Clean, linear history that looks like you knew what you were doing all  
+along                                                                           
+
+
+                                Example Scenario                                
+
+                                                                                
+ # You're on feature-branch, main has moved ahead                               
+ git checkout feature-branch                                                    
+ git rebase main                                                                
+                                                                                
+ # If conflicts occur (and they will, because of course they will):             
+ # 1. Fix the conflicts in your editor                                          
+ # 2. Stage the resolved files                                                  
+ git add &lt;resolved-files&gt;                                                       
+ # 3. Continue the rebase                                                       
+ git rebase --continue                                                          
+                                                                                
+ # Or admit defeat:                                                             
+ git rebase --abort                                                             
+                                                                                
+
+
+                 Important Warnings (Please Read, For Science)                  
+
+⚠️ THE GOLDEN RULE: Never rebase commits that have been pushed to a shared/public
+branch. You'll rewrite history that others depend on, and they'll hate you.     
+Well, more than usual.                                                          
+
+                                                                                
+ # Safe - your local feature branch:                                            
+ git rebase main  ✓                                                             
+                                                                                
+ # Dangerous - already pushed to shared repo:                                   
+ git rebase main  # Then force push... ✗                                        
+ git push --force  # Congratulations, you've made enemies                       
+                                                                                
+
+
+                                 Useful Options                                 
+
+                                                                                
+ git rebase --continue      # Continue after resolving conflicts                
+ git rebase --skip          # Skip current commit (give up on it)               
+ git rebase --abort         # Abandon ship, return to pre-rebase state          
+ git rebase -i HEAD~5       # Interactive rebase last 5 commits                 
+ git rebase --onto A B C    # Advanced: rebase C onto A, starting from B        
+                                                                                
+
+
+                               When to Use Rebase                               
+
+ • ✓ Cleaning up local commits before pushing                                   
+ • ✓ Keeping feature branches up-to-date with main                              
+ • ✓ Creating a clean, linear history                                           
+ • ✓ Squashing "fix typo" commits (we all make them, apparently)                
+
+
+                             When NOT to Use Rebase                             
+
+ • ✗ On public/shared branches                                                  
+ • ✗ When you want to preserve exact history                                    
+ • ✗ When you're not prepared for conflict resolution                           
+ • ✗ Right before a demo (trust me on this one)                                 
+
+────────────────────────────────────────────────────────────────────────────────
+For more details that you probably won't read: git rebase --help                
+
+Now go forth and rewrite history. Just remember: with great power comes great   
+responsibility, and with git rebase comes great potential for catastrophic      
+mistakes. But I'm sure you'll be fine.                                          </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="contributing" class="level2">
+<h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
+<p>ShellSage is built using <a href="https://nbdev.fast.ai/">nbdev</a>. For detailed contribution guidelines, please see our <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> file.</p>
+<p>We welcome contributions of all kinds:</p>
+<ul>
+<li>Bug reports</li>
+<li>Feature requests</li>
+<li>Documentation improvements</li>
+<li>Code contributions</li>
+</ul>
+<p>Please visit our <a href="https://github.com/AnswerDotAI/shell_sage">GitHub repository</a> to get started.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/AnswerDotAI\.github\.io\/shell_sage");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/AnswerDotAI/shell_sage/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
