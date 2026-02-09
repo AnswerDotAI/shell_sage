@@ -6,8 +6,8 @@ __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_
            'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb #d7c5634a
+from contextlib import contextmanager
 from datetime import datetime
-from itertools import accumulate
 from fastcore.script import *
 from fastcore.tools import *
 from fastcore.utils import *
@@ -34,6 +34,9 @@ def __rich_console__(self:CodeBlock, console, options):
 # %% ../nbs/00_core.ipynb #9d52ca34
 console = Console()
 print = console.print
+_live = None
+_res = ""
+_md = None
 
 # %% ../nbs/00_core.ipynb #977bd215
 def Chat(*arg, **kw):
@@ -179,23 +182,35 @@ def get_opts(**opts):
         if v is None: opts[k] = cfg.get(k, default_cfg.get(k))
     return AttrDict(opts)
 
-# %% ../nbs/00_core.ipynb #5b3ae69b
+# %% ../nbs/00_core.ipynb #7eba8e55
 _always_allow = set()  # Session-level tracking of auto-approved tools
+
+@contextmanager
+def _pause_live():
+    global _res
+    _live.update('', refresh=True)
+    if _res: print(_md(_res))
+    _res = ''
+    _live.stop()
+    try: yield
+    finally: _live.start()
 
 def with_permission(action_desc):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            global _res
             if IN_NOTEBOOK or func.__name__ in _always_allow: return func(*args, **kwargs)
             limit = 50
             details_dict = {
                 "args": [str(arg)[:limit] + ("..." if len(str(arg)) > limit else "") for arg in args],
                 "kwargs": {k: str(v)[:limit] + ("..." if len(str(v)) > limit else "") for k, v in kwargs.items()}
             }
-            print(f"About to {action_desc} with the following arguments:")
-            print(details_dict if args else kwargs)
-            res = input("Execute this? (y/n/a=always/suggestion): ").lower().strip()
-
+            with _pause_live():
+                print(f"About to {action_desc} with the following arguments:", str(details_dict) if args else str(kwargs))
+                res = input("Execute this? (y/n/a=always/suggestion): ").lower().strip()
+                print()
+            
             if res == 'a': _always_allow.add(func.__name__)
             if res in ('y','a'): return func(*args, **kwargs)
             elif res == 'n': return "[Command cancelled by user]"
@@ -219,10 +234,14 @@ def get_sage(model, mode='default', search=False, use_safecmd=False):
 
 # %% ../nbs/00_core.ipynb #68be9484
 def get_res(sage, q, opts):
-    from litellm.types.utils import ModelResponseStream # lazy load
-    # need to use stream=True to get search citations
-    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key, think=opts.think) 
-    yield from accumulate(o.choices[0].delta.content or "" for o in gen if isinstance(o, ModelResponseStream))
+    global _res
+    from litellm.types.utils import ModelResponseStream
+    _res = ""
+    gen = sage(q, max_steps=10, stream=True, api_base=opts.api_base, api_key=opts.api_key, think=opts.think)
+    for o in gen:
+        if isinstance(o, ModelResponseStream):
+            _res += o.choices[0].delta.content or ""
+            yield _res
 
 # %% ../nbs/00_core.ipynb #4e6e4d92
 class Log: id:int; timestamp:str; query:str; response:str; model:str; mode:str
@@ -260,10 +279,12 @@ def main(
     res=""
     try:
         with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
+            global _live, _md
+            _live = live
             if mode not in ['default', 'sassy']:
                 raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
             
-            md = partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
+            _md = partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
                          inline_code_theme=opts.code_theme)
             query = ' '.join(query)
             ctxt = '' if skip_system else _sys_info()
@@ -285,7 +306,7 @@ def main(
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
             sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd)
-            for res in get_res(sage, query, opts): live.update(md(res), refresh=True)
+            for res in get_res(sage, query, opts): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
         if opts.log:
