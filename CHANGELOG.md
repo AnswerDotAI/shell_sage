@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 1.0.5
+
+
+### Bugs Squashed
+
+- Fix duplicated output during tool use by pausing Live display ([#76](https://github.com/AnswerDotAI/shell_sage/pull/76)), thanks to [@ncoop57](https://github.com/ncoop57)
+
+
 ## 1.0.4
 
 ### New Features
