@@ -398,12 +398,6 @@ model = "ollama_chat/qwen3:1.7b"
 ssage --model gpt-5 --api_key <your_key_here> explain kubernetes pods
 ```
 
-#### Google Gemini
-
-``` bash
-ssage --model gemini/gemini-pro --api_key <your_key_here> what is systemd?
-```
-
 #### Other Providers
 
 For any provider supported by LiteLLM, set the appropriate API key and
