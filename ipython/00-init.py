@@ -3,6 +3,13 @@ import os, shlex, subprocess
 
 ip = get_ipython()
 ip.run_line_magic('rehashx', '')
+
+# Alias hyphenated executables with underscores (e.g. ws-status -> ws_status)
+for d in os.environ.get('PATH', '').split(os.pathsep):
+    if os.path.isdir(d):
+        for f in os.listdir(d):
+            if '-' in f and os.access(f'{d}/{f}', os.X_OK):
+                ip.alias_manager.soft_define_alias(f.replace('-', '_'), f)
 ip.system = lambda cmd: ip.system_raw(f'bash -c {shlex.quote("shopt -s expand_aliases; source ~/.bashrc; " + cmd)}')
 ip.getoutput = lambda cmd: subprocess.run(['bash', '-c', f'shopt -s expand_aliases; source ~/.bashrc; {cmd}'],
                                           capture_output=True, text=True).stdout.strip().split('\n')
