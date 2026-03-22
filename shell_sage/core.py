@@ -270,6 +270,7 @@ def main(
     trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "view,rg")
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
+    raw: bool = False,  # Skip markdown rendering and print plain text
 ):
     safecmd = None
     opts = get_opts(history_lines=history_lines, model=model, search=search,
@@ -284,8 +285,11 @@ def main(
             if mode not in ['default', 'sassy']:
                 raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
             
-            _md = partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
+            _md = noop if raw else partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
                          inline_code_theme=opts.code_theme)
+            if raw:
+                global print
+                print = Console(width=2**15).print
             query = ' '.join(query)
             ctxt = '' if skip_system else _sys_info()
 
