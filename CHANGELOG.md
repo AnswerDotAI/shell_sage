@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.0.6
+
+### New Features
+
+- Add --raw flag to skip markdown rendering and print plain text output ([#78](https://github.com/AnswerDotAI/shell_sage/issues/78))
+
+
 ## 1.0.5
 
 
