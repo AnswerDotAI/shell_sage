@@ -23,7 +23,7 @@ from .config import *
 from subprocess import check_output as co, DEVNULL
 from safecmd import bash
 
-import asyncio,os,pyperclip,re,subprocess,sys
+import asyncio,os,pyperclip,re,subprocess,sys,builtins
 
 # %% ../nbs/00_core.ipynb #4d0676fd
 @patch
@@ -289,7 +289,7 @@ def main(
                          inline_code_theme=opts.code_theme)
             if raw:
                 global print
-                print = Console(width=2**15).print
+                print = builtins.print
             query = ' '.join(query)
             ctxt = '' if skip_system else _sys_info()
 
