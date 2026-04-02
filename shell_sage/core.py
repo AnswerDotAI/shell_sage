@@ -142,7 +142,7 @@ def _aliases(shell):
 def _sys_info():
     sys = co(['uname', '-a'], text=True).strip()
     ssys = f'<system>{sys}</system>'
-    shell = co('echo $SHELL', shell=True, text=True).strip()
+    shell = os.environ.get('SHELL', '/bin/bash')
     sshell = f'<shell>{shell}</shell>'
     saliases = f'<aliases>\n{_aliases(shell)}\n</aliases>'
     return f'<system_info>\n{ssys}\n{sshell}\n{saliases}\n</system_info>'
