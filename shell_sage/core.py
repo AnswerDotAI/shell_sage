@@ -182,12 +182,15 @@ def get_opts(**opts):
         if v is None: opts[k] = cfg.get(k, default_cfg.get(k))
     return AttrDict(opts)
 
-# %% ../nbs/00_core.ipynb #7eba8e55
+# %% ../nbs/00_core.ipynb #36a4cb93
 _always_allow = set()  # Session-level tracking of auto-approved tools
 
 @contextmanager
 def _pause_live():
     global _res
+    if _live is None:
+        yield
+        return
     _live.update('', refresh=True)
     if _res: print(_md(_res))
     _res = ''
@@ -200,14 +203,14 @@ def with_permission(action_desc):
         @wraps(func)
         def wrapper(*args, **kwargs):
             global _res
-            if IN_NOTEBOOK or func.__name__ in _always_allow: return func(*args, **kwargs)
-            limit = 50
-            details_dict = {
-                "args": [str(arg)[:limit] + ("..." if len(str(arg)) > limit else "") for arg in args],
-                "kwargs": {k: str(v)[:limit] + ("..." if len(str(v)) > limit else "") for k, v in kwargs.items()}
-            }
             with _pause_live():
+                limit = 50
+                details_dict = {
+                    "args": [str(arg)[:limit] + ("..." if len(str(arg)) > limit else "") for arg in args],
+                    "kwargs": {k: str(v)[:limit] + ("..." if len(str(v)) > limit else "") for k, v in kwargs.items()}
+                }
                 print(f"About to {action_desc} with the following arguments:", str(details_dict) if args else str(kwargs))
+                if IN_NOTEBOOK or func.__name__ in _always_allow: return func(*args, **kwargs)
                 res = input("Execute this? (y/n/a=always/suggestion): ").lower().strip()
                 print()
             
@@ -218,7 +221,7 @@ def with_permission(action_desc):
         return wrapper
     return decorator
 
-# %% ../nbs/00_core.ipynb #d9bb5ae7
+# %% ../nbs/00_core.ipynb #122a1bb7
 tools = [with_permission('ripgrep a search term')(rg),
          with_permission('View file/directory')(view),
          with_permission('Create a file')(create),
