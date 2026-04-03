@@ -33,4 +33,5 @@ version = {attr = "shell_sage.__version__"}
 include = ["shell_sage"]
 
 [tool.nbdev]
+allowed_cell_metadata_keys = ["solveit_ai"]
 custom_sidebar = false
