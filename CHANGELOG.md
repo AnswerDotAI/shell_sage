@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 1.0.7
+
+### New Features
+
+- Fix: Print tool use details before permission check ([#81](https://github.com/AnswerDotAI/shell_sage/pull/81)), thanks to [@ncoop57](https://github.com/ncoop57)
+- Use os.environ.get instead of subprocess to retrieve SHELL variable ([#80](https://github.com/AnswerDotAI/shell_sage/issues/80))
+
+
 ## 1.0.6
 
 ### New Features
