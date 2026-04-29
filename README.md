@@ -545,6 +545,51 @@ ssage-insert() {
 bind -x '"\C-j": ssage-insert'
 ```
 
+### `ssage_log` — read the SQLite log
+
+When `log = True` in your config, each `ssage` run is stored in
+`~/.shell_sage/logs/logs.db`. The **`ssage_log`** command prints that
+history: machine-friendly **json** (default) or **md**, with no header
+on stdout (safe to pipe to `jq`).
+
+- `ssage_log` — last **1** most recent turn, oldest-of-one first
+- `ssage_log --last N` — **N** most recent rows by time, printed
+  **oldest to newest** within that set
+- `ssage_log --all` — every row, chronological
+- `ssage_log --prune` — rotate active `logs.db` to
+  `logs-YYYY-MM-DD-HHMMSS.db` and create a fresh active `logs.db`
+- `ssage_log --format md` — Markdown export
+- `ssage_log --format md --frontmatter` — add YAML frontmatter
+  (id/timestamp/model/mode)
+- `ssage_log --format md --context` — include captured context in a
+  collapsible details block
+- `ssage_log --format nb` — export a notebook (`.ipynb`) with one
+  markdown cell per selected row
+- `ssage_log --out /tmp/out.json` — write to a file instead of stdout
+- `ssage_log --log_db PATH` — read a specific database file (for example
+  a rotated or copied `logs-*.db`)
+- `ssage_log --ls` — list `*.db` in the log directory (name, active
+  marker, size, mtime)
+- `ssage_log --info` — human index: order, timestamp, and a one-line
+  user query per row (do not combine with `--all` or `--last`)
+
+Shareable markdown recap example:
+
+``` bash
+ssage_log --format md --frontmatter --last 5 --out notes.md
+```
+
+Notebook export example:
+
+``` bash
+ssage_log --format nb --last 10 --out session-log.ipynb
+```
+
+If `log` is `False` and the database is missing or empty, you get a
+message on **stderr** explaining how to enable logging. You can still
+run `ssage_log` read-only on an existing file even if logging is off in
+the config.
+
 ### Enabling Sassy Mode
 
 For a more entertaining experience, try sassy mode (GLaDOS-inspired):
