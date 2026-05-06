@@ -19,13 +19,15 @@ def _cfg_path(): return xdg_config_home() / _shell_sage_home_dir / _shell_sage_c
 # %% ../nbs/01_config.ipynb #9a8ce1d2
 @dataclass
 class ShellSageConfig:
-    model: str = 'claude-sonnet-4-5-20250929'
+    model: str = 'claude-sonnet-4-6'
     search: str = ''
     think: str = ''
     trust: str = ''
     mode: str = 'default'
     api_base: str = ''
     api_key: str = ''
+    backend: str = 'lisette'
+    vendor_name: str = ''
     history_lines: int = -1
     code_theme: str = "monokai"
     code_lexer: str = "python"
