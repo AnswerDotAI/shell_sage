@@ -281,7 +281,7 @@ async def main(
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
     raw: bool = False,  # Skip markdown rendering and print plain text
-    backend: str = 'lisette',  # Backend to use: 'lisette' or 'fastllm'
+    backend: str = None,  # Backend to use. Defaults to shell_sage config.
     vendor_name: str = None,  # Vendor name for fastllm backend (e.g. 'fireworks_ai')
 ):
     safecmd = None
