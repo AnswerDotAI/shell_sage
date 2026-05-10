@@ -16,7 +16,7 @@ from fastcore.tools import *
 from fastcore.utils import *
 from fastcore.meta import delegates
 from fastlite import database
-from functools import partial, wraps
+from functools import lru_cache, partial, wraps
 from rich.live import Live
 from rich.spinner import Spinner
 from rich.console import Console
@@ -181,6 +181,10 @@ def tmux_history_lim():
 
 
 # %% ../nbs/00_core.ipynb #0d70591e
+_GHOSTTY_DEFAULT_HISTORY_LINES = 3000
+_GHOSTTY_HISTORY_MAX_BYTES = 10 * 1024 * 1024
+_GHOSTTY_POLL_INTERVAL = 0.05
+
 GHOSTTY_SCROLLBACK_SCRIPT = """
 tell application "Ghostty"
   perform action "write_scrollback_file:copy,plain" on focused terminal of selected tab of front window
@@ -205,17 +209,18 @@ def _run_osascript(script):
     subprocess.run(['osascript', '-e', script], text=True, check=True, stdout=DEVNULL, stderr=DEVNULL)
 
 
+@lru_cache(maxsize=1)
 def _ghostty_history_temp_roots():
     roots = {tempfile.gettempdir(), '/var/folders', '/private/var/folders'}
-    roots.update('/private' + root for root in list(roots) if root.startswith('/var/'))
-    roots.update(root.removeprefix('/private') for root in list(roots) if root.startswith('/private/'))
-    return [Path(root).resolve() for root in roots if root]
+    roots |= {'/private' + root for root in roots if root.startswith('/var/')}
+    roots |= {root.removeprefix('/private') for root in roots if root.startswith('/private/')}
+    return tuple(Path(root).resolve() for root in roots if root)
 
 
 def _valid_ghostty_history_path(candidate):
     try:
         path = Path(str(candidate).strip())
-        if path.name != 'history.txt' or not path.is_file() or path.stat().st_size > 10 * 1024 * 1024:
+        if path.name != 'history.txt' or not path.is_file() or path.stat().st_size > _GHOSTTY_HISTORY_MAX_BYTES:
             return False
         path = path.resolve()
         return any(os.path.commonpath([str(path), str(root)]) == str(root) for root in _ghostty_history_temp_roots())
@@ -225,8 +230,9 @@ def _valid_ghostty_history_path(candidate):
 
 def _wait_for_ghostty_history_path(old_clip=None, timeout=1.0):
     start = time.time()
+    deadline = start + timeout
     old_clip = (old_clip or '').strip()
-    while time.time() < start + timeout:
+    while time.time() < deadline:
         candidate = (_pbpaste() or '').strip()
         if _valid_ghostty_history_path(candidate):
             if candidate != old_clip:
@@ -236,7 +242,7 @@ def _wait_for_ghostty_history_path(old_clip=None, timeout=1.0):
                     return candidate
             except OSError:
                 pass
-        time.sleep(0.05)
+        time.sleep(_GHOSTTY_POLL_INTERVAL)
     return None
 
 
@@ -299,7 +305,7 @@ def get_terminal_history(n, pid='current'):
         n = tmux_history_lim() if n is None or n < 0 else n
         return get_hist_tmux(n, pid)
 
-    n = 3000 if n is None or n < 0 else n
+    n = _GHOSTTY_DEFAULT_HISTORY_LINES if n is None or n < 0 else n
     if is_ghostty():
         return get_ghostty_history(n, pid)
     return get_history(n, pid)
