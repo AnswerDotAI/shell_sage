@@ -14,7 +14,7 @@ ShellSage is an AI-powered command-line assistant that integrates seamlessly wit
 
 ShellSage is an AI-powered command-line assistant that integrates seamlessly with your terminal workflow through tmux or macOS Ghostty. It provides contextual help for shell operations, making it easier to navigate complex command-line tasks, debug scripts, and manage your system.
 
-ShellSage works with multiple LLM providers including Claude, GPT, and Ollama. It uses supported terminal-history providers—tmux and macOS Ghostty—to automatically read recent terminal context. Inside tmux, it can also read multiple pane histories. You can pipe command output or file contents directly to ShellSage, and it can view files, search code, create files, and make edits with your permission. When needed, it can even search the internet for up-to-date information. You can also log all your interactions directly to SQLite for later reference.
+ShellSage works with multiple LLM providers including Claude, GPT, and Ollama. It reads recent terminal context from tmux, or from Ghostty on macOS; tmux can also provide specific pane histories. You can pipe command output or file contents directly to ShellSage, and it can view files, search code, create files, and make edits with your permission. When needed, it can search the internet for up-to-date information. You can also log all your interactions directly to SQLite for later reference.
 
 ## Installation
 
@@ -82,7 +82,7 @@ export OPENAI_API_KEY=sk...
 
 ShellSage works best with a properly configured tmux environment. I’ve created a preconfigured [tmux configuration](tmux.conf) that works well with ShellSage. This configuration enables mouse support, adds pane IDs to your status bar so you can quickly reference them when having ShellSage read from specific panes, turns off alternative-screen so editor content like vim stays in the tmux buffer where ShellSage can see it, and adds a convenient shortcut (CTRL+B+E followed by the index number) for automatically extracting code fence blocks into your command prompt.
 
-On macOS, ShellSage can also capture history from the front, focused Ghostty terminal. This requires Ghostty 1.3+ with AppleScript support enabled (`macos-applescript = true`). ShellSage invokes Ghostty’s `write_scrollback_file:copy,plain` action through AppleScript, briefly uses the macOS clipboard to receive the temporary `history.txt` path, reads that file, and restores the clipboard afterward. If Ghostty history capture fails, `ssage` behaves as before and sends no `<terminal_history>` block.
+On macOS, ShellSage can also read the front, focused Ghostty terminal. This requires Ghostty 1.3+ with AppleScript enabled (`macos-applescript = true`). ShellSage runs Ghostty’s `write_scrollback_file:copy,plain` action, uses the macOS clipboard only to receive the temporary `history.txt` path, then restores the clipboard. If capture fails, `ssage` behaves as before and sends no `<terminal_history>` block.
 
 ## Getting Started
 
@@ -156,7 +156,7 @@ ShellSage will provide the command, explain how it works, and give you practical
 
 ### Using Terminal Context
 
-ShellSage automatically reads terminal history from supported providers to understand what you’re working on. Provider priority is tmux first, then macOS Ghostty when `TERM_PROGRAM=ghostty` or `TERM` starts with `xterm-ghostty`. Ghostty capture targets the front, focused terminal only; `--pid all` and pane-id targeting remain tmux-only, and Linux/GTK Ghostty history capture is not supported yet. If history cannot be captured, `ssage` continues without terminal context:
+ShellSage automatically reads terminal history to understand what you’re working on. It uses tmux first. Outside tmux, it can use macOS Ghostty when `TERM_PROGRAM=ghostty` or `TERM` starts with `xterm-ghostty`. Ghostty capture is focused-terminal only: pane IDs and `--pid all` remain tmux-only, and Linux/GTK Ghostty is not supported yet. If capture fails, `ssage` continues without terminal context:
 
 ``` python
 # After running some commands that produced errors (e.g. find -name "*.tmp" .)
@@ -257,7 +257,7 @@ One of ShellSage’s most powerful features is analyzing piped input:
 
 ### Working with Multiple Tmux Panes
 
-When you have multiple tmux panes open, you can reference specific ones by their ID (shown in your status bar). This is a tmux-only feature; Ghostty macOS support captures only the front, focused terminal for now.
+When you have multiple tmux panes open, you can reference specific ones by their ID (shown in your status bar). This is tmux-only; Ghostty macOS support captures only the front, focused terminal for now.
 
 ![btop output](./screenshots/btop_output.png)
 
