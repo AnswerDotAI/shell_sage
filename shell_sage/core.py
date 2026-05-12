@@ -297,17 +297,17 @@ def get_history(n, pid='current'):
     return get_hist_tmux(n, pid) or get_hist_osa(n, pid)
 
 
+def _is_current_macos_terminal(pid):
+    return sys.platform == 'darwin' and pid in ('current', None)
+
+
 def get_ghostty_history(n, pid='current'):
-    if sys.platform != 'darwin' or pid not in ('current', None):
-        return None
-    return get_ghostty_history_macos(n)
+    return get_ghostty_history_macos(n) if _is_current_macos_terminal(pid) else None
 
 
 def get_macos_terminal_history(n, pid='current'):
-    if sys.platform != 'darwin' or pid not in ('current', None):
-        return None
     script = MACOS_TERMINAL_HISTORY_SCRIPTS.get(os.environ.get('TERM_PROGRAM'))
-    if not script:
+    if not script or not _is_current_macos_terminal(pid):
         return None
     try:
         return _tail_lines(co(['osascript', '-e', script], text=True, stderr=DEVNULL), n)
@@ -321,9 +321,7 @@ def get_terminal_history(n, pid='current'):
         return get_hist_tmux(n, pid)
 
     n = _DEFAULT_TERMINAL_HISTORY_LINES if n is None or n < 0 else n
-    if is_ghostty():
-        return get_ghostty_history(n, pid)
-    return get_macos_terminal_history(n, pid)
+    return get_ghostty_history(n, pid) if is_ghostty() else get_macos_terminal_history(n, pid)
 
 # %% ../nbs/00_core.ipynb #0dcbb503
 default_cfg = asdict(ShellSageConfig())
