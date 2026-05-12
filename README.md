@@ -97,9 +97,8 @@ export your Anthropic API key:
 export ANTHROPIC_API_KEY=sk...
 ```
 
-If you prefer to use OpenAI instead, you can export your OpenAI API key
-and update your shell sage config to use openai (see the Configuration
-section below for details):
+If you prefer to use OpenAI instead, export your OpenAI API key and set
+the model in your ShellSage config or on the command line:
 
 ``` sh
 export OPENAI_API_KEY=sk...
@@ -358,65 +357,79 @@ ShellSage can be customized through a configuration file located at
 `~/.config/shell_sage/shell_sage.conf`:
 
     [DEFAULT]
-    model = 'claude-sonnet-4-5-20250929'    # Your preferred model
-    search = ''                             # Enable web search capability (can be either l,m,h https://lisette.answer.ai/#web-search)
-    think = ''                              # Enable thinking capability (can be either l,m,h)
-    trust = ''                              # Comma-delimeted list of tools to not ask for confirmation about
+    model = 'claude-sonnet-4-6'             # Your preferred model
+    search = ''                             # Web search effort for supported models: l, m, or h
+    think = ''                              # Reasoning effort for supported models: l, m, or h
+    trust = ''                              # Comma-delimited list of tools to always allow
     mode = 'default'                        # or "sassy"
-    api_base = ''                           # alternative api url base
-    api_key = ''                            # alternative api key to use instead of default env var
+    base_url = ''                           # Alternative API base URL
+    api_key = ''                            # API key override instead of the default env var
+    vendor_name = ''                        # Explicit fastllm vendor name when needed
     history_lines = -1                      # Lines of terminal history to include. -1 means include all
     code_theme = "monokai"                  # Syntax highlighting theme
     code_lexer = "python"                   # Default lexer for inline code blocks
     log = False                             # Enable SQLite logging (required for code extraction)
+    safecmd = False                         # Enable the safecmd-backed bash tool
 
 ### Using Different Model Providers
 
-ShellSage uses [lisette](https://github.com/AnswerDotAI/lisette) under
-the hood, which supports any LLM provider via
-[LiteLLM](https://docs.litellm.ai/docs/providers). This means you can
-use Claude, GPT, Gemini, local models via Ollama, and many others.
+ShellSage uses [fastllm](https://github.com/AnswerDotAI/fastllm) under
+the hood. fastllm can automatically resolve common Claude, Gemini, GPT,
+and OpenAI model names. For providers that are not auto-resolved, set
+`vendor_name` in your config or pass `--vendor_name` on the command
+line.
 
-#### Local Models with Ollama
+| `vendor_name`  | API key source                             |
+|----------------|--------------------------------------------|
+| `openai`       | `OPENAI_API_KEY`                           |
+| `anthropic`    | `ANTHROPIC_API_KEY`                        |
+| `gemini`       | `GEMINI_API_KEY`                           |
+| `openai_chat`  | `OPENAI_API_KEY`                           |
+| `codex`        | `CODEX_AUTH_TOKEN` or `~/.codex/auth.json` |
+| `moonshot`     | `MOONSHOT_API_KEY`                         |
+| `deepseek`     | `DEEPSEEK_API_KEY`                         |
+| `openrouter`   | `OPENROUTER_API_KEY`                       |
+| `together`     | `TOGETHER_API_KEY`                         |
+| `fireworks_ai` | `FIREWORKS_API_KEY`                        |
+| `qwen`         | `QWEN_API_KEY`                             |
 
-For privacy-conscious users or offline usage, run models locally:
+#### Claude, OpenAI, and Gemini
 
-``` sh
-# First, install and start Ollama, then pull a model
-ollama pull qwen3:1.7b
-
-# Use with ShellSage
-ssage --model ollama_chat/qwen3:1.7b how do I compress a directory?
-
-# Or set as default in your config.toml
-model = "ollama_chat/qwen3:1.7b"
-```
-
-#### OpenAI
-
-``` bash
-ssage --model gpt-5 --api_key <your_key_here> explain kubernetes pods
-```
-
-#### Google Gemini
+Common Claude, GPT, and Gemini model names are auto-resolved:
 
 ``` bash
-ssage --model gemini/gemini-pro --api_key <your_key_here> what is systemd?
+ssage --model claude-sonnet-4-6 explain systemd timers
+ssage --model gpt-5 explain kubernetes pods
+ssage --model gemini-2.5-pro what is journald?
 ```
+
+#### Known Vendors
+
+Use `vendor_name` when the model name does not identify the provider on
+its own:
+
+``` bash
+ssage --vendor_name openrouter --model openai/gpt-5 explain cgroups
+ssage --vendor_name codex --model gpt-5.5 review my shell script
+```
+
+You can also set the vendor in your config:
+
+    model = 'gpt-5.5'
+    vendor_name = 'codex'
 
 #### Other Providers
 
-For any provider supported by LiteLLM, set the appropriate API key and
-use the provider’s model format:
+For another OpenAI-compatible API, provide the vendor, API base URL, API
+key, and model:
 
 ``` bash
-# Custom API base
-ssage --api-base https://your-api.com --api-key your_key --model your_model your query
+ssage --vendor_name openai_chat --base_url https://your-api.com/v1 --api_key your_key --model your_model your query
 ```
 
-See the [LiteLLM providers
-documentation](https://docs.litellm.ai/docs/providers) for the complete
-list of supported providers and their model naming conventions.
+For known non-OpenAI-compatible providers, prefer the matching
+`vendor_name` from the table above so fastllm can use the right API
+format and environment variable.
 
 ### Command Line Overrides
 
@@ -425,10 +438,10 @@ arguments:
 
 ``` sh
 # Adjust history lines
-ssage --history-lines 100 what commands did I just run?
+ssage --history_lines 100 what commands did I just run?
 
 # Change the display theme
-ssage --code-theme dracula --code-lexer python show me a python example
+ssage --code_theme dracula --code_lexer python show me a python example
 ```
 
 You can find all available code themes and lexers at
