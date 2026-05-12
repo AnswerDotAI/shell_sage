@@ -24,9 +24,8 @@ class ShellSageConfig:
     think: str = ''
     trust: str = ''
     mode: str = 'default'
-    api_base: str = ''
+    base_url: str = ''
     api_key: str = ''
-    backend: str = 'lisette'
     vendor_name: str = ''
     history_lines: int = -1
     code_theme: str = "monokai"
