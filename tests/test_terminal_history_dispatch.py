@@ -136,11 +136,13 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
         with patch.dict(self.core.os.environ, {'TMUX': '/tmp/tmux', 'TERM_PROGRAM': 'ghostty'}, clear=True), \
              patch.object(self.core, 'tmux_history_lim', return_value=123) as history_lim, \
              patch.object(self.core, 'get_hist_tmux', return_value='tmux history') as get_tmux, \
-             patch.object(self.core, 'get_ghostty_history_macos') as get_ghostty:
+             patch.object(self.core, 'get_ghostty_history_macos') as get_ghostty, \
+             patch.object(self.core, 'get_macos_terminal_history') as get_terminal:
             self.assertEqual(self.core.get_terminal_history(None, 'all'), 'tmux history')
             history_lim.assert_called_once_with()
             get_tmux.assert_called_once_with(123, 'all')
             get_ghostty.assert_not_called()
+            get_terminal.assert_not_called()
 
     def test_explicit_history_lines_pass_through_to_tmux(self):
         with patch.dict(self.core.os.environ, {'TMUX': '/tmp/tmux'}, clear=True), \
@@ -155,7 +157,12 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
              patch.object(self.core, 'get_hist_osa', return_value='terminal history') as get_osa:
             self.assertEqual(self.core.get_history(12, 'current'), 'terminal history')
             get_tmux.assert_called_once_with(12, 'current')
-            get_osa.assert_called_once_with(12)
+            get_osa.assert_called_once_with(12, 'current')
+
+    def test_get_hist_osa_remains_compatible(self):
+        with patch.object(self.core, 'get_macos_terminal_history', return_value='terminal history') as get_terminal:
+            self.assertEqual(self.core.get_hist_osa(12), 'terminal history')
+            get_terminal.assert_called_once_with(12, 'current')
 
     def test_ghostty_detection_uses_term_program_or_term(self):
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'ghostty'}, clear=True):
@@ -172,9 +179,58 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     def test_ghostty_provider_uses_default_history_lines(self):
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'ghostty'}, clear=True), \
              patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'get_ghostty_history_macos', return_value='ghostty history') as get_ghostty:
+             patch.object(self.core, 'get_ghostty_history_macos', return_value='ghostty history') as get_ghostty, \
+             patch.object(self.core, 'get_macos_terminal_history') as get_terminal:
             self.assertEqual(self.core.get_terminal_history(-1, 'current'), 'ghostty history')
             get_ghostty.assert_called_once_with(3000)
+            get_terminal.assert_not_called()
+
+    def test_terminal_app_provider_uses_default_history_lines(self):
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
+             patch.object(self.core, 'get_macos_terminal_history', return_value='terminal history') as get_terminal:
+            self.assertEqual(self.core.get_terminal_history(-1, 'current'), 'terminal history')
+            get_terminal.assert_called_once_with(3000, 'current')
+
+    def test_terminal_app_history_reads_recent_lines_from_osascript(self):
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'darwin'), \
+             patch.object(self.core, 'co', return_value='one\ntwo\nthree\n') as co:
+            self.assertEqual(self.core.get_macos_terminal_history(2), 'two\nthree')
+            co.assert_called_once_with(
+                ['osascript', '-e', self.core.MACOS_TERMINAL_HISTORY_SCRIPTS['Apple_Terminal']],
+                text=True,
+                stderr=self.core.DEVNULL,
+            )
+
+    def test_iterm_history_reads_recent_lines_from_osascript(self):
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'iTerm.app'}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'darwin'), \
+             patch.object(self.core, 'co', return_value='alpha\nbeta\ngamma\n') as co:
+            self.assertEqual(self.core.get_macos_terminal_history(1), 'gamma')
+            co.assert_called_once_with(
+                ['osascript', '-e', self.core.MACOS_TERMINAL_HISTORY_SCRIPTS['iTerm.app']],
+                text=True,
+                stderr=self.core.DEVNULL,
+            )
+
+    def test_macos_terminal_rejects_unsupported_pid(self):
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'darwin'), \
+             patch.object(self.core, 'co') as co:
+            self.assertIsNone(self.core.get_macos_terminal_history(10, 'all'))
+            self.assertIsNone(self.core.get_macos_terminal_history(10, '%2'))
+            co.assert_not_called()
+
+    def test_macos_terminal_unsupported_or_failed_capture_returns_none(self):
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'linux'), \
+             patch.object(self.core, 'co') as co:
+            self.assertIsNone(self.core.get_macos_terminal_history(10))
+            co.assert_not_called()
+        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'darwin'), \
+             patch.object(self.core, 'co', side_effect=Exception('boom')):
+            self.assertIsNone(self.core.get_macos_terminal_history(10))
 
     def test_ghostty_rejects_unsupported_pid(self):
         with patch.object(self.core.sys, 'platform', 'darwin'), \
