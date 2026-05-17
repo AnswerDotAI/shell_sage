@@ -446,7 +446,7 @@ async def main(
     v: Annotated[str, "Print version", dict(action='version')] = '%(prog)s ' + __version__,
     pid: str = 'current',  # `current`, `all` or tmux pane_id (e.g. %0) for context
     skip_system: bool = False,  # Whether to skip system information in the AI's context
-    history_lines: int = None,  # Number of history lines. Defaults to tmux scrollback history length
+    history_lines: int = None,  # Number of terminal history lines; defaults to tmux limit or 3000 outside tmux
     mode: str = 'default', # Available ShellSage modes: ['default', 'sassy']
     model: str = None,  # The LLM model that will be invoked on the LLM provider
     vendor_name: str = None,  # Vendor name for non auto-resolved models (e.g. 'codex', 'fireworks_ai', 'moonshot', 'deepseek', ...)

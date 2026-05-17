@@ -82,7 +82,7 @@ export OPENAI_API_KEY=sk...
 
 ShellSage works best with a properly configured tmux environment. I’ve created a preconfigured [tmux configuration](tmux.conf) that works well with ShellSage. This configuration enables mouse support, adds pane IDs to your status bar so you can quickly reference them when having ShellSage read from specific panes, turns off alternative-screen so editor content like vim stays in the tmux buffer where ShellSage can see it, and adds a convenient shortcut (CTRL+B+E followed by the index number) for automatically extracting code fence blocks into your command prompt.
 
-On macOS, ShellSage can also read the front, focused Ghostty, Terminal.app, or iTerm2 terminal. Ghostty needs version 1.3+ with AppleScript enabled (`macos-applescript = true`); ShellSage uses the macOS clipboard only to receive Ghostty’s temporary `history.txt` path, then restores the clipboard. Terminal.app and iTerm2 use AppleScript text capture directly. If capture fails, `ssage` behaves as before and sends no `<terminal_history>` block.
+On macOS, ShellSage can also read the front, focused Ghostty, Terminal.app, or iTerm2 terminal. Ghostty needs version 1.3+ with AppleScript enabled (`macos-applescript = true`); ShellSage uses the macOS clipboard only to receive Ghostty’s temporary `history.txt` path, then restores previous text clipboard contents when available. Terminal.app and iTerm2 use AppleScript text capture directly. If capture fails, `ssage` behaves as before and sends no `<terminal_history>` block.
 
 ## Getting Started
 
@@ -330,7 +330,7 @@ ShellSage can be customized through a configuration file located at `~/.config/s
     base_url = ''                           # Alternative API base URL
     api_key = ''                            # API key override instead of the default env var
     vendor_name = ''                        # Explicit fastllm vendor name when needed
-    history_lines = -1                      # Lines of terminal history to include. -1 means include all
+    history_lines = -1                      # Lines of terminal history; -1 uses tmux limit or 3000 outside tmux
     code_theme = "monokai"                  # Syntax highlighting theme
     code_lexer = "python"                   # Default lexer for inline code blocks
     log = False                             # Enable SQLite logging (required for code extraction)

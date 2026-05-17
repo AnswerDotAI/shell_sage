@@ -15,6 +15,27 @@ def _module(name, **attrs):
     return module
 
 
+_MISSING = object()
+_STUB_MODULES = [
+    'fastcore', 'fastcore.script', 'fastcore.tools', 'fastcore.utils', 'fastcore.meta',
+    'fastlite', 'rich', 'rich.live', 'rich.spinner', 'rich.console', 'rich.markdown',
+    'rich.syntax', 'shell_sage.config', 'safecmd', 'pyperclip', 'rgapi', 'fastllm',
+    'fastllm.chat', 'shell_sage.core',
+]
+
+
+def _save_modules():
+    return {name: sys.modules.get(name, _MISSING) for name in _STUB_MODULES}
+
+
+def _restore_modules(saved):
+    for name, module in saved.items():
+        if module is _MISSING:
+            sys.modules.pop(name, None)
+        else:
+            sys.modules[name] = module
+
+
 def _install_import_stubs():
     """Import shell_sage.core without loading optional runtime dependencies."""
     fastcore_script = _module('fastcore.script', call_parse=lambda f: f)
@@ -123,14 +144,18 @@ def _install_import_stubs():
 
 
 def import_core():
+    saved_modules = _save_modules()
     _install_import_stubs()
     sys.modules.pop('shell_sage.core', None)
-    return importlib.import_module('shell_sage.core')
+    return importlib.import_module('shell_sage.core'), saved_modules
 
 
 class TerminalHistoryDispatchTests(unittest.TestCase):
     def setUp(self):
-        self.core = import_core()
+        self.core, self._saved_modules = import_core()
+
+    def tearDown(self):
+        _restore_modules(self._saved_modules)
 
     def test_tmux_provider_wins_and_defaults_to_tmux_history_limit(self):
         with patch.dict(self.core.os.environ, {'TMUX': '/tmp/tmux', 'TERM_PROGRAM': 'ghostty'}, clear=True), \
