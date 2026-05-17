@@ -185,9 +185,11 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             get_osa.assert_called_once_with(12, 'current')
 
     def test_get_hist_osa_remains_compatible(self):
-        with patch.object(self.core, 'get_macos_terminal_history', return_value='terminal history') as get_terminal:
+        with patch.object(self.core.sys, 'platform', 'darwin'), \
+             patch.object(self.core, 'get_macos_terminal_history', return_value='terminal history') as get_terminal:
             self.assertEqual(self.core.get_hist_osa(12), 'terminal history')
-            get_terminal.assert_called_once_with(12, 'current')
+            self.assertIsNone(self.core.get_hist_osa(12, '%2'))
+            get_terminal.assert_called_once_with(12)
 
     def test_ghostty_detection_uses_term_program_or_term(self):
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'ghostty'}, clear=True):
@@ -201,68 +203,67 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
         ):
             self.assertFalse(self.core.is_ghostty())
 
-    def test_ghostty_provider_uses_default_history_lines(self):
-        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'ghostty'}, clear=True), \
-             patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'get_ghostty_history_macos', return_value='ghostty history') as get_ghostty, \
-             patch.object(self.core, 'get_macos_terminal_history') as get_terminal:
-            self.assertEqual(self.core.get_terminal_history(-1, 'current'), 'ghostty history')
-            get_ghostty.assert_called_once_with(3000)
-            get_terminal.assert_not_called()
+    def test_non_tmux_providers_use_default_history_lines(self):
+        cases = [
+            ('ghostty', 'get_ghostty_history_macos', 'get_macos_terminal_history', 'ghostty history'),
+            ('Apple_Terminal', 'get_macos_terminal_history', 'get_ghostty_history_macos', 'terminal history'),
+        ]
+        for term, provider, other, expected in cases:
+            with self.subTest(term=term), \
+                 patch.dict(self.core.os.environ, {'TERM_PROGRAM': term}, clear=True), \
+                 patch.object(self.core.sys, 'platform', 'darwin'), \
+                 patch.object(self.core, provider, return_value=expected) as provider_fn, \
+                 patch.object(self.core, other) as other_fn:
+                self.assertEqual(self.core.get_terminal_history(-1, 'current'), expected)
+                provider_fn.assert_called_once_with(3000)
+                other_fn.assert_not_called()
 
-    def test_terminal_app_provider_uses_default_history_lines(self):
+    def test_macos_terminal_history_reads_recent_lines_from_osascript(self):
+        cases = [
+            ('Apple_Terminal', 2, 'one\ntwo\nthree\n', 'two\nthree'),
+            ('iTerm.app', 1, 'alpha\nbeta\ngamma\n', 'gamma'),
+        ]
+        for term, n, output, expected in cases:
+            with self.subTest(term=term), \
+                 patch.dict(self.core.os.environ, {'TERM_PROGRAM': term}, clear=True), \
+                 patch.object(self.core.sys, 'platform', 'darwin'), \
+                 patch.object(self.core, 'co', return_value=output) as co:
+                self.assertEqual(self.core.get_macos_terminal_history(n), expected)
+                co.assert_called_once_with(
+                    ['osascript', '-e', self.core.MACOS_TERMINAL_HISTORY_SCRIPTS[term]],
+                    text=True,
+                    stderr=self.core.DEVNULL,
+                )
+
+    def test_non_tmux_rejects_unsupported_pid_or_platform_before_capture(self):
+        for term, provider in [
+            ('Apple_Terminal', 'get_macos_terminal_history'),
+            ('ghostty', 'get_ghostty_history_macos'),
+        ]:
+            with self.subTest(term=term), \
+                 patch.dict(self.core.os.environ, {'TERM_PROGRAM': term}, clear=True), \
+                 patch.object(self.core.sys, 'platform', 'darwin'), \
+                 patch.object(self.core, provider) as capture:
+                self.assertIsNone(self.core.get_terminal_history(10, 'all'))
+                self.assertIsNone(self.core.get_terminal_history(10, '%2'))
+                capture.assert_not_called()
+
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
-             patch.object(self.core, 'get_macos_terminal_history', return_value='terminal history') as get_terminal:
-            self.assertEqual(self.core.get_terminal_history(-1, 'current'), 'terminal history')
-            get_terminal.assert_called_once_with(3000, 'current')
+             patch.object(self.core.sys, 'platform', 'linux'), \
+             patch.object(self.core, 'get_macos_terminal_history') as capture:
+            self.assertIsNone(self.core.get_terminal_history(10))
+            capture.assert_not_called()
 
-    def test_terminal_app_history_reads_recent_lines_from_osascript(self):
+    def test_macos_terminal_failed_capture_returns_none(self):
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
              patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'co', return_value='one\ntwo\nthree\n') as co:
-            self.assertEqual(self.core.get_macos_terminal_history(2), 'two\nthree')
-            co.assert_called_once_with(
-                ['osascript', '-e', self.core.MACOS_TERMINAL_HISTORY_SCRIPTS['Apple_Terminal']],
-                text=True,
-                stderr=self.core.DEVNULL,
-            )
-
-    def test_iterm_history_reads_recent_lines_from_osascript(self):
-        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'iTerm.app'}, clear=True), \
-             patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'co', return_value='alpha\nbeta\ngamma\n') as co:
-            self.assertEqual(self.core.get_macos_terminal_history(1), 'gamma')
-            co.assert_called_once_with(
-                ['osascript', '-e', self.core.MACOS_TERMINAL_HISTORY_SCRIPTS['iTerm.app']],
-                text=True,
-                stderr=self.core.DEVNULL,
-            )
-
-    def test_macos_terminal_rejects_unsupported_pid(self):
-        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
-             patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'co') as co:
-            self.assertIsNone(self.core.get_macos_terminal_history(10, 'all'))
-            self.assertIsNone(self.core.get_macos_terminal_history(10, '%2'))
-            co.assert_not_called()
-
-    def test_macos_terminal_unsupported_or_failed_capture_returns_none(self):
+             patch.object(self.core, 'co', side_effect=Exception('boom')):
+            self.assertIsNone(self.core.get_terminal_history(10))
         with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
              patch.object(self.core.sys, 'platform', 'linux'), \
              patch.object(self.core, 'co') as co:
             self.assertIsNone(self.core.get_macos_terminal_history(10))
             co.assert_not_called()
-        with patch.dict(self.core.os.environ, {'TERM_PROGRAM': 'Apple_Terminal'}, clear=True), \
-             patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'co', side_effect=Exception('boom')):
-            self.assertIsNone(self.core.get_macos_terminal_history(10))
-
-    def test_ghostty_rejects_unsupported_pid(self):
-        with patch.object(self.core.sys, 'platform', 'darwin'), \
-             patch.object(self.core, 'get_ghostty_history_macos') as macos_history:
-            self.assertIsNone(self.core.get_ghostty_history(10, 'all'))
-            self.assertIsNone(self.core.get_ghostty_history(10, '%2'))
-            macos_history.assert_not_called()
 
     def test_ghostty_macos_happy_path_reads_temp_history_and_restores_clipboard(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
@@ -270,20 +271,25 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             history_path.write_text('one\ntwo\nthree\nfour', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
-                 patch.object(self.core, '_run_osascript') as run_osascript:
+                 patch.object(self.core.subprocess, 'run') as run:
                 self.assertEqual(self.core.get_ghostty_history_macos(2), 'three\nfour')
-                run_osascript.assert_called_once_with(self.core.GHOSTTY_SCROLLBACK_SCRIPT)
+                run.assert_called_once_with(
+                    ['osascript', '-e', self.core.GHOSTTY_SCROLLBACK_SCRIPT],
+                    text=True,
+                    check=True,
+                    stdout=self.core.DEVNULL,
+                    stderr=self.core.DEVNULL,
+                )
                 pbcopy.assert_called_once_with('original clip')
 
     def test_ghostty_macos_invalid_clipboard_path_returns_none_and_restores_clipboard(self):
         clipboard_values = iter(['original clip', 'not a path'])
 
-        def fake_pbpaste():
-            return next(clipboard_values, 'not a path')
+        def fake_pbpaste(): return next(clipboard_values, 'not a path')
 
         with patch.object(self.core, '_pbpaste', side_effect=fake_pbpaste), \
              patch.object(self.core, '_pbcopy') as pbcopy, \
-             patch.object(self.core, '_run_osascript'), \
+             patch.object(self.core.subprocess, 'run'), \
              patch.object(self.core.time, 'sleep'), \
              patch.object(self.core.time, 'time', side_effect=[0, 0, 2]):
             self.assertIsNone(self.core.get_ghostty_history_macos(10))
@@ -295,7 +301,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             history_path.write_text('history', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
-                 patch.object(self.core, '_run_osascript'), \
+                 patch.object(self.core.subprocess, 'run'), \
                  patch.object(self.core.Path, 'read_text', side_effect=OSError('boom')):
                 self.assertIsNone(self.core.get_ghostty_history_macos(10))
                 pbcopy.assert_called_once_with('original clip')
@@ -316,7 +322,8 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
         self.assertEqual(self.core._tail_lines('one\ntwo', 0), '')
 
     def test_no_terminal_provider_returns_none(self):
-        with patch.dict(self.core.os.environ, {}, clear=True):
+        with patch.dict(self.core.os.environ, {}, clear=True), \
+             patch.object(self.core.sys, 'platform', 'darwin'):
             self.assertIsNone(self.core.get_terminal_history(10, 'current'))
 
 
