@@ -5,9 +5,9 @@
 # %% auto #0
 __all__ = ['console', 'print', 'sp', 'ssp', 'GHOSTTY_SCROLLBACK_SCRIPT', 'MACOS_TERMINAL_HISTORY_SCRIPTS', 'default_cfg', 'tools',
            'sps', 'log_path', 'pane_mark', 'get_pane', 'get_panes', 'tmux_history_lim', 'get_ghostty_history_macos',
-           'is_ghostty', 'get_hist_tmux', 'get_hist_osa', 'get_history', 'get_ghostty_history',
-           'get_macos_terminal_history', 'get_terminal_history', 'get_opts', 'with_permission', 'rg', 'ls', 'fd',
-           'get_sage', 'get_res', 'Log', 'mk_db', 'main', 'extract_cf', 'extract']
+           'is_ghostty', 'get_hist_tmux', 'get_hist_osa', 'get_history', 'get_macos_terminal_history',
+           'get_terminal_history', 'get_opts', 'with_permission', 'rg', 'ls', 'fd', 'get_sage', 'get_res', 'Log',
+           'mk_db', 'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb #d7c5634a
 from contextlib import contextmanager
@@ -212,10 +212,6 @@ def _pbcopy(clip):
         pass
 
 
-def _run_osascript(script):
-    subprocess.run(['osascript', '-e', script], text=True, check=True, stdout=DEVNULL, stderr=DEVNULL)
-
-
 @lru_cache(maxsize=1)
 def _ghostty_history_temp_roots():
     roots = {tempfile.gettempdir(), '/var/folders', '/private/var/folders'}
@@ -264,7 +260,7 @@ def _tail_lines(text, n):
 def get_ghostty_history_macos(n):
     old_clip = _pbpaste()
     try:
-        _run_osascript(GHOSTTY_SCROLLBACK_SCRIPT)
+        subprocess.run(['osascript', '-e', GHOSTTY_SCROLLBACK_SCRIPT], text=True, check=True, stdout=DEVNULL, stderr=DEVNULL)
         path = _wait_for_ghostty_history_path(old_clip)
         if not path:
             return None
@@ -290,7 +286,7 @@ def get_hist_tmux(n, pid='current'):
 # %% ../nbs/00_core.ipynb #0eda0216
 def get_hist_osa(n, pid=''):
     "Backwards-compatible wrapper for macOS terminal history capture."
-    return get_macos_terminal_history(n, pid or 'current')
+    return get_macos_terminal_history(n) if _is_current_macos_terminal(pid or 'current') else None
 
 # %% ../nbs/00_core.ipynb #5344a2bd
 def get_history(n, pid='current'):
@@ -301,13 +297,9 @@ def _is_current_macos_terminal(pid):
     return sys.platform == 'darwin' and pid in ('current', None)
 
 
-def get_ghostty_history(n, pid='current'):
-    return get_ghostty_history_macos(n) if _is_current_macos_terminal(pid) else None
-
-
-def get_macos_terminal_history(n, pid='current'):
+def get_macos_terminal_history(n):
     script = MACOS_TERMINAL_HISTORY_SCRIPTS.get(os.environ.get('TERM_PROGRAM'))
-    if not script or not _is_current_macos_terminal(pid):
+    if not script or sys.platform != 'darwin':
         return None
     try:
         return _tail_lines(co(['osascript', '-e', script], text=True, stderr=DEVNULL), n)
@@ -319,9 +311,11 @@ def get_terminal_history(n, pid='current'):
     if os.environ.get('TMUX'):
         n = tmux_history_lim() if n is None or n < 0 else n
         return get_hist_tmux(n, pid)
+    if not _is_current_macos_terminal(pid):
+        return None
 
     n = _DEFAULT_TERMINAL_HISTORY_LINES if n is None or n < 0 else n
-    return get_ghostty_history(n, pid) if is_ghostty() else get_macos_terminal_history(n, pid)
+    return get_ghostty_history_macos(n) if is_ghostty() else get_macos_terminal_history(n)
 
 # %% ../nbs/00_core.ipynb #0dcbb503
 default_cfg = asdict(ShellSageConfig())
