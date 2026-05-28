@@ -370,6 +370,7 @@ ShellSage can be customized through a configuration file located at
     code_lexer = "python"                   # Default lexer for inline code blocks
     log = False                             # Enable SQLite logging (required for code extraction)
     safecmd = False                         # Enable the safecmd-backed bash tool
+    custom_instructions = ''                # Extra instructions appended to the system prompt
 
 ### Using Different Model Providers
 
