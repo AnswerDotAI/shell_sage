@@ -34,6 +34,7 @@ class ShellSageConfig:
     code_lexer: str = "python"
     log: bool = False
     safecmd: bool = False
+    custom_instructions: str = ''
 
 # %% ../nbs/01_config.ipynb #38e35cce
 def get_cfg():

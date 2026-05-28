@@ -226,10 +226,12 @@ tools = [with_permission('ripgrep a search term')(rg),
 # %% ../nbs/00_core.ipynb #619df024
 sps = {'default': sp, 'sassy': ssp}
 @delegates(AsyncChat)
-def get_sage(model, mode='default', search=False, use_safecmd=False, vendor_name=None, **kwargs):
+def get_sage(model, mode='default', search=False, use_safecmd=False, vendor_name=None, custom_instructions=None, **kwargs):
     t = tools + [bash] if use_safecmd else tools
     if use_safecmd: _always_allow.add('bash')
-    return AsyncChat(model=model, sp=sps[mode], tools=t, search=search, vendor_name=vendor_name, **kwargs)
+    sysp = sps[mode]
+    if custom_instructions: sysp += f'\n\n<custom_instructions>\n{custom_instructions}\n</custom_instructions>'
+    return AsyncChat(model=model, sp=sysp, tools=t, search=search, vendor_name=vendor_name, **kwargs)
 
 # %% ../nbs/00_core.ipynb #2788faf4
 @delegates(AsyncChat._call)
@@ -271,12 +273,13 @@ async def main(
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
     raw: bool = False,  # Skip markdown rendering and print plain text
+    custom_instructions: str = None,  # Extra instructions appended to the system prompt
 ):
     safecmd = None
     opts = get_opts(history_lines=history_lines, model=model, search=search,
                     base_url=base_url, api_key=api_key, code_theme=code_theme,
                     code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd,
-                    vendor_name=vendor_name, log=None)
+                    vendor_name=vendor_name, log=None, custom_instructions=custom_instructions)
     if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
@@ -310,7 +313,7 @@ async def main(
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
-            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, vendor_name=opts.vendor_name)
+            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, vendor_name=opts.vendor_name, custom_instructions=opts.custom_instructions)
             async for res in get_res(sage, query, opts): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
