@@ -25,6 +25,7 @@ shell_sage = "shell_sage._modidx:d"
 [project.scripts]
 ssage = "shell_sage.core:main"
 ssage_extract = "shell_sage.core:extract"
+ssage_log = "shell_sage.logview:ssage_log"
 
 [tool.setuptools.dynamic]
 version = {attr = "shell_sage.__version__"}
