@@ -4,8 +4,8 @@
 
 # %% auto #0
 __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_path', 'get_pane', 'get_panes',
-           'tmux_history_lim', 'get_history', 'get_opts', 'with_permission', 'get_sage', 'get_res', 'Log', 'mk_db',
-           'main', 'extract_cf', 'extract']
+           'tmux_history_lim', 'get_hist_tmux', 'get_hist_osa', 'get_history', 'get_opts', 'with_permission',
+           'get_sage', 'get_res', 'Log', 'mk_db', 'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb #d7c5634a
 from contextlib import contextmanager
@@ -162,12 +162,26 @@ def tmux_history_lim():
 
 
 # %% ../nbs/00_core.ipynb #0d70591e
-def get_history(n, pid='current'):
+def get_hist_tmux(n, pid='current'):
+    if not os.environ.get('TMUX'): return None
     try:
         if pid=='current': return get_pane(n)
         if pid=='all': return get_panes(n)
         return get_pane(n, pid)
     except subprocess.CalledProcessError: return None
+
+# %% ../nbs/00_core.ipynb #0eda0216
+def get_hist_osa(n, pid=''):
+    script = ({
+        'Apple_Terminal':'tell application "Terminal" to get the contents of the selected tab of the front window',
+        'iTerm.app':'tell application id "com.googlecode.iterm2" to get text of current session of current tab of current window',
+    }).get(os.getenv('TERM_PROGRAM'))
+    if not script: return None
+    return "\n".join(co(['osascript', '-e', script], text=True).splitlines()[:n])
+
+# %% ../nbs/00_core.ipynb #5344a2bd
+def get_history(n, pid='current'):
+    return get_hist_tmux(n, pid) or get_hist_osa(n)
 
 # %% ../nbs/00_core.ipynb #0dcbb503
 default_cfg = asdict(ShellSageConfig())
@@ -298,11 +312,10 @@ async def main(
             ctxt = '' if skip_system else _sys_info()
 
             # Get tmux history if in a tmux session
-            if os.environ.get('TMUX'):
-                if opts.history_lines is None or opts.history_lines < 0:
-                    opts.history_lines = tmux_history_lim()
-                history = get_history(opts.history_lines, pid)
-                if history: ctxt += f'<terminal_history>\n{history}\n</terminal_history>'
+            if opts.history_lines is None or opts.history_lines < 0:
+                opts.history_lines = tmux_history_lim()
+            history = get_history(opts.history_lines, pid)
+            if history: ctxt += f'<terminal_history>\n{history}\n</terminal_history>'
 
             # Read from redirect stdin if available
             if not sys.stdin.isatty() and not IN_NOTEBOOK:
