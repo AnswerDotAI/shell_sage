@@ -157,6 +157,7 @@ def get_panes(n):
 
 # %% ../nbs/00_core.ipynb #3d77f1a1
 def tmux_history_lim():
+    if not os.environ.get('TMUX'): return 3000
     lim = co(['tmux', 'display-message', '-p', '#{history-limit}'], text=True).strip()
     return int(lim) if lim.isdigit() else 3000
 
