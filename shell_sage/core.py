@@ -4,8 +4,8 @@
 
 # %% auto #0
 __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_path', 'get_pane', 'get_panes',
-           'tmux_history_lim', 'get_hist_tmux', 'get_hist_osa', 'get_history', 'get_opts', 'with_permission',
-           'get_sage', 'get_res', 'Log', 'mk_db', 'main', 'extract_cf', 'extract']
+           'tmux_history_lim', 'get_hist_tmux', 'get_hist_osa', 'get_history', 'get_opts', 'with_permission', 'rg',
+           'ls', 'fd', 'get_sage', 'get_res', 'Log', 'mk_db', 'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb #d7c5634a
 from contextlib import contextmanager
@@ -27,6 +27,7 @@ from subprocess import check_output as co, DEVNULL
 from safecmd import bash
 from fastllm.chat import AsyncChat
 
+import rgapi
 import asyncio,os,pyperclip,re,subprocess,sys,builtins
 from typing import Annotated
 
@@ -232,12 +233,43 @@ def with_permission(action_desc):
         return wrapper
     return decorator
 
+# %% ../nbs/00_core.ipynb #81dbe18b
+def rg(
+    pattern:str, # Regex to search file contents for
+    root:str='.', # Directory or file to search
+    context:int=0, # Lines of context around each match
+    max_results:int=None, # Cap on matched lines
+):
+    "Search file contents recursively (ripgrep semantics, gitignore respected)"
+    try: return str(rgapi.rg(pattern, root, context=context, max_results=max_results))
+    except Exception as e: return f'Error: {e}'
+
+def ls(
+    path:str='.', # Directory to list
+    hidden:bool=False, # Include hidden entries?
+):
+    "List a directory, one level, like `ls -l`"
+    try: return str(rgapi.ls(path, hidden=hidden))
+    except Exception as e: return f'Error: {e}'
+
+def fd(
+    pattern:str=None, # Regex matched against file basenames
+    root:str='.', # Directory to walk recursively
+    max_depth:int=None, # Directory depth limit
+    limit:int=200, # Cap on returned paths
+):
+    "Find files recursively by name (gitignore respected)"
+    try: return str(rgapi.fd(root, pattern, max_depth=max_depth)[:limit])
+    except Exception as e: return f'Error: {e}'
+
 # %% ../nbs/00_core.ipynb #122a1bb7
 tools = [with_permission('ripgrep a search term')(rg),
-         with_permission('View file/directory')(view),
-         with_permission('Create a file')(create),
-         with_permission('Replace a string with another string')(str_replace),
-         with_permission('Insert content into a file')(insert)]
+         with_permission('List a directory')(ls),
+         with_permission('Find files by name')(fd),
+         with_permission('View a file')(file_view),
+         with_permission('Create a file')(file_create),
+         with_permission('Replace a string with another string')(file_str_replace),
+         with_permission('Insert content into a file')(file_insert_line)]
 
 # %% ../nbs/00_core.ipynb #619df024
 sps = {'default': sp, 'sassy': ssp}
@@ -285,7 +317,7 @@ async def main(
     base_url: str = None, # If using a custom LLM base url
     api_key: str = None,  # If don't have the default environment variables set 
     think: str = None,  # Reasoning effort level: 'l', 'm', 'h' (for supported models)
-    trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "view,rg")
+    trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "file_view,rg")
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
     raw: bool = False,  # Skip markdown rendering and print plain text
