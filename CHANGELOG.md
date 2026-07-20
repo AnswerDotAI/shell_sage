@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 1.0.8
+
+### New Features
+
+- Add rgapi-backed rg/ls/fd tools and rename file operations to `file_view`/`file_create`/`file_str_replace`/`file_insert_line` ([#90](https://github.com/AnswerDotAI/`shell_sage`/issues/90))
+- allow custom instructions ([#88](https://github.com/AnswerDotAI/`shell_sage`/pull/88)), thanks to [@RensDimmendaal](https://github.com/RensDimmendaal)
+
+
 ## 1.0.7
 
 ### New Features
