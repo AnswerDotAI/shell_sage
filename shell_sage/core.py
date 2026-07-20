@@ -266,8 +266,8 @@ def fd(
 tools = [with_permission('ripgrep a search term')(rg),
          with_permission('List a directory')(ls),
          with_permission('Find files by name')(fd),
-         with_permission('View a file')(file_view),
-         with_permission('Create a file')(file_create),
+         with_permission('View a file')(view_file),
+         with_permission('Create a file')(create_file),
          with_permission('Replace a string with another string')(file_str_replace),
          with_permission('Insert content into a file')(file_insert_line)]
 
@@ -317,7 +317,7 @@ async def main(
     base_url: str = None, # If using a custom LLM base url
     api_key: str = None,  # If don't have the default environment variables set 
     think: str = None,  # Reasoning effort level: 'l', 'm', 'h' (for supported models)
-    trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "file_view,rg")
+    trust: str = None,  # Comma-delimited list of tools to always allow (e.g. "view_file,rg")
     code_theme: str = None,  # The code theme to use when rendering ShellSage's responses
     code_lexer: str = None,  # The lexer to use for inline code markdown blocks
     raw: bool = False,  # Skip markdown rendering and print plain text
