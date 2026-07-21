@@ -30,7 +30,7 @@ from safecmd import bash
 from fastllm.chat import AsyncChat
 
 import rgapi
-import asyncio,os,pyperclip,re,subprocess,sys,tempfile,time,builtins
+import asyncio,os,pyperclip,re,stat,subprocess,sys,tempfile,time,builtins
 from typing import Annotated
 
 # %% ../nbs/00_core.ipynb #4d0676fd
@@ -202,12 +202,14 @@ def _pbpaste():
     try:
         return co(['pbpaste'], text=True, stderr=DEVNULL)
     except Exception:
-        return ''
+        return None
 
 
 def _pbcopy(clip):
+    if clip is None:
+        return
     try:
-        subprocess.run(['pbcopy'], input=clip or '', text=True, check=False, stdout=DEVNULL, stderr=DEVNULL)
+        subprocess.run(['pbcopy'], input=clip, text=True, check=False, stdout=DEVNULL, stderr=DEVNULL)
     except Exception:
         pass
 
@@ -257,18 +259,64 @@ def _tail_lines(text, n):
     return '\n'.join(text.splitlines()[-n:])
 
 
-def get_ghostty_history_macos(n):
-    old_clip = _pbpaste()
+# [tag:ghostty_history_fd_validation] Validate and read the same descriptor so path swaps cannot escape temp roots.
+def _read_ghostty_history_file(candidate, n):
+    descriptor = None
     try:
-        subprocess.run(['osascript', '-e', GHOSTTY_SCROLLBACK_SCRIPT], text=True, check=True, stdout=DEVNULL, stderr=DEVNULL)
-        path = _wait_for_ghostty_history_path(old_clip)
-        if not path:
+        path = Path(str(candidate).strip())
+        if path.name != 'history.txt':
             return None
-        return _tail_lines(Path(path).read_text(encoding='utf-8', errors='replace'), n)
+        flags = os.O_RDONLY | getattr(os, 'O_CLOEXEC', 0) | getattr(os, 'O_NOFOLLOW', 0)
+        descriptor = os.open(path, flags)
+        opened = os.fstat(descriptor)
+        if not stat.S_ISREG(opened.st_mode) or opened.st_size > _GHOSTTY_HISTORY_MAX_BYTES:
+            return None
+
+        resolved = path.resolve(strict=True)
+        if not any(os.path.commonpath([str(resolved), str(root)]) == str(root) for root in _ghostty_history_temp_roots()):
+            return None
+        current = resolved.stat()
+        if (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino):
+            return None
+
+        chunks = []
+        remaining = _GHOSTTY_HISTORY_MAX_BYTES + 1
+        while remaining:
+            chunk = os.read(descriptor, min(64 * 1024, remaining))
+            if not chunk:
+                break
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        data = b''.join(chunks)
+        if len(data) > _GHOSTTY_HISTORY_MAX_BYTES:
+            return None
+        return _tail_lines(data.decode('utf-8', errors='replace'), n)
     except Exception:
         return None
     finally:
-        _pbcopy(old_clip)
+        if descriptor is not None:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+
+
+def get_ghostty_history_macos(n):
+    old_clip = _pbpaste()
+    history_path = None
+    try:
+        subprocess.run(['osascript', '-e', GHOSTTY_SCROLLBACK_SCRIPT], text=True, check=True, stdout=DEVNULL, stderr=DEVNULL)
+        history_path = _wait_for_ghostty_history_path(old_clip)
+        if not history_path:
+            return None
+        return _read_ghostty_history_file(history_path, n)
+    except Exception:
+        return None
+    finally:
+        # [tag:ghostty_clipboard_restore] Never overwrite clipboard content changed while capture was running.
+        current_clip = _pbpaste() if old_clip is not None and history_path else None
+        if current_clip is not None and current_clip.strip() == str(history_path).strip():
+            _pbcopy(old_clip)
 
 
 def is_ghostty():
@@ -290,7 +338,8 @@ def get_hist_osa(n, pid=''):
 
 # %% ../nbs/00_core.ipynb #5344a2bd
 def get_history(n, pid='current'):
-    return get_hist_tmux(n, pid) or get_hist_osa(n, pid)
+    "Backwards-compatible entry point for terminal history dispatch."
+    return get_terminal_history(n, pid)
 
 
 def _is_current_macos_terminal(pid):

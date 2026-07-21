@@ -177,12 +177,10 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             history_lim.assert_not_called()
             get_tmux.assert_called_once_with(42, '%1')
 
-    def test_get_history_keeps_main_provider_order(self):
-        with patch.object(self.core, 'get_hist_tmux', return_value=None) as get_tmux, \
-             patch.object(self.core, 'get_hist_osa', return_value='terminal history') as get_osa:
+    def test_get_history_delegates_to_canonical_dispatcher(self):
+        with patch.object(self.core, 'get_terminal_history', return_value='terminal history') as get_terminal:
             self.assertEqual(self.core.get_history(12, 'current'), 'terminal history')
-            get_tmux.assert_called_once_with(12, 'current')
-            get_osa.assert_called_once_with(12, 'current')
+            get_terminal.assert_called_once_with(12, 'current')
 
     def test_get_hist_osa_remains_compatible(self):
         with patch.object(self.core.sys, 'platform', 'darwin'), \
@@ -269,7 +267,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
             history_path = Path(directory) / 'history.txt'
             history_path.write_text('one\ntwo\nthree\nfour', encoding='utf-8')
-            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path)]), \
+            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
                  patch.object(self.core.subprocess, 'run') as run:
                 self.assertEqual(self.core.get_ghostty_history_macos(2), 'three\nfour')
@@ -282,7 +280,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
                 )
                 pbcopy.assert_called_once_with('original clip')
 
-    def test_ghostty_macos_invalid_clipboard_path_returns_none_and_restores_clipboard(self):
+    def test_ghostty_macos_invalid_path_does_not_restore_clipboard(self):
         clipboard_values = iter(['original clip', 'not a path'])
 
         def fake_pbpaste(): return next(clipboard_values, 'not a path')
@@ -293,28 +291,94 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
              patch.object(self.core.time, 'sleep'), \
              patch.object(self.core.time, 'time', side_effect=[0, 0, 2]):
             self.assertIsNone(self.core.get_ghostty_history_macos(10))
-            pbcopy.assert_called_once_with('original clip')
+            pbcopy.assert_not_called()
+
+    # [ref:ghostty_clipboard_restore]
+    def test_ghostty_capture_does_not_overwrite_concurrent_clipboard_change(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            with patch.object(
+                self.core,
+                '_pbpaste',
+                side_effect=['original clip', str(history_path), 'new user clip'],
+            ), patch.object(self.core, '_pbcopy') as pbcopy, \
+                 patch.object(self.core.subprocess, 'run'):
+                self.assertEqual(self.core.get_ghostty_history_macos(10), 'history')
+                pbcopy.assert_not_called()
+
+    def test_ghostty_capture_does_not_restore_unavailable_clipboard_text(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            with patch.object(
+                self.core,
+                '_pbpaste',
+                side_effect=[None, str(history_path), str(history_path)],
+            ), patch.object(self.core, '_pbcopy') as pbcopy, \
+                 patch.object(self.core.subprocess, 'run'):
+                self.assertEqual(self.core.get_ghostty_history_macos(10), 'history')
+                pbcopy.assert_not_called()
+
+    def test_clipboard_helpers_preserve_unavailable_text_state(self):
+        with patch.object(self.core, 'co', side_effect=OSError('no text clipboard')):
+            self.assertIsNone(self.core._pbpaste())
+        with patch.object(self.core.subprocess, 'run') as run:
+            self.core._pbcopy(None)
+            run.assert_not_called()
 
     def test_ghostty_macos_read_errors_return_none_and_restore_clipboard(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
             history_path = Path(directory) / 'history.txt'
             history_path.write_text('history', encoding='utf-8')
-            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path)]), \
+            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
                  patch.object(self.core.subprocess, 'run'), \
-                 patch.object(self.core.Path, 'read_text', side_effect=OSError('boom')):
+                 patch.object(self.core.os, 'read', side_effect=OSError('boom')):
                 self.assertIsNone(self.core.get_ghostty_history_macos(10))
                 pbcopy.assert_called_once_with('original clip')
 
-    def test_ghostty_path_validation_requires_temp_history_file(self):
-        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
+    def test_ghostty_path_validation_enforces_name_root_and_size(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
+             tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
             valid = Path(directory) / 'history.txt'
             valid.write_text('history', encoding='utf-8')
             wrong_name = Path(directory) / 'not-history.txt'
             wrong_name.write_text('history', encoding='utf-8')
+            oversized_target = Path(directory) / 'history.txt'
+            outside = Path(outside_directory) / 'history.txt'
+            outside.write_text('outside history', encoding='utf-8')
+
             self.assertTrue(self.core._valid_ghostty_history_path(str(valid)))
             self.assertFalse(self.core._valid_ghostty_history_path(str(wrong_name)))
+            self.assertFalse(self.core._valid_ghostty_history_path(str(outside)))
+            self.assertIsNone(self.core._read_ghostty_history_file(outside, 10))
             self.assertFalse(self.core._valid_ghostty_history_path('not a path'))
+
+            valid.unlink()
+            oversized_target.touch()
+            oversized_target.write_bytes(b'')
+            with oversized_target.open('r+b') as stream:
+                stream.truncate(self.core._GHOSTTY_HISTORY_MAX_BYTES + 1)
+            self.assertFalse(self.core._valid_ghostty_history_path(str(oversized_target)))
+            self.assertIsNone(self.core._read_ghostty_history_file(oversized_target, 10))
+
+    # [ref:ghostty_history_fd_validation]
+    def test_ghostty_safe_read_rejects_symlink_swap_after_validation(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
+             tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
+            safe_target = Path(directory) / 'safe-history.txt'
+            safe_target.write_text('safe history', encoding='utf-8')
+            candidate = Path(directory) / 'history.txt'
+            candidate.symlink_to(safe_target)
+            outside = Path(outside_directory) / 'secret.txt'
+            outside.write_text('secret outside history', encoding='utf-8')
+
+            self.assertTrue(self.core._valid_ghostty_history_path(str(candidate)))
+            candidate.unlink()
+            candidate.symlink_to(outside)
+
+            self.assertIsNone(self.core._read_ghostty_history_file(candidate, 10))
 
     def test_tail_lines_respects_history_line_count(self):
         self.assertEqual(self.core._tail_lines('one\ntwo\nthree', 2), 'two\nthree')
