@@ -1,3 +1,4 @@
+import errno
 import importlib
 import sys
 import tempfile
@@ -263,6 +264,103 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             self.assertIsNone(self.core.get_macos_terminal_history(10))
             co.assert_not_called()
 
+    # [ref:ghostty_history_cleanup]
+    def test_ghostty_capture_scrubs_consumed_history_file(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
+                 patch.object(self.core, '_pbcopy'), \
+                 patch.object(self.core.subprocess, 'run'):
+                self.assertEqual(self.core.get_ghostty_history_macos(10), 'history')
+            self.assertTrue(history_path.exists())
+            self.assertEqual(history_path.read_bytes(), b'')
+
+    # [ref:ghostty_history_cleanup]
+    def test_ghostty_cleanup_uses_descriptor_not_replacement_path(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
+             tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            replacement = Path(outside_directory) / 'replacement.txt'
+            replacement.write_text('do not scrub', encoding='utf-8')
+            original_read = self.core.os.read
+            swapped = False
+
+            def swap_path_then_read(descriptor, size):
+                nonlocal swapped
+                if not swapped:
+                    history_path.unlink()
+                    history_path.symlink_to(replacement)
+                    swapped = True
+                return original_read(descriptor, size)
+
+            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
+                 patch.object(self.core, '_pbcopy'), \
+                 patch.object(self.core.subprocess, 'run'), \
+                 patch.object(self.core.os, 'read', side_effect=swap_path_then_read):
+                self.assertEqual(self.core.get_ghostty_history_macos(10), 'history')
+            self.assertTrue(history_path.is_symlink())
+            self.assertEqual(replacement.read_text(encoding='utf-8'), 'do not scrub')
+
+    def test_ghostty_cleanup_rejects_preexisting_hard_link(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
+             tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
+            outside = Path(outside_directory) / 'outside.txt'
+            outside.write_text('do not scrub', encoding='utf-8')
+            history_path = Path(directory) / 'history.txt'
+            try:
+                self.core.os.link(outside, history_path)
+            except OSError as error:
+                if error.errno in (errno.EXDEV, errno.EPERM, errno.EOPNOTSUPP):
+                    self.skipTest(f'hard links unavailable: {error}')
+                raise
+
+            self.assertIsNone(self.core._read_ghostty_history_file(history_path, 10))
+            self.assertEqual(outside.read_text(encoding='utf-8'), 'do not scrub')
+            self.assertFalse(self.core._valid_ghostty_history_path(history_path))
+
+    def test_ghostty_cleanup_skips_scrub_if_hard_link_appears_during_read(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
+             tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            alias = Path(outside_directory) / 'alias.txt'
+            probe = Path(outside_directory) / 'probe.txt'
+            try:
+                self.core.os.link(history_path, probe)
+            except OSError as error:
+                if error.errno in (errno.EXDEV, errno.EPERM, errno.EOPNOTSUPP):
+                    self.skipTest(f'hard links unavailable: {error}')
+                raise
+            probe.unlink()
+            original_read = self.core.os.read
+            linked = False
+
+            def link_then_read(descriptor, size):
+                nonlocal linked
+                if not linked:
+                    self.core.os.link(history_path, alias)
+                    linked = True
+                return original_read(descriptor, size)
+
+            with patch.object(self.core.os, 'read', side_effect=link_then_read):
+                self.assertEqual(self.core._read_ghostty_history_file(history_path, 10), 'history')
+            self.assertEqual(history_path.read_text(encoding='utf-8'), 'history')
+            self.assertEqual(alias.read_text(encoding='utf-8'), 'history')
+
+    def test_ghostty_scrub_failure_does_not_mask_history_or_clipboard_restore(self):
+        with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
+            history_path = Path(directory) / 'history.txt'
+            history_path.write_text('history', encoding='utf-8')
+            with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
+                 patch.object(self.core, '_pbcopy') as pbcopy, \
+                 patch.object(self.core.subprocess, 'run'), \
+                 patch.object(self.core.os, 'ftruncate', side_effect=OSError('cannot scrub')):
+                self.assertEqual(self.core.get_ghostty_history_macos(10), 'history')
+                pbcopy.assert_called_once_with('original clip')
+            self.assertEqual(history_path.read_text(encoding='utf-8'), 'history')
+
     def test_ghostty_macos_happy_path_reads_temp_history_and_restores_clipboard(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
             history_path = Path(directory) / 'history.txt'
@@ -337,6 +435,8 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
                  patch.object(self.core.os, 'read', side_effect=OSError('boom')):
                 self.assertIsNone(self.core.get_ghostty_history_macos(10))
                 pbcopy.assert_called_once_with('original clip')
+            self.assertTrue(history_path.exists())
+            self.assertEqual(history_path.read_bytes(), b'')
 
     def test_ghostty_path_validation_enforces_name_root_and_size(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
@@ -353,6 +453,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
             self.assertFalse(self.core._valid_ghostty_history_path(str(wrong_name)))
             self.assertFalse(self.core._valid_ghostty_history_path(str(outside)))
             self.assertIsNone(self.core._read_ghostty_history_file(outside, 10))
+            self.assertEqual(outside.read_text(encoding='utf-8'), 'outside history')
             self.assertFalse(self.core._valid_ghostty_history_path('not a path'))
 
             valid.unlink()
