@@ -225,7 +225,10 @@ def _ghostty_history_temp_roots():
 def _valid_ghostty_history_path(candidate):
     try:
         path = Path(str(candidate).strip())
-        if path.name != 'history.txt' or not path.is_file() or path.stat().st_size > _GHOSTTY_HISTORY_MAX_BYTES:
+        info = path.stat()
+        owner_uid = getattr(os, 'getuid', lambda: info.st_uid)()
+        if (path.name != 'history.txt' or not stat.S_ISREG(info.st_mode) or
+                info.st_size > _GHOSTTY_HISTORY_MAX_BYTES or info.st_nlink != 1 or info.st_uid != owner_uid):
             return False
         path = path.resolve()
         return any(os.path.commonpath([str(path), str(root)]) == str(root) for root in _ghostty_history_temp_roots())
@@ -262,22 +265,27 @@ def _tail_lines(text, n):
 # [tag:ghostty_history_fd_validation] Validate and read the same descriptor so path swaps cannot escape temp roots.
 def _read_ghostty_history_file(candidate, n):
     descriptor = None
+    validated = False
     try:
         path = Path(str(candidate).strip())
         if path.name != 'history.txt':
             return None
-        flags = os.O_RDONLY | getattr(os, 'O_CLOEXEC', 0) | getattr(os, 'O_NOFOLLOW', 0)
+        flags = os.O_RDWR | getattr(os, 'O_CLOEXEC', 0) | getattr(os, 'O_NOFOLLOW', 0)
         descriptor = os.open(path, flags)
         opened = os.fstat(descriptor)
-        if not stat.S_ISREG(opened.st_mode) or opened.st_size > _GHOSTTY_HISTORY_MAX_BYTES:
+        owner_uid = getattr(os, 'getuid', lambda: opened.st_uid)()
+        if (not stat.S_ISREG(opened.st_mode) or opened.st_size > _GHOSTTY_HISTORY_MAX_BYTES or
+                opened.st_nlink != 1 or opened.st_uid != owner_uid):
             return None
 
         resolved = path.resolve(strict=True)
         if not any(os.path.commonpath([str(resolved), str(root)]) == str(root) for root in _ghostty_history_temp_roots()):
             return None
         current = resolved.stat()
-        if (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino):
+        if ((opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino) or
+                current.st_nlink != 1 or current.st_uid != owner_uid):
             return None
+        validated = True
 
         chunks = []
         remaining = _GHOSTTY_HISTORY_MAX_BYTES + 1
@@ -295,6 +303,14 @@ def _read_ghostty_history_file(candidate, n):
         return None
     finally:
         if descriptor is not None:
+            # [tag:ghostty_history_cleanup] Scrub the validated descriptor; unlinking by path would reintroduce a swap race.
+            if validated:
+                try:
+                    latest = os.fstat(descriptor)
+                    if latest.st_nlink == 1 and latest.st_uid == owner_uid:
+                        os.ftruncate(descriptor, 0)
+                except OSError:
+                    pass
             try:
                 os.close(descriptor)
             except OSError:
