@@ -21,4 +21,6 @@ ssage_clear() {
   else
     printf '\033[H\033[2J'
   fi
+
+  [[ -n $ZSH_VERSION && -o zle ]] && zle reset-prompt
 }
