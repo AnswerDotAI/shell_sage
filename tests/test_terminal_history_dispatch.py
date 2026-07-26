@@ -267,7 +267,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     # [ref:ghostty_history_cleanup]
     def test_ghostty_capture_scrubs_consumed_history_file(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy'), \
@@ -280,7 +280,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     def test_ghostty_cleanup_uses_descriptor_not_replacement_path(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
              tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             replacement = Path(outside_directory) / 'replacement.txt'
             replacement.write_text('do not scrub', encoding='utf-8')
@@ -308,7 +308,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
              tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
             outside = Path(outside_directory) / 'outside.txt'
             outside.write_text('do not scrub', encoding='utf-8')
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             try:
                 self.core.os.link(outside, history_path)
             except OSError as error:
@@ -323,7 +323,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     def test_ghostty_cleanup_skips_scrub_if_hard_link_appears_during_read(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
              tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             alias = Path(outside_directory) / 'alias.txt'
             probe = Path(outside_directory) / 'probe.txt'
@@ -351,7 +351,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
 
     def test_ghostty_scrub_failure_does_not_mask_history_or_clipboard_restore(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
@@ -363,14 +363,15 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
 
     def test_ghostty_macos_happy_path_reads_temp_history_and_restores_clipboard(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('one\ntwo\nthree\nfour', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
                  patch.object(self.core.subprocess, 'run') as run:
                 self.assertEqual(self.core.get_ghostty_history_macos(2), 'three\nfour')
+                self.assertIn('perform action "write_screen_file:copy,plain"', self.core.GHOSTTY_SCREEN_SCRIPT)
                 run.assert_called_once_with(
-                    ['osascript', '-e', self.core.GHOSTTY_SCROLLBACK_SCRIPT],
+                    ['osascript', '-e', self.core.GHOSTTY_SCREEN_SCRIPT],
                     text=True,
                     check=True,
                     stdout=self.core.DEVNULL,
@@ -394,7 +395,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     # [ref:ghostty_clipboard_restore]
     def test_ghostty_capture_does_not_overwrite_concurrent_clipboard_change(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             with patch.object(
                 self.core,
@@ -407,7 +408,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
 
     def test_ghostty_capture_does_not_restore_unavailable_clipboard_text(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             with patch.object(
                 self.core,
@@ -427,7 +428,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
 
     def test_ghostty_macos_read_errors_return_none_and_restore_clipboard(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory:
-            history_path = Path(directory) / 'history.txt'
+            history_path = Path(directory) / 'screen.txt'
             history_path.write_text('history', encoding='utf-8')
             with patch.object(self.core, '_pbpaste', side_effect=['original clip', str(history_path), str(history_path)]), \
                  patch.object(self.core, '_pbcopy') as pbcopy, \
@@ -441,12 +442,12 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
     def test_ghostty_path_validation_enforces_name_root_and_size(self):
         with tempfile.TemporaryDirectory(dir=tempfile.gettempdir()) as directory, \
              tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
-            valid = Path(directory) / 'history.txt'
+            valid = Path(directory) / 'screen.txt'
             valid.write_text('history', encoding='utf-8')
-            wrong_name = Path(directory) / 'not-history.txt'
+            wrong_name = Path(directory) / 'history.txt'
             wrong_name.write_text('history', encoding='utf-8')
-            oversized_target = Path(directory) / 'history.txt'
-            outside = Path(outside_directory) / 'history.txt'
+            oversized_target = Path(directory) / 'screen.txt'
+            outside = Path(outside_directory) / 'screen.txt'
             outside.write_text('outside history', encoding='utf-8')
 
             self.assertTrue(self.core._valid_ghostty_history_path(str(valid)))
@@ -470,7 +471,7 @@ class TerminalHistoryDispatchTests(unittest.TestCase):
              tempfile.TemporaryDirectory(dir=Path.cwd()) as outside_directory:
             safe_target = Path(directory) / 'safe-history.txt'
             safe_target.write_text('safe history', encoding='utf-8')
-            candidate = Path(directory) / 'history.txt'
+            candidate = Path(directory) / 'screen.txt'
             candidate.symlink_to(safe_target)
             outside = Path(outside_directory) / 'secret.txt'
             outside.write_text('secret outside history', encoding='utf-8')
