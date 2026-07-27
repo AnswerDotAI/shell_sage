@@ -14,6 +14,10 @@ from contextlib import contextmanager
 from datetime import datetime
 from fastcore.script import *
 from fastcore.tools import *
+try: from fastcore.tools import view_file, create_file, file_str_replace, file_insert_line
+except ImportError:
+    from fastcore.tools import view as view_file, create as create_file
+    from fastcore.tools import str_replace as file_str_replace, insert as file_insert_line
 from fastcore.utils import *
 from fastcore.meta import delegates
 from fastlite import database
