@@ -96,7 +96,6 @@ def _install_import_stubs():
         mode: str = 'default'
         base_url: str = ''
         api_key: str = ''
-        vendor_name: str = ''
         history_lines: int = -1
         code_theme: str = 'monokai'
         code_lexer: str = 'python'
@@ -112,7 +111,11 @@ def _install_import_stubs():
         def __init__(self, *args, **kwargs): pass
         def _call(self, *args, **kwargs): pass
 
-    fastllm_chat = _module('fastllm.chat', AsyncChat=AsyncChat)
+    class StreamAccum:
+        def __init__(self, *args, **kwargs): self.txt = ''
+        def __call__(self, *args, **kwargs): return False
+
+    fastllm_chat = _module('fastllm.chat', AsyncChat=AsyncChat, StreamAccum=StreamAccum)
     fastllm = _module('fastllm', chat=fastllm_chat)
     fastllm.__path__ = []
 
