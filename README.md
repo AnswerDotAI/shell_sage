@@ -204,6 +204,26 @@ ShellSage automatically reads your tmux history to understand what you’re work
     Tip: If you forget the path, find defaults to the current directory, so find    
     -name "*.tmp" also works!                                                       
 
+### Clearing Context
+
+Ctrl-L looks like it clears the terminal, but it only wipes the visible screen – tmux’s history still holds everything, so ShellSage keeps seeing it. The [`ssage_clear`](https://github.com/AnswerDotAI/shell_sage/blob/main/ssage_clear.sh) binding gives ctrl-L real “clear” semantics for ShellSage without destroying anything: it scrolls the screen into history and records a mark, and ShellSage captures never reach past the most recent clear, while your own scrollback stays intact.
+
+Save the script from the link above, then add to your `.bashrc`:
+
+``` sh
+source /path/to/ssage_clear.sh
+bind -x '"\C-l": ssage_clear'
+```
+
+Or to your `.zshrc`:
+
+``` sh
+source /path/to/ssage_clear.sh
+zle -N ssage_clear && bindkey '^L' ssage_clear
+```
+
+The binding is only active at the shell prompt, so full-screen apps still receive a plain ctrl-L, and outside tmux it falls back to a normal clear.
+
 ### Piping Content for Analysis
 
 One of ShellSage’s most powerful features is analyzing piped input:
