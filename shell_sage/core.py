@@ -25,7 +25,7 @@ from . import __version__
 from .config import *
 from subprocess import check_output as co, DEVNULL
 from safecmd import bash
-from fastllm.chat import AsyncChat
+from fastllm.chat import AsyncChat, StreamAccum
 
 import rgapi
 import asyncio,os,pyperclip,re,subprocess,sys,builtins
@@ -301,10 +301,11 @@ def get_sage(model, mode='default', search=False, use_safecmd=False, vendor_name
 async def get_res(sage, q, opts, **kwargs):
     global _res
     _res = ""
+    acc = StreamAccum(sage)
     kw = dict(max_steps=10, stream=True, base_url=opts.base_url, api_key=opts.api_key, think=opts.think) | kwargs
     async for chunk in await sage(q, **kw):
-        if isinstance(chunk, dict) and 'text' in chunk: _res += chunk['text']
-        else: continue
+        if not acc(chunk): continue
+        _res = acc.txt
         yield _res
 
 # %% ../nbs/00_core.ipynb #4e6e4d92
