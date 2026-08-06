@@ -14,6 +14,9 @@ keywords = ['nbdev', 'jupyter', 'notebook', 'python']
 classifiers = ["Natural Language :: English", "Intended Audience :: Developers", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
 dependencies = ['fastcore>=2.1.3', 'rgapi>=0.1.16', 'fastlite', 'pyperclip', 'rich', 'safecmd', 'python-fastllm>=0.0.38']
 
+[project.optional-dependencies]
+dev = ['cachy']
+
 [project.urls]
 Repository = "https://github.com/AnswerDotAI/shell_sage"
 Documentation = "https://AnswerDotAI.github.io/shell_sage"
