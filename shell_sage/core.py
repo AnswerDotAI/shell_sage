@@ -326,7 +326,7 @@ async def main(
     pid: str = 'current',  # `current`, `all` or tmux pane_id (e.g. %0) for context
     skip_system: bool = False,  # Whether to skip system information in the AI's context
     history_lines: int = None,  # Number of history lines. Defaults to tmux scrollback history length
-    mode: str = 'default', # Available ShellSage modes: ['default', 'sassy']
+    mode: str = None, # Available ShellSage modes: ['default', 'sassy']
     model: str = None,  # The LLM model that will be invoked on the LLM provider
     vendor_name: str = None,  # Vendor name for non auto-resolved models (e.g. 'codex', 'fireworks_ai', 'moonshot', 'deepseek', ...)
     search: str = None, # Wheather to allow the LLM to search the internet
@@ -340,7 +340,7 @@ async def main(
     custom_instructions: str = None,  # Extra instructions appended to the system prompt
 ):
     safecmd = None
-    opts = get_opts(history_lines=history_lines, model=model, search=search,
+    opts = get_opts(history_lines=history_lines, model=model, mode=mode, search=search,
                     base_url=base_url, api_key=api_key, code_theme=code_theme,
                     code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd,
                     vendor_name=vendor_name, log=None, custom_instructions=custom_instructions)
@@ -350,8 +350,8 @@ async def main(
         with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
             global _live, _md
             _live = live
-            if mode not in ['default', 'sassy']:
-                raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
+            if opts.mode not in ['default', 'sassy']:
+                raise Exception(f"{opts.mode} is not valid. Must be one of the following: ['default', 'sassy']")
             
             _md = noop if raw else partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
                          inline_code_theme=opts.code_theme)
@@ -376,14 +376,14 @@ async def main(
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
-            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, vendor_name=opts.vendor_name, custom_instructions=opts.custom_instructions)
+            sage = get_sage(opts.model, opts.mode, search=opts.search, use_safecmd=opts.safecmd, vendor_name=opts.vendor_name, custom_instructions=opts.custom_instructions)
             async for res in get_res(sage, query, opts): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
         if opts.log:
             db = mk_db()
             db.logs.insert(Log(timestamp=datetime.now().isoformat(), query=query,
-                            response=res, model=opts.model, mode=mode))
+                            response=res, model=opts.model, mode=opts.mode))
     except KeyboardInterrupt: print("Interrupted.")
 
 # %% ../nbs/00_core.ipynb #f093b48b
