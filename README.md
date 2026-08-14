@@ -347,7 +347,6 @@ ShellSage can be customized through a configuration file located at `~/.config/s
     mode = 'default'                        # or "sassy"
     base_url = ''                           # Alternative API base URL
     api_key = ''                            # API key override instead of the default env var
-    vendor_name = ''                        # Explicit fastllm vendor name when needed
     history_lines = -1                      # Lines of terminal history to include. -1 means include all
     code_theme = "monokai"                  # Syntax highlighting theme
     code_lexer = "python"                   # Default lexer for inline code blocks
@@ -357,15 +356,16 @@ ShellSage can be customized through a configuration file located at `~/.config/s
 
 ### Using Different Model Providers
 
-ShellSage uses [fastllm](https://github.com/AnswerDotAI/fastllm) under the hood. fastllm can automatically resolve common Claude, Gemini, GPT, and OpenAI model names. For providers that are not auto-resolved, set `vendor_name` in your config or pass `--vendor_name` on the command line.
+ShellSage uses [fastllm](https://github.com/AnswerDotAI/fastllm) under the hood. fastllm can automatically resolve common Claude, Gemini, GPT, and OpenAI model names. For other providers, prefix the model name with the vendor, e.g. `openrouter/openai/gpt-5`:
 
-| `vendor_name`  | API key source                             |
+| Prefix         | API key source                             |
 |----------------|--------------------------------------------|
 | `openai`       | `OPENAI_API_KEY`                           |
 | `anthropic`    | `ANTHROPIC_API_KEY`                        |
 | `gemini`       | `GEMINI_API_KEY`                           |
 | `openai_chat`  | `OPENAI_API_KEY`                           |
 | `codex`        | `CODEX_AUTH_TOKEN` or `~/.codex/auth.json` |
+| `claude_code`  | Claude Code subscription (no key needed)   |
 | `moonshot`     | `MOONSHOT_API_KEY`                         |
 | `deepseek`     | `DEEPSEEK_API_KEY`                         |
 | `openrouter`   | `OPENROUTER_API_KEY`                       |
@@ -383,29 +383,34 @@ ssage --model gpt-5 explain kubernetes pods
 ssage --model gemini-2.5-pro what is journald?
 ```
 
-#### Known Vendors
+#### Vendor Prefixes
 
-Use `vendor_name` when the model name does not identify the provider on its own:
+Prefix the model with a vendor when the name does not identify the provider on its own:
 
 ``` bash
-ssage --vendor_name openrouter --model openai/gpt-5 explain cgroups
-ssage --vendor_name codex --model gpt-5.5 review my shell script
+ssage --model openrouter/openai/gpt-5 explain cgroups
+ssage --model codex/gpt-5.5 review my shell script
 ```
 
-You can also set the vendor in your config:
+A `claude_code/` prefix uses your Claude Code subscription instead of an API key:
 
-    model = 'gpt-5.5'
-    vendor_name = 'codex'
+``` bash
+ssage --model claude_code/claude-sonnet-4-6 explain iptables
+```
+
+You can also set a prefixed model in your config:
+
+    model = 'codex/gpt-5.5'
 
 #### Other Providers
 
-For another OpenAI-compatible API, provide the vendor, API base URL, API key, and model:
+For another OpenAI-compatible API, provide the API base URL, API key, and model:
 
 ``` bash
-ssage --vendor_name openai_chat --base_url https://your-api.com/v1 --api_key your_key --model your_model your query
+ssage --base_url https://your-api.com/v1 --api_key your_key --model your_model your query
 ```
 
-For known non-OpenAI-compatible providers, prefer the matching `vendor_name` from the table above so fastllm can use the right API format and environment variable.
+For known providers, prefer the matching prefix from the table above so fastllm can use the right API format and environment variable.
 
 ### Command Line Overrides
 

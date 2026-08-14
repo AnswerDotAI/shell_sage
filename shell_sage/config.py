@@ -28,7 +28,6 @@ class ShellSageConfig:
     mode: str = 'default'
     base_url: str = ''
     api_key: str = ''
-    vendor_name: str = ''
     history_lines: int = -1
     code_theme: str = "monokai"
     code_lexer: str = "python"
@@ -41,5 +40,7 @@ def get_cfg():
     path = _cfg_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     _types = get_type_hints(ShellSageConfig)
-    return Config(path.parent, path.name, create=asdict(ShellSageConfig()),
-                  types=_types, inline_comment_prefixes=('#'))
+    cfg = Config(path.parent, path.name, create=asdict(ShellSageConfig()), types=_types, inline_comment_prefixes=('#'))
+    for k in cfg.d:
+        if k not in _types: print(f"Warning: unknown config key '{k}' in {path} (ignored)")
+    return cfg
