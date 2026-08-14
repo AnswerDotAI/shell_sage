@@ -289,12 +289,12 @@ tools = [with_permission('ripgrep a search term')(rg),
 # %% ../nbs/00_core.ipynb #619df024
 sps = {'default': sp, 'sassy': ssp}
 @delegates(AsyncChat)
-def get_sage(model, mode='default', search=False, use_safecmd=False, vendor_name=None, custom_instructions=None, **kwargs):
+def get_sage(model, mode='default', search=False, use_safecmd=False, custom_instructions=None, **kwargs):
     t = tools + [bash] if use_safecmd else tools
     if use_safecmd: _always_allow.add('bash')
     sysp = sps[mode]
     if custom_instructions: sysp += f'\n\n<custom_instructions>\n{custom_instructions}\n</custom_instructions>'
-    return AsyncChat(model=model, sp=sysp, tools=t, search=search, vendor_name=vendor_name, **kwargs)
+    return AsyncChat(model=model, sp=sysp, tools=t, search=search, **kwargs)
 
 # %% ../nbs/00_core.ipynb #2788faf4
 @delegates(AsyncChat._call)
@@ -327,8 +327,7 @@ async def main(
     skip_system: bool = False,  # Whether to skip system information in the AI's context
     history_lines: int = None,  # Number of history lines. Defaults to tmux scrollback history length
     mode: str = 'default', # Available ShellSage modes: ['default', 'sassy']
-    model: str = None,  # The LLM model that will be invoked on the LLM provider
-    vendor_name: str = None,  # Vendor name for non auto-resolved models (e.g. 'codex', 'fireworks_ai', 'moonshot', 'deepseek', ...)
+    model: str = None,  # The LLM model, optionally vendor-prefixed (e.g. 'codex/gpt-5.5', 'claude_code/claude-sonnet-4-6')
     search: str = None, # Wheather to allow the LLM to search the internet
     base_url: str = None, # If using a custom LLM base url
     api_key: str = None,  # If don't have the default environment variables set 
@@ -343,7 +342,7 @@ async def main(
     opts = get_opts(history_lines=history_lines, model=model, search=search,
                     base_url=base_url, api_key=api_key, code_theme=code_theme,
                     code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd,
-                    vendor_name=vendor_name, log=None, custom_instructions=custom_instructions)
+                    log=None, custom_instructions=custom_instructions)
     if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
@@ -376,7 +375,7 @@ async def main(
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
-            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, vendor_name=opts.vendor_name, custom_instructions=opts.custom_instructions)
+            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, custom_instructions=opts.custom_instructions)
             async for res in get_res(sage, query, opts): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
