@@ -2,13 +2,18 @@
 
 <!-- do not remove -->
 
+## 1.1.1
+
+- Update for new fastcore.script
+
+
 ## 1.1.0
 
 ### New Features
 
-- Replace vendor_name option with vendor-prefixed model names ([#100](https://github.com/AnswerDotAI/shell_sage/pull/100)), thanks to [@ncoop57](https://github.com/ncoop57)
-- Use fastllm StreamAccum for streaming response accumulation ([#96](https://github.com/AnswerDotAI/shell_sage/issues/96))
-- Replace tmux C-l clear-history binding with shell-level ssage_clear script ([#92](https://github.com/AnswerDotAI/shell_sage/issues/92))
+- Replace `vendor_name` option with vendor-prefixed model names ([#100](https://github.com/AnswerDotAI/`shell_sage`/pull/100)), thanks to [@ncoop57](https://github.com/ncoop57)
+- Use fastllm StreamAccum for streaming response accumulation ([#96](https://github.com/AnswerDotAI/`shell_sage`/issues/96))
+- Replace tmux C-l clear-history binding with shell-level `ssage_clear` script ([#92](https://github.com/AnswerDotAI/`shell_sage`/issues/92))
 
 
 ## 1.0.8
