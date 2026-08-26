@@ -2,7 +2,7 @@
 
 <!-- do not remove -->
 
-## 1.1.1
+## 1.1.2
 
 - Update for new fastcore.script
 
