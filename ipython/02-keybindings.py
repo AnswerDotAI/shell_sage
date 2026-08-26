@@ -6,7 +6,7 @@ from prompt_toolkit.enums import DEFAULT_BUFFER
 
 def _ssage(event):
     buf = event.app.current_buffer
-    res = run(["ssage_extract", "--do_print", buf.text or "0"], capture_output=True, text=True)
+    res = run(["ssage_extract", "--do-print", buf.text or "0"], capture_output=True, text=True)
     buf.text = res.stdout.rstrip('\n')
     buf.cursor_position = len(buf.text)
 

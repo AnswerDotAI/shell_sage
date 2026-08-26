@@ -519,7 +519,7 @@ You can also bind a keyboard shortcut in Bash to insert code fences directly int
 
 ``` bash
 ssage-insert() {
-  local r=$(ssage_extract --do_print "${READLINE_LINE:-0}")
+  local r=$(ssage_extract --do-print "${READLINE_LINE:-0}")
   READLINE_LINE="$r" READLINE_POINT=${#r}
 }
 bind -x '"\C-j": ssage-insert'

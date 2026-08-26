@@ -393,10 +393,10 @@ def extract_cf(idx): return re.findall(r'```(\w+)?\n(.*?)\n```', mk_db().logs()[
 def extract(
     idx: int,  # Index of code block to extract
     copy: bool = False,  # Copy to clipboard
-    do_print: bool = False, # Print (useful for readline custom shortcuts)
+    do-print: bool = False, # Print (useful for readline custom shortcuts)
 ):
     "Extracts the idx'th codefence from the last shell sage response and sends it to tmux by default"
     blk = extract_cf(idx)
     if copy: pyperclip.copy(blk)
-    elif do_print: print(blk)
+    elif do-print: print(blk)
     else: subprocess.run(['tmux', 'send-keys', blk])
