@@ -407,7 +407,7 @@ You can also set a prefixed model in your config:
 For another OpenAI-compatible API, provide the API base URL, API key, and model:
 
 ``` bash
-ssage --base_url https://your-api.com/v1 --api_key your_key --model your_model your query
+ssage --base-url https://your-api.com/v1 --api-key your_key --model your_model your query
 ```
 
 For known providers, prefer the matching prefix from the table above so fastllm can use the right API format and environment variable.
@@ -418,10 +418,10 @@ Any configuration option can be temporarily overridden via command line argument
 
 ``` sh
 # Adjust history lines
-ssage --history_lines 100 what commands did I just run?
+ssage --history-lines 100 what commands did I just run?
 
 # Change the display theme
-ssage --code_theme dracula --code_lexer python show me a python example
+ssage --code-theme dracula --code-lexer python show me a python example
 ```
 
 You can find all available code themes and lexers at https://pygments.org/styles/
