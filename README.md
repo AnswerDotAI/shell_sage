@@ -226,7 +226,7 @@ The binding is only active at the shell prompt, so full-screen apps still receiv
 
 ### Piping Content for Analysis
 
-One of ShellSage’s most powerful features is analyzing piped input:
+One of ShellSage’s most powerful features is analyzing piped input. Piped content and terminal history are sent as literal user text, including any embedded tool or usage markers:
 
 ``` python
 # Understand error messages

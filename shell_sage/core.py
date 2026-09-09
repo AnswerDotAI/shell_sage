@@ -26,6 +26,7 @@ from .config import *
 from subprocess import check_output as co, DEVNULL
 from safecmd import bash
 from fastllm.chat import AsyncChat, StreamAccum
+from aidialog.msg_parts import Msg, Text
 
 import rgapi
 import asyncio,os,pyperclip,re,subprocess,sys,builtins
@@ -303,7 +304,7 @@ async def get_res(sage, q, opts, **kwargs):
     _res = ""
     acc = StreamAccum(sage)
     kw = dict(max_steps=10, stream=True, base_url=opts.base_url, api_key=opts.api_key, think=opts.think) | kwargs
-    async for chunk in await sage(q, **kw):
+    async for chunk in await sage(Msg(role='user', content=[Text(q)]), **kw):
         if not acc(chunk): continue
         _res = acc.txt
         yield _res
