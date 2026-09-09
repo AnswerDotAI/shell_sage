@@ -2,6 +2,14 @@
 
 <!-- do not remove -->
 
+## 1.1.3
+
+### Bugs Squashed
+
+- Send queries as explicit user Msg with Text part so piped context is never parsed as assistant tool or usage markers ([#102](https://github.com/AnswerDotAI/shell_sage/issues/102))
+- Update CLI flags for fastcore.script hyphenation ([#101](https://github.com/AnswerDotAI/shell_sage/pull/101)), thanks to [@jph00](https://github.com/jph00)
+
+
 ## 1.1.2
 
 - Update for new fastcore.script
