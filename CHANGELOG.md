@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.1.4
+
+### New Features
+
+- new fd api ([#104](https://github.com/AnswerDotAI/shell_sage/issues/104))
+
+
 ## 1.1.3
 
 ### Bugs Squashed
