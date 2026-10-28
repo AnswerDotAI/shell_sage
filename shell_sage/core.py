@@ -275,7 +275,7 @@ def fd(
     limit:int=200, # Cap on returned paths
 ):
     "Find files recursively by name (gitignore respected)"
-    try: return str(rgapi.fd(root, pattern, max_depth=max_depth)[:limit])
+    try: return str(rgapi.fd(pattern=pattern, root=root, max_depth=max_depth)[:limit])
     except Exception as e: return f'Error: {e}'
 
 # %% ../nbs/00_core.ipynb #122a1bb7
