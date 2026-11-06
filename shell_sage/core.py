@@ -377,14 +377,25 @@ def get_macos_terminal_history(n):
         return None
 
 
+def _get_rex_history(n):
+    if n == 0: return ''
+    cmd = ['rex', 'capture', '-s', os.environ['REX_SESSION'], '-b', os.environ['REX_BLOCK'], '--trim']
+    try:
+        return _tail_lines(co(cmd, text=True, stderr=DEVNULL, timeout=10), n)
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
 def get_terminal_history(n, pid='current'):
     if os.environ.get('TMUX'):
         n = tmux_history_lim() if n is None or n < 0 else n
         return get_hist_tmux(n, pid)
+    n = _DEFAULT_TERMINAL_HISTORY_LINES if n is None or n < 0 else n
+    if os.environ.get('REX_SESSION') and os.environ.get('REX_BLOCK'):
+        return _get_rex_history(n) if pid in ('current', None) else None
     if not _is_current_macos_terminal(pid):
         return None
 
-    n = _DEFAULT_TERMINAL_HISTORY_LINES if n is None or n < 0 else n
     return get_ghostty_history_macos(n) if is_ghostty() else get_macos_terminal_history(n)
 
 # %% ../nbs/00_core.ipynb #0dcbb503
