@@ -21,7 +21,7 @@ _STUB_MODULES = [
     'fastcore', 'fastcore.script', 'fastcore.tools', 'fastcore.utils', 'fastcore.meta',
     'fastlite', 'rich', 'rich.live', 'rich.spinner', 'rich.console', 'rich.markdown',
     'rich.syntax', 'shell_sage.config', 'safecmd', 'pyperclip', 'rgapi', 'fastllm',
-    'fastllm.chat', 'shell_sage.core',
+    'fastllm.chat', 'aidialog', 'aidialog.msg_parts', 'shell_sage.core',
 ]
 
 
@@ -143,6 +143,8 @@ def _install_import_stubs():
         ),
         'fastllm': fastllm,
         'fastllm.chat': fastllm_chat,
+        'aidialog': _module('aidialog'),
+        'aidialog.msg_parts': _module('aidialog.msg_parts', Msg=object, Text=object),
     }
     sys.modules.update(modules)
 
