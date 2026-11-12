@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.1.5
+
+### New Features
+
+- Default to Anthropic Haiku, add `api_name` option for Responses API, expand env vars in config, pass `base_url`/`api_key` via `get_sage` ([#105](https://github.com/AnswerDotAI/`shell_sage`/issues/105))
+
+
 ## 1.1.4
 
 ### New Features
