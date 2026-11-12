@@ -200,6 +200,7 @@ def get_hist_osa(n, pid=''):
 
 # %% ../nbs/00_core.ipynb #5344a2bd
 def get_history(n, pid='current'):
+    if n == 0: return None
     return get_hist_tmux(n, pid) or get_hist_osa(n)
 
 # %% ../nbs/00_core.ipynb #0dcbb503
@@ -233,10 +234,8 @@ def with_permission(action_desc):
             global _res
             with _pause_live():
                 limit = 50
-                details_dict = {
-                    "args": [str(arg)[:limit] + ("..." if len(str(arg)) > limit else "") for arg in args],
-                    "kwargs": {k: str(v)[:limit] + ("..." if len(str(v)) > limit else "") for k, v in kwargs.items()}
-                }
+                details_dict = {'args': [str(arg)[:limit] + ('...' if len(str(arg)) > limit else '') for arg in args],
+                    'kwargs': {k: str(v)[:limit] + ('...' if len(str(v)) > limit else '') for k, v in kwargs.items()}}
                 print(f"About to {action_desc} with the following arguments:", str(details_dict) if args else str(kwargs))
                 if IN_NOTEBOOK or func.__name__ in _always_allow: return func(*args, **kwargs)
                 res = input("Execute this? (y/n/a=always/suggestion): ").lower().strip()
@@ -280,17 +279,17 @@ def fd(
 
 # %% ../nbs/00_core.ipynb #122a1bb7
 tools = [with_permission('ripgrep a search term')(rg),
-         with_permission('List a directory')(ls),
-         with_permission('Find files by name')(fd),
-         with_permission('View a file')(view_file),
-         with_permission('Create a file')(create_file),
-         with_permission('Replace a string with another string')(file_str_replace),
-         with_permission('Insert content into a file')(file_insert_line)]
+    with_permission('List a directory')(ls),
+    with_permission('Find files by name')(fd),
+    with_permission('View a file')(view_file),
+    with_permission('Create a file')(create_file),
+    with_permission('Replace a string with another string')(file_str_replace),
+    with_permission('Insert content into a file')(file_insert_line)]
 
 # %% ../nbs/00_core.ipynb #619df024
 sps = {'default': sp, 'sassy': ssp}
 @delegates(AsyncChat)
-def get_sage(model, mode='default', search=False, use_safecmd=False, custom_instructions=None, **kwargs):
+def get_sage(model=default_cfg['model'], mode='default', search=False, use_safecmd=False, custom_instructions=None, **kwargs):
     t = tools + [bash] if use_safecmd else tools
     if use_safecmd: _always_allow.add('bash')
     sysp = sps[mode]
@@ -299,11 +298,11 @@ def get_sage(model, mode='default', search=False, use_safecmd=False, custom_inst
 
 # %% ../nbs/00_core.ipynb #2788faf4
 @delegates(AsyncChat._call)
-async def get_res(sage, q, opts, **kwargs):
+async def get_res(sage, q, think=None, **kwargs):
     global _res
     _res = ""
     acc = StreamAccum(sage)
-    kw = dict(max_steps=10, stream=True, base_url=opts.base_url, api_key=opts.api_key, think=opts.think) | kwargs
+    kw = dict(max_steps=10, stream=True, think=think) | kwargs
     async for chunk in await sage(Msg(role='user', content=[Text(q)]), **kw):
         if not acc(chunk): continue
         _res = acc.txt
@@ -329,6 +328,7 @@ async def main(
     history_lines: int = None,  # Number of history lines. Defaults to tmux scrollback history length
     mode: str = 'default', # Available ShellSage modes: ['default', 'sassy']
     model: str = None,  # The LLM model, optionally vendor-prefixed (e.g. 'codex/gpt-5.5', 'claude_code/claude-sonnet-4-6')
+    api_name: str = None,  # API format override (e.g. 'openai' for Responses)
     search: str = None, # Wheather to allow the LLM to search the internet
     base_url: str = None, # If using a custom LLM base url
     api_key: str = None,  # If don't have the default environment variables set 
@@ -340,21 +340,19 @@ async def main(
     custom_instructions: str = None,  # Extra instructions appended to the system prompt
 ):
     safecmd = None
-    opts = get_opts(history_lines=history_lines, model=model, search=search,
-                    base_url=base_url, api_key=api_key, code_theme=code_theme,
-                    code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd,
-                    log=None, custom_instructions=custom_instructions)
+    opts = get_opts(history_lines=history_lines, model=model, search=search, api_name=api_name, base_url=base_url, api_key=api_key,
+        code_theme=code_theme, code_lexer=code_lexer, think=think, trust=trust, safecmd=safecmd, log=None,
+        custom_instructions=custom_instructions)
     if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
         with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
             global _live, _md
             _live = live
-            if mode not in ['default', 'sassy']:
-                raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
+            if mode not in ['default', 'sassy']: raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
             
             _md = noop if raw else partial(Markdown, code_theme=opts.code_theme, inline_code_lexer=opts.code_lexer,
-                         inline_code_theme=opts.code_theme)
+                inline_code_theme=opts.code_theme)
             if raw:
                 global print
                 print = builtins.print
@@ -362,8 +360,7 @@ async def main(
             ctxt = '' if skip_system else _sys_info()
 
             # Get tmux history if in a tmux session
-            if opts.history_lines is None or opts.history_lines < 0:
-                opts.history_lines = tmux_history_lim()
+            if opts.history_lines is None or opts.history_lines < 0: opts.history_lines = tmux_history_lim()
             history = get_history(opts.history_lines, pid)
             if history: ctxt += f'<terminal_history>\n{history}\n</terminal_history>'
 
@@ -376,14 +373,15 @@ async def main(
             
             query = f'{ctxt}\n<query>\n{query}\n</query>'
 
-            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, custom_instructions=opts.custom_instructions)
-            async for res in get_res(sage, query, opts): live.update(_md(res), refresh=True)
+            sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, custom_instructions=opts.custom_instructions,
+                api_name=opts.api_name or None, base_url=opts.base_url, api_key=opts.api_key)
+            async for res in get_res(sage, query, think=opts.think): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
         if opts.log:
             db = mk_db()
             db.logs.insert(Log(timestamp=datetime.now().isoformat(), query=query,
-                            response=res, model=opts.model, mode=mode))
+                response=res, model=opts.model, mode=mode))
     except KeyboardInterrupt: print("Interrupted.")
 
 # %% ../nbs/00_core.ipynb #f093b48b

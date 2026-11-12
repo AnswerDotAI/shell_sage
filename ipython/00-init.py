@@ -1,5 +1,5 @@
 from IPython.core.magic import register_line_magic
-import os, shlex, subprocess
+import os
 
 ip = get_ipython()
 ip.run_line_magic('rehashx', '')
@@ -11,8 +11,7 @@ def export(line): ip.run_line_magic('env', line)
 def _builtin_transformer(lines):
     new_lines = []
     for line in lines:
-        if line.strip().startswith('export '):
-            line = line.replace('export ', '%export ', 1)
+        if line.strip().startswith('export '): line = line.replace('export ', '%export ', 1)
         new_lines.append(line)
     return new_lines
 
