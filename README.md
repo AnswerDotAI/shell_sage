@@ -160,7 +160,7 @@ ssage --pid %2 "what can you tell me about this pane?"
 ShellSage can be customized through a configuration file located at `~/.config/shell_sage/shell_sage.conf`:
 
     [DEFAULT]
-    # model = anthropic/claude-sonnet-5-5     # Optional model override
+    # model = anthropic/sonn                # Full model name or fastllm short name (default: anthropic/haik)
     search = ''                             # Web search effort for supported models: l, m, or h
     think = ''                              # Reasoning effort for supported models: l, m, or h
     trust = ''                              # Comma-delimited list of tools to always allow
@@ -176,6 +176,8 @@ ShellSage can be customized through a configuration file located at `~/.config/s
     custom_instructions = ''                # Extra instructions appended to the system prompt
 
 Config values expand `$VAR` and `${VAR}` when read. For example, `api_key = ${MY_API_KEY}` reads the current environment value while keeping the reference in the file.
+
+For `model`, you can use any `fastllm.types` short variable name (such as `haik`, `sonn`, `opus`, `sol`, or `flash`) instead of a full name, bare or with a vendor prefix like `claude_code/opus`.
 
 ### Using Different Model Providers
 
@@ -206,6 +208,23 @@ ssage --model gpt-5 explain kubernetes pods
 ssage --model gemini-2.5-pro what is journald?
 ```
 
+#### Short Model Names
+
+`model` in `shell_sage.conf` and `--model` accept any `fastllm.types` short variable name (including versioned names like `opus48`) in place of a full model name:
+
+``` bash
+ssage --model opus explain systemd timers
+ssage --model sol explain kubernetes pods
+ssage --model flash what is journald?
+```
+
+Short names also work after a vendor prefix:
+
+``` bash
+ssage --model claude_code/opus explain iptables
+ssage --model codex/sol review my shell script
+```
+
 #### Vendor Prefixes
 
 Prefix the model with a vendor when the name does not identify the provider on its own:
@@ -223,7 +242,7 @@ ssage --model claude_code/claude-sonnet-4-6 explain iptables
 
 You can also set a prefixed model in your config:
 
-    model = 'codex/gpt-5.5'
+    model = codex/sol
 
 #### Other Providers
 

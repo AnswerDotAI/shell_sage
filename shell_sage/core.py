@@ -8,7 +8,7 @@ __all__ = ['console', 'print', 'sp', 'ssp', 'default_cfg', 'tools', 'sps', 'log_
            'ls', 'fd', 'get_sage', 'get_res', 'Log', 'mk_db', 'main', 'extract_cf', 'extract']
 
 # %% ../nbs/00_core.ipynb #d7c5634a
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from datetime import datetime
 from fastcore.script import *
 from fastcore.tools import *
@@ -26,6 +26,7 @@ from .config import *
 from subprocess import check_output as co, DEVNULL
 from safecmd import bash
 from fastllm.chat import AsyncChat, StreamAccum
+from fastllm.acomplete import resolve_model
 from aidialog.msg_parts import Msg, Text
 
 import rgapi
@@ -209,6 +210,7 @@ def get_opts(**opts):
     cfg = get_cfg()
     for k, v in opts.items():
         if v is None: opts[k] = cfg.get(k, default_cfg.get(k))
+    if opts.get('model'): opts['model'] = resolve_model(opts['model'])
     return AttrDict(opts)
 
 # %% ../nbs/00_core.ipynb #36a4cb93
@@ -294,7 +296,7 @@ def get_sage(model=default_cfg['model'], mode='default', search=False, use_safec
     if use_safecmd: _always_allow.add('bash')
     sysp = sps[mode]
     if custom_instructions: sysp += f'\n\n<custom_instructions>\n{custom_instructions}\n</custom_instructions>'
-    return AsyncChat(model=model, sp=sysp, tools=t, search=search, **kwargs)
+    return AsyncChat(model=resolve_model(model), sp=sysp, tools=t, search=search, **kwargs)
 
 # %% ../nbs/00_core.ipynb #2788faf4
 @delegates(AsyncChat._call)
@@ -327,7 +329,7 @@ async def main(
     skip_system: bool = False,  # Whether to skip system information in the AI's context
     history_lines: int = None,  # Number of history lines. Defaults to tmux scrollback history length
     mode: str = 'default', # Available ShellSage modes: ['default', 'sassy']
-    model: str = None,  # The LLM model, optionally vendor-prefixed (e.g. 'codex/gpt-5.5', 'claude_code/claude-sonnet-4-6')
+    model: str = None,  # The LLM model or fastllm short name, optionally vendor-prefixed (e.g. 'opus', 'codex/sol', 'claude_code/sonn')
     api_name: str = None,  # API format override (e.g. 'openai' for Responses)
     search: str = None, # Wheather to allow the LLM to search the internet
     base_url: str = None, # If using a custom LLM base url
@@ -346,7 +348,7 @@ async def main(
     if opts.trust: _always_allow.update(t.strip() for t in opts.trust.split(','))
     res=""
     try:
-        with Live(Spinner("dots", text="Connecting..."), auto_refresh=False) as live:
+        with (nullcontext() if raw else Live(Spinner("dots", text="Connecting..."), auto_refresh=False)) as live:
             global _live, _md
             _live = live
             if mode not in ['default', 'sassy']: raise Exception(f"{mode} is not valid. Must be one of the following: ['default', 'sassy']")
@@ -375,7 +377,11 @@ async def main(
 
             sage = get_sage(opts.model, mode, search=opts.search, use_safecmd=opts.safecmd, custom_instructions=opts.custom_instructions,
                 api_name=opts.api_name or None, base_url=opts.base_url, api_key=opts.api_key)
-            async for res in get_res(sage, query, think=opts.think): live.update(_md(res), refresh=True)
+            if raw:
+                async for res in get_res(sage, query, think=opts.think): pass
+                builtins.print(res)
+            else:
+                async for res in get_res(sage, query, think=opts.think): live.update(_md(res), refresh=True)
             
         # Handle logging if the log flag is set
         if opts.log:

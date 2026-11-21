@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from configparser import BasicInterpolation
 from fastcore.all import *
 from fastcore.xdg import *
-from fastllm.types import haik
+from fastllm.acomplete import resolve_model
 from typing import get_type_hints
 
 # %% ../nbs/01_config.ipynb #a3f34f9f
@@ -23,7 +23,7 @@ def _cfg_path(): return xdg_config_home() / _shell_sage_home_dir / _shell_sage_c
 # %% ../nbs/01_config.ipynb #9a8ce1d2
 @dataclass
 class ShellSageConfig:
-    model: str = f'anthropic/{haik}'
+    model: str = 'anthropic/haik'
     search: str = ''
     think: str = ''
     trust: str = ''
@@ -47,6 +47,7 @@ def get_cfg():
     path = _cfg_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     _types = get_type_hints(ShellSageConfig)
+    _types['model'] = resolve_model
     cfg = Config(path.parent, path.name, create=asdict(ShellSageConfig()), types=_types,
         inline_comment_prefixes=('#'), interpolation=EnvInterpolation())
     for k in cfg.d:
