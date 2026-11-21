@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 1.1.6
+
+### New Features
+
+- Support fastllm short model names via `resolve_model` and skip Rich Live output in raw mode ([#106](https://github.com/AnswerDotAI/`shell_sage`/issues/106))
+
+
 ## 1.1.5
 
 ### New Features
