@@ -7,7 +7,7 @@ name = "shell-sage"
 dynamic = ["version"]
 description = "Your favorite AI buddy right in your terminal"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 authors = [{name = "ncoop57", email = "nc@answer.ai"}]
 keywords = ['nbdev', 'jupyter', 'notebook', 'python']
